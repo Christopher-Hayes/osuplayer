@@ -453,6 +453,12 @@ public class Player : IPlayer, IImportNotifications
 
         var findBackgroundTask = fullMapEntry.FindBackground();
 
+        // Capture the previous song and how long it was listened to, before the timer is reset.
+        // These values are used later to decide whether to scrobble the previous song.
+        var previousSong = CurrentSong.Value;
+        var previousSongElapsedMs = _currentSongTimer.ElapsedMilliseconds;
+        var previousSongLengthMs = _audioEngine.ChannelLength.Value * 1000.0;
+
         _currentSongTimer.Stop();
 
         UpdateXpOnApi(fullMapEntry);
@@ -478,7 +484,7 @@ public class Player : IPlayer, IImportNotifications
         CurrentSong.Value = fullMapEntry;
         CurrentIndex = SongSourceProvider.SongSourceList.IndexOf(fullMapEntry);
 
-        await UpdateSongsPlayedOnApi(fullMapEntry, config);
+        await UpdateSongsPlayedOnApi(fullMapEntry, config, previousSong, previousSongElapsedMs, previousSongLengthMs);
 
         return true;
     }
@@ -498,7 +504,7 @@ public class Player : IPlayer, IImportNotifications
         }
     }
 
-    private async Task UpdateSongsPlayedOnApi(IMapEntryBase fullMapEntry, Config config)
+    private async Task UpdateSongsPlayedOnApi(IMapEntryBase fullMapEntry, Config config, IMapEntry? previousSong = null, long previousSongElapsedMs = 0, double previousSongLengthMs = 0)
     {
         //Same as update XP mentioned Above
         try
@@ -516,12 +522,28 @@ public class Player : IPlayer, IImportNotifications
             if (!config.Container.EnableScrobbling)
                 return;
 
-            if (CurrentSong.Value == null
-                || (string.IsNullOrWhiteSpace(CurrentSong.Value.GetTitle())
-                    || string.IsNullOrWhiteSpace(CurrentSong.Value.GetArtist())))
+            if (previousSong == null
+                || string.IsNullOrWhiteSpace(previousSong.GetTitle())
+                || string.IsNullOrWhiteSpace(previousSong.GetArtist()))
                 return;
 
-            await _lastFmApi?.Scrobble(CurrentSong.Value.Title, CurrentSong.Value.Artist)!;
+            // Per the Last.fm scrobbling spec, a track should only be scrobbled when:
+            //   - It has been played for at least 30 seconds, AND
+            //   - Either half the track has been played, or 4 minutes have elapsed
+            //     (whichever comes first).
+            // This prevents rapid song skips from all being scrobbled.
+            const long minScrobbleMs = 30_000;  // 30 seconds
+            const long maxScrobbleMs = 240_000; // 4 minutes
+
+            if (previousSongElapsedMs < minScrobbleMs)
+                return;
+
+            if (previousSongLengthMs > 0
+                && previousSongElapsedMs < previousSongLengthMs / 2
+                && previousSongElapsedMs < maxScrobbleMs)
+                return;
+
+            await _lastFmApi?.Scrobble(previousSong.Title, previousSong.Artist)!;
         }
         catch (Exception e)
         {

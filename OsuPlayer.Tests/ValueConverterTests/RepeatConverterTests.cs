@@ -34,7 +34,7 @@ public class RepeatConverterTests
     }
 
     [TestCase(RepeatMode.NoRepeat)]
-    [TestCase(RepeatMode.Playlist)]
+    [TestCase(RepeatMode.RepeatAll)]
     public void TestCorrectUsage(RepeatMode test)
     {
         var output = _repeatConverter.Convert(test, _expectedOutput, null, CultureInfo.InvariantCulture);
@@ -42,14 +42,14 @@ public class RepeatConverterTests
     }
 
     [TestCase(RepeatMode.NoRepeat, false)]
-    [TestCase(RepeatMode.Playlist, true)]
+    [TestCase(RepeatMode.RepeatAll, false)]
     public void TestCorrectBoolUsage(RepeatMode mode, bool expected)
     {
+        // The converter no longer returns bool; it only maps to MaterialIconKind.
+        // Verify it returns null (not bool) for non-icon target types.
         var type = typeof(bool);
-
         var output = _repeatConverter.Convert(mode, type, null, CultureInfo.InvariantCulture);
-        Assert.That(output, Is.InstanceOf(type));
-        Assert.That(output, Is.EqualTo(expected));
+        Assert.That(output, Is.Null);
     }
 
     [Test]

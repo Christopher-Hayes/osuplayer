@@ -49,6 +49,12 @@
                     <TextBlock Name="ArtistText" Text="{Binding ArtistText}" FontSize="16"
                                Foreground="#FFCCCCCC" TextTrimming="CharacterEllipsis"
                                FontWeight="{DynamicResource SmallerFontWeight}" />
+                    <TextBlock Name="ActivePlaylistLabel"
+                               Text="{Binding ActivePlaylist}"
+                               FontSize="12"
+                               Foreground="#FF88BBFF"
+                               IsVisible="{Binding IsPlayingFromPlaylist}"
+                               TextTrimming="CharacterEllipsis" />
                 </StackPanel>
             </Grid>
 
@@ -106,14 +112,9 @@
             </DockPanel>
 
             <DockPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Button Name="Repeat" Width="38" Height="38" CornerRadius="50" Click="SongControl" Theme="{StaticResource TransparentButton}"
-                        ToolTip.ShowDelay="{Binding IsRepeating, Converter={StaticResource RepeatConverter}}">
-                    <!-- <Button.ContextMenu> -->
-                    <!--     <ContextMenu IsVisible="{Binding IsRepeating, Converter={StaticResource RepeatConverter}}" -->
-                    <!--                  ItemsSource="{Binding Playlists}" PointerReleased="RepeatContextMenu_OnPointerReleased" /> -->
-                    <!-- </Button.ContextMenu> -->
+                <Button Name="Repeat" Width="38" Height="38" CornerRadius="50" Click="SongControl" Theme="{StaticResource TransparentButton}">
                     <ToolTip.Tip>
-                        <TextBlock Text="{Binding ActivePlaylist}" />
+                        <TextBlock Text="{Binding IsRepeating}" />
                     </ToolTip.Tip>
                     <avalonia:MaterialIcon Kind="{Binding IsRepeating, Converter={StaticResource RepeatConverter}}"
                                            Height="19" Width="19" />

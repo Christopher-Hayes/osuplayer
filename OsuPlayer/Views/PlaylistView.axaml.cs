@@ -6,7 +6,6 @@ using Material.Icons.Avalonia;
 using Nein.Base;
 using Nein.Extensions;
 using OsuPlayer.Data.DataModels.Interfaces;
-using OsuPlayer.Data.OsuPlayer.Enums;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.UI_Extensions;
@@ -43,11 +42,9 @@ public partial class PlaylistView : ReactiveControl<PlaylistViewModel>
     {
         if (sender is not Control {DataContext: IMapEntryBase song}) return;
 
-        if (new Config().Container.PlaylistEnableOnPlay)
-        {
-            ViewModel.Player.RepeatMode.Value = RepeatMode.Playlist;
-            ViewModel.Player.SelectedPlaylist.Value = ViewModel.SelectedPlaylist;
-        }
+        // Playing a song from within the playlist view activates that playlist as the playback context
+        ViewModel.Player.SelectedPlaylist.Value = ViewModel.SelectedPlaylist;
+        ViewModel.Player.ActivePlaylistContext.Value = ViewModel.SelectedPlaylist;
 
         await ViewModel.Player.TryPlaySongAsync(song);
     }
@@ -63,9 +60,8 @@ public partial class PlaylistView : ReactiveControl<PlaylistViewModel>
             return;
         }
 
-        ViewModel.Player.RepeatMode.Value = RepeatMode.Playlist;
-        ViewModel.Player.SelectedPlaylist.Value = null;
         ViewModel.Player.SelectedPlaylist.Value = playlist;
+        ViewModel.Player.ActivePlaylistContext.Value = playlist;
     }
 
     private void PlaylistItemLoaded(object? sender, VisualTreeAttachmentEventArgs e)

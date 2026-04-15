@@ -7,7 +7,6 @@ using Material.Icons.Avalonia;
 using Nein.Base;
 using Nein.Extensions;
 using OsuPlayer.Data.DataModels.Interfaces;
-using OsuPlayer.Data.OsuPlayer.Enums;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.Interfaces.Service;
 using OsuPlayer.IO.Storage.Playlists;
@@ -85,9 +84,9 @@ public class PlaylistViewModel : BaseViewModel
 
         Player.SelectedPlaylist.BindValueChanged(_ => RefreshAllIcons(), true);
 
-        Player.RepeatMode.BindValueChanged(d =>
+        Player.ActivePlaylistContext.BindValueChanged(d =>
         {
-            if (d.NewValue != RepeatMode.Playlist)
+            if (d.NewValue == null)
             {
                 Dispatcher.UIThread.Post(() =>
                 {
@@ -146,24 +145,24 @@ public class PlaylistViewModel : BaseViewModel
 
         var indexOf = _materialIcons.IndexOf(icon);
 
-        if (Player.RepeatMode.Value != RepeatMode.Playlist || indexOf >= Playlists?.Count)
+        if (Player.ActivePlaylistContext.Value == null || indexOf >= Playlists?.Count)
         {
             icon.IsVisible = false;
             return;
         }
 
-        icon.IsVisible = Player.SelectedPlaylist.Value?.Id == Playlists?[indexOf].Id;
+        icon.IsVisible = Player.ActivePlaylistContext.Value?.Id == Playlists?[indexOf].Id;
     }
 
     private void RefreshAllIcons()
     {
-        if (_materialIcons.Count != Playlists?.Count || Player.RepeatMode.Value != RepeatMode.Playlist) return;
+        if (_materialIcons.Count != Playlists?.Count || Player.ActivePlaylistContext.Value == null) return;
 
         Dispatcher.UIThread.Post(() =>
         {
             for (var i = 0; i < _materialIcons.Count; i++)
             {
-                _materialIcons[i].IsVisible = Player.SelectedPlaylist.Value?.Id == Playlists?[i].Id;
+                _materialIcons[i].IsVisible = Player.ActivePlaylistContext.Value?.Id == Playlists?[i].Id;
             }
         });
     }

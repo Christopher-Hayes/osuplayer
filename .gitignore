@@ -1,7 +1,17 @@
+
+# Data
+data/
+OsuPlayer.sln.DotSettings.user
+
+# Build
 bin/
 obj/
 /packages/
-riderModule.iml
+
+# Cache
 /_ReSharper.Caches/
-OsuPlayer.sln.DotSettings.user
+
+# Misc
+*.log
+riderModule.iml
 .name

@@ -80,7 +80,7 @@ public partial class Miniplayer : FluentReactiveWindow<MiniplayerViewModel>
     {
         if (ViewModel == default) return;
 
-        ViewModel.Player.SelectedPlaylist.Value = (Playlist) (sender as ContextMenu)?.SelectedItem;
+        // Kept for AXAML compatibility; playlist context is now set via the playlist view.
     }
 
     private void TopBarGrid_PointerPressed(object? sender, PointerPressedEventArgs e)

@@ -164,7 +164,11 @@ public class PlayerControlViewModel : BaseViewModel
 
     public IEnumerable<Playlist>? Playlists => PlaylistManager.GetAllPlaylists()?.Where(x => x.Songs.Count > 0);
 
-    public string ActivePlaylist => $"Active playlist: {Player.SelectedPlaylist.Value?.Name ?? "none"}";
+    public string ActivePlaylist => Player.ActivePlaylistContext.Value != null
+        ? $"▶ Playlist: {Player.ActivePlaylistContext.Value.Name}"
+        : string.Empty;
+
+    public bool IsPlayingFromPlaylist => Player.ActivePlaylistContext.Value != null;
 
     public PlayerControlViewModel(IPlayer player, IAudioEngine bassEngine, FluentAppWindowViewModel mainWindowViewModel)
     {
@@ -232,6 +236,12 @@ public class PlayerControlViewModel : BaseViewModel
         {
             this.RaisePropertyChanged(nameof(IsAPlaylistSelected));
             this.RaisePropertyChanged(nameof(IsCurrentSongInPlaylist));
+        }, true);
+
+        Player.ActivePlaylistContext.BindValueChanged(_ =>
+        {
+            this.RaisePropertyChanged(nameof(ActivePlaylist));
+            this.RaisePropertyChanged(nameof(IsPlayingFromPlaylist));
         }, true);
 
         Activator = new ViewModelActivator();

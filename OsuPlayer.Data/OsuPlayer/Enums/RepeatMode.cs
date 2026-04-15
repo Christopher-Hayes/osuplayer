@@ -3,6 +3,6 @@
 public enum RepeatMode
 {
     NoRepeat,
-    Playlist,
-    SingleSong
+    RepeatAll,
+    RepeatOne
 }

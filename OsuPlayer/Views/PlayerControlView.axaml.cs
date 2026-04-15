@@ -123,18 +123,13 @@ public partial class PlayerControlView : ReactiveControl<PlayerControlViewModel>
         ViewModel!.PlaybackSpeed = 0;
     }
 
-    private void RepeatContextMenu_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
-    {
-        ViewModel.Player.SelectedPlaylist.Value = (Playlist) (sender as ContextMenu)?.SelectedItem;
-    }
-
     private void CurrentSongLabel_OnClick(object? sender, RoutedEventArgs e)
     {
         if (_mainWindow?.ViewModel == default) return;
 
         var player = ViewModel.Player;
 
-        if (player.RepeatMode.Value != RepeatMode.Playlist)
+        if (player.ActivePlaylistContext.Value == null)
         {
             switch (_mainWindow.ViewModel.MainView)
             {
@@ -150,7 +145,7 @@ public partial class PlayerControlView : ReactiveControl<PlayerControlViewModel>
         }
         else
         {
-            _mainWindow.ViewModel.PlaylistView.SelectedPlaylist = player.SelectedPlaylist.Value;
+            _mainWindow.ViewModel.PlaylistView.SelectedPlaylist = player.ActivePlaylistContext.Value;
             _mainWindow.ViewModel.PlaylistView.SelectedSong = player.CurrentSong.Value;
             _mainWindow.ViewModel.MainView = _mainWindow.ViewModel.PlaylistView;
         }

@@ -43,6 +43,9 @@ public partial class HomeView : ReactiveControl<HomeViewModel>
         var list = sender as ListBox;
         var song = list!.SelectedItem as IMapEntryBase;
 
+        // Playing from the library view clears any active playlist context
+        ViewModel.Player.ActivePlaylistContext.Value = null;
+
         await ViewModel.Player.TryPlaySongAsync(song);
     }
 

@@ -19,6 +19,9 @@ public partial class SearchView : ReactiveControl<SearchViewModel>
         var list = sender as ListBox;
         var song = list!.SelectedItem as IMapEntryBase;
 
+        // Playing from search clears any active playlist context
+        ViewModel.Player.ActivePlaylistContext.Value = null;
+
         await ViewModel.Player.TryPlaySongAsync(song);
     }
 

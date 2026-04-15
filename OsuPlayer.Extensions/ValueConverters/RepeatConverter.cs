@@ -15,15 +15,12 @@ public class RepeatConverter : IValueConverter
             return val switch
             {
                 RepeatMode.NoRepeat => MaterialIconKind.RepeatOff,
-                RepeatMode.Playlist => MaterialIconKind.Repeat,
-                RepeatMode.SingleSong => MaterialIconKind.RepeatOnce,
+                RepeatMode.RepeatAll => MaterialIconKind.Repeat,
+                RepeatMode.RepeatOne => MaterialIconKind.RepeatOnce,
                 _ => MaterialIconKind.RepeatOff
             };
 
-        if (targetType == typeof(int))
-            return val == RepeatMode.Playlist ? 400 : int.MaxValue;
-
-        return targetType == typeof(bool) && val == RepeatMode.Playlist;
+        return null;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

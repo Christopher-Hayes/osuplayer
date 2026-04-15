@@ -63,6 +63,7 @@ public class Player : IPlayer, IImportNotifications
     }
 
     public Bindable<Playlist?> SelectedPlaylist { get; } = new();
+    public Bindable<Playlist?> ActivePlaylistContext { get; } = new();
     private List<IMapEntryBase> ActivePlaylistSongs { get; set; } = new();
 
     public Player(IAudioEngine audioEngine, ISongSourceProvider songSourceProvider, IShuffleServiceProvider? shuffleProvider = null,
@@ -121,6 +122,7 @@ public class Player : IPlayer, IImportNotifications
         RepeatMode.BindValueChanged(OnRepeatModeChanged, true);
         IsShuffle.BindValueChanged(_ => _shuffleProvider?.ShuffleImpl?.Init(0));
         SelectedPlaylist.BindValueChanged(OnSelectedPlaylistChanged, true);
+        ActivePlaylistContext.BindValueChanged(OnActivePlaylistContextChanged, true);
     }
 
     private async void OnSelectedPlaylistChanged(ValueChangedEvent<Playlist?> selectedPlaylist)
@@ -130,19 +132,28 @@ public class Player : IPlayer, IImportNotifications
         await using var cfg = new Config();
 
         cfg.Container.SelectedPlaylist = selectedPlaylist.NewValue.Id;
+    }
 
-        ActivePlaylistSongs = SongSourceProvider.GetMapEntriesFromHash(selectedPlaylist.NewValue.Songs, out var invalidHashes);
+    private async void OnActivePlaylistContextChanged(ValueChangedEvent<Playlist?> playlistContext)
+    {
+        if (playlistContext.NewValue == null)
+        {
+            ActivePlaylistSongs = new List<IMapEntryBase>();
+            return;
+        }
+
+        ActivePlaylistSongs = SongSourceProvider.GetMapEntriesFromHash(playlistContext.NewValue.Songs, out var invalidHashes);
 
         if (invalidHashes.Any())
         {
             using var playlists = new PlaylistStorage();
 
-            var playlist = playlists.Container.Playlists?.First(x => x.Id == selectedPlaylist.NewValue.Id);
+            var playlist = playlists.Container.Playlists?.First(x => x.Id == playlistContext.NewValue.Id);
 
             playlist?.Songs.RemoveWhere(song => invalidHashes.Contains(song));
         }
 
-        if (RepeatMode.Value != Data.OsuPlayer.Enums.RepeatMode.Playlist || CurrentSong.Value == null) return;
+        if (CurrentSong.Value == null) return;
 
         if (!ActivePlaylistSongs.Contains(CurrentSong.Value)) await NextSong(PlayDirection.Forward);
     }
@@ -312,13 +323,18 @@ public class Player : IPlayer, IImportNotifications
             return await TryStartSongAsync(CurrentSong.Value ?? SongSourceProvider.SongSourceList[0]);
         }
 
+        // Determine the active song source: playlist context if set, otherwise full library
+        var songSource = ActivePlaylistContext.Value != null && ActivePlaylistSongs.Any()
+            ? ActivePlaylistSongs
+            : (IList<IMapEntryBase>) SongSourceProvider.SongSourceList;
+
         return RepeatMode.Value switch
         {
             Data.OsuPlayer.Enums.RepeatMode.NoRepeat => await TryPlaySongAsync(
-                GetNextSongToPlay(SongSourceProvider.SongSourceList, CurrentIndex, playDirection), playDirection),
-            Data.OsuPlayer.Enums.RepeatMode.Playlist => await TryPlaySongAsync(GetNextSongToPlay(ActivePlaylistSongs, CurrentIndex, playDirection),
-                playDirection),
-            Data.OsuPlayer.Enums.RepeatMode.SingleSong => await TryStartSongAsync(CurrentSong.Value!),
+                GetNextSongToPlay(songSource, CurrentIndex, playDirection), playDirection),
+            Data.OsuPlayer.Enums.RepeatMode.RepeatAll => await TryPlaySongAsync(
+                GetNextSongToPlay(songSource, CurrentIndex, playDirection), playDirection),
+            Data.OsuPlayer.Enums.RepeatMode.RepeatOne => await TryStartSongAsync(CurrentSong.Value!),
             _ => throw new ArgumentOutOfRangeException()
         };
     }

@@ -412,6 +412,31 @@ public class Player : IPlayer, IImportNotifications
 
         if (IsShuffle.Value && _shuffleProvider?.ShuffleImpl != null)
         {
+            // When going backwards in shuffle mode, navigate to the previously played song via
+            // the play history instead of picking a new random song.
+            if (playDirection == PlayDirection.Backwards && _historyProvider != null)
+            {
+                var history = _historyProvider.History;
+                var currentHash = CurrentSong.Value?.Hash;
+                var currentHistoryIndex = -1;
+
+                for (var i = history.Count - 1; i >= 0; i--)
+                {
+                    if (history[i].MapEntry.Hash == currentHash)
+                    {
+                        currentHistoryIndex = i;
+                        break;
+                    }
+                }
+
+                if (currentHistoryIndex > 0)
+                {
+                    var prevSong = songSource.FirstOrDefault(s => s.Hash == history[currentHistoryIndex - 1].MapEntry.Hash);
+                    if (prevSong != null)
+                        return prevSong;
+                }
+            }
+
             _shuffleProvider.ShuffleImpl.Init(songSource.Count);
 
             songToPlay = songSource[_shuffleProvider.ShuffleImpl.DoShuffle(currentIndex, (ShuffleDirection) playDirection)];

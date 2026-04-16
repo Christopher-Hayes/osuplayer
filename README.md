@@ -1,7 +1,3 @@
-<p align="center">
-    <img src="https://github.com/Christopher-Hayes/osuplayer/assets/28785685/6f970ac4-7c22-408e-ab84-023fdbec37d9"/>
-</P>
-
 # Music Player for osu!
 
 [![CodeFactor](https://www.codefactor.io/repository/github/Christopher-Hayes/osuplayer/badge)](https://www.codefactor.io/repository/github/Christopher-Hayes/osuplayer)
@@ -31,12 +27,18 @@ Music Player for osu! is well, a music player for *osu!* for playing your osu! s
 
 ✨ **Added**
 
-- The **song sort** dropdown was added to "Home"
-- Added support for **media keys** on Linux
+- Song lists **show cover images** (optional setting).
+- The **song sort** dropdown from settings was also added to the "Songs" view.
+- Added support for **media keys** on Linux.
+- The song list **highlights** the currently playing song.
+- Song control icon buttons now have **tooltips.**
 
 🏗️ **Changed**
 
 - The **repeat button** was simplified to only focus on whether songs repeat. Previously it would enable/disable playlists, which could be confusing.
+- **Song cover image** now always shows to the left of the song title (regardless of app background).
+- Clicking on the cover image now shows a **full-size song cover image**.
+- **Playback speed** snaps to 0.1x increments and shows the actual playback speed.
 
 🐞 **Fixed**
 

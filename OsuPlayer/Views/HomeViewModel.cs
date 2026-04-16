@@ -8,11 +8,14 @@ using Nein.Base;
 using OsuPlayer.Data.DataModels;
 using OsuPlayer.Data.DataModels.Interfaces;
 using OsuPlayer.Data.OsuPlayer.Classes;
+using OsuPlayer.Data.OsuPlayer.Enums;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.IO.Importer;
 using OsuPlayer.IO.Storage.Playlists;
+using OsuPlayer.Interfaces.Service;
 using OsuPlayer.Modules.Audio.Interfaces;
 using ReactiveUI;
+using Splat;
 
 namespace OsuPlayer.Views;
 
@@ -20,6 +23,8 @@ public class HomeViewModel : BaseViewModel
 {
     private readonly Bindable<bool> _songsLoading = new();
     private readonly ReadOnlyObservableCollection<IMapEntryBase>? _sortedSongEntries;
+    private readonly Bindable<SortingMode> _sortingMode = new();
+    private readonly ISortProvider? _sortProvider;
 
     public readonly IPlayer Player;
 
@@ -28,6 +33,21 @@ public class HomeViewModel : BaseViewModel
     private IMapEntryBase? _selectedSong;
 
     public ReadOnlyObservableCollection<IMapEntryBase>? SortedSongEntries => _sortedSongEntries;
+
+    public IEnumerable<SortingMode> SortingModes => Enum.GetValues<SortingMode>();
+
+    public SortingMode SelectedSortingMode
+    {
+        get => _sortingMode.Value;
+        set
+        {
+            _sortingMode.Value = value;
+            this.RaisePropertyChanged();
+
+            using var config = new Config();
+            config.Container.SortingMode = value;
+        }
+    }
 
     public IMapEntryBase? SelectedSong
     {
@@ -46,6 +66,14 @@ public class HomeViewModel : BaseViewModel
     public HomeViewModel(IPlayer player)
     {
         Player = player;
+
+        _sortProvider = Locator.Current.GetService<ISortProvider>();
+
+        if (_sortProvider != null)
+        {
+            _sortingMode.BindTo(_sortProvider.SortingModeBindable);
+            _sortingMode.BindValueChanged(_ => this.RaisePropertyChanged(nameof(SelectedSortingMode)));
+        }
 
         _songsLoading.BindTo(((IImportNotifications) Player).SongsLoading);
         _songsLoading.BindValueChanged(_ => this.RaisePropertyChanged(nameof(SongsLoading)));

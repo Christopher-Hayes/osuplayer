@@ -27,8 +27,23 @@
                 </Grid>
             </Border>
 
-            <ListBox Grid.Row="1" ItemsSource="{Binding SortedSongEntries}" Background="Transparent"
+            <ListBox Grid.Row="1" x:Name="SongListBox"
+                     ItemsSource="{Binding SortedSongEntries}" Background="Transparent"
                      DoubleTapped="InputElement_OnDoubleTapped" SelectedItem="{Binding SelectedSong}">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem.playing">
+                        <Setter Property="Background" Value="#28FFFFFF" />
+                    </Style>
+                    <Style Selector="ListBoxItem.playing:selected /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="#28FFFFFF" />
+                    </Style>
+                    <Style Selector="ListBoxItem.playing:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="#28FFFFFF" />
+                    </Style>
+                    <Style Selector="ListBoxItem.playing:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="#28FFFFFF" />
+                    </Style>
+                </ListBox.Styles>
                 <ListBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Add to playlist"

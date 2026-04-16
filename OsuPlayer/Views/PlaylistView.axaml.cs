@@ -8,6 +8,8 @@ using Nein.Extensions;
 using OsuPlayer.Data.DataModels.Interfaces;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.IO.Storage.Playlists;
+using OsuPlayer.Modules;
+using OsuPlayer.Modules.Audio.Interfaces;
 using OsuPlayer.UI_Extensions;
 using OsuPlayer.Windows;
 using Splat;
@@ -18,12 +20,16 @@ namespace OsuPlayer.Views;
 public partial class PlaylistView : ReactiveControl<PlaylistViewModel>
 {
     private FluentAppWindow _mainWindow;
+    private NowPlayingHighlighter? _highlighter;
 
     public PlaylistView()
     {
         _mainWindow = Locator.Current.GetRequiredService<FluentAppWindow>();
 
         InitializeComponent();
+
+        var player = Locator.Current.GetRequiredService<IPlayer>();
+        _highlighter = new NowPlayingHighlighter(SongListBox, player);
     }
 
     private void OpenPlaylistEditor_OnClick(object? sender, RoutedEventArgs e)

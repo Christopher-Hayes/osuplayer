@@ -4,6 +4,8 @@ using Nein.Base;
 using Nein.Extensions;
 using OsuPlayer.Data.DataModels.Interfaces;
 using OsuPlayer.IO.Storage.Blacklist;
+using OsuPlayer.Modules;
+using OsuPlayer.Modules.Audio.Interfaces;
 using OsuPlayer.UI_Extensions;
 using OsuPlayer.Windows;
 using Splat;
@@ -14,12 +16,16 @@ namespace OsuPlayer.Views;
 public partial class HomeView : ReactiveControl<HomeViewModel>
 {
     private FluentAppWindow? _mainWindow;
+    private NowPlayingHighlighter? _highlighter;
 
     public HomeView()
     {
         InitializeComponent();
 
         _mainWindow = Locator.Current.GetRequiredService<FluentAppWindow>();
+
+        var player = Locator.Current.GetRequiredService<IPlayer>();
+        _highlighter = new NowPlayingHighlighter(SongListBox, player);
 
         HomeViewInitialized();
     }

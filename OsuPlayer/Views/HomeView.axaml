@@ -12,14 +12,9 @@
         <views:HomeViewModel />
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto, 50*" ColumnDefinitions="50*, 50*" Background="Transparent">
-        <!--User Grid-->
-        <Grid Row="0" Column="0" ColumnSpan="2" IsVisible="{Binding DisplayUserStats}">
-            <ContentControl Grid.Row="0" Grid.Column="0" Content="{Binding HomeUserPanelView}" />
-        </Grid>
-
+    <Grid RowDefinitions="*" ColumnDefinitions="50*, 50*" Background="Transparent">
         <!--Songs Grid-->
-        <Grid Row="1" Column="0" ColumnSpan="2" RowDefinitions="50, *" Margin="0 1">
+        <Grid Row="0" Column="0" ColumnSpan="2" RowDefinitions="50, *" Margin="0 1">
             <Border Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{DynamicResource BaseBrighterDarkTransparentColor}">
                 <TextBlock Text="Your songs" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Left" Margin=" 10 0 0 0" />
             </Border>

@@ -78,7 +78,6 @@ internal static class Program
             audioEngine: resolver.GetRequiredService<IAudioEngine>(),
             songSourceProvider: resolver.GetRequiredService<ISongSourceProvider>(),
             shuffleProvider: resolver.GetService<IShuffleServiceProvider>(),
-            statisticsProvider: resolver.GetService<IStatisticsProvider>(),
             sortProvider: resolver.GetService<ISortProvider>(),
             historyProvider: resolver.GetService<IHistoryProvider>(),
             discordService: resolver.GetService<IDiscordService>(),
@@ -90,7 +89,6 @@ internal static class Program
             resolver.GetRequiredService<IPlayer>(),
             resolver.GetRequiredService<IProfileManagerService>(),
             resolver.GetService<IShuffleServiceProvider>(),
-            resolver.GetService<IStatisticsProvider>(),
             resolver.GetService<ISortProvider>(),
             resolver.GetService<IHistoryProvider>()));
 
@@ -108,7 +106,6 @@ internal static class Program
         services.RegisterLazySingleton<IDiscordService>(() => new DiscordService());
         services.RegisterLazySingleton<IProfileManagerService>(() => new ProfileManagerService());
         services.RegisterLazySingleton<IShuffleServiceProvider>(() => new ShuffleService());
-        services.RegisterLazySingleton<IStatisticsProvider>(() => new ApiStatisticsService(resolver.GetService<IProfileManagerService>()));
         services.RegisterLazySingleton<ISortProvider>(() => new SortService());
         services.RegisterLazySingleton<ISongSourceProvider>(() => new OsuSongSourceService(resolver.GetService<ISortProvider>()));
         services.RegisterLazySingleton<IHistoryProvider>(() => new HistoryService());

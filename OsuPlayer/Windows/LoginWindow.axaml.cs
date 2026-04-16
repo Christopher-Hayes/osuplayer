@@ -88,11 +88,6 @@ public partial class LoginWindow : FluentReactiveWindow<LoginWindowViewModel>
 
         _profileManager.User = user.ConvertObjectToJson<User>();
 
-        var mainWindow = Locator.Current.GetRequiredService<FluentAppWindow>();
-
-        mainWindow.LoginNavItem.IsVisible = mainWindow.ViewModel!.HomeView.IsUserNotLoggedIn;
-        mainWindow.EditUserNavItem.IsVisible = mainWindow.ViewModel!.HomeView.IsUserLoggedIn;
-
         Close();
     }
 

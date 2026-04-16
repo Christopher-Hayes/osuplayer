@@ -164,16 +164,13 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
 
             ViewModel.MainView = ViewModel.HomeView;
 
-            LoginNavItem.IsVisible = ViewModel!.HomeView.IsUserNotLoggedIn;
-            EditUserNavItem.IsVisible = ViewModel!.HomeView.IsUserLoggedIn;
-
             using var config = new Config();
 
             SetAudioVisualization(config.Container.DisplayAudioVisualizer);
         });
     }
 
-    private async void AppNavigationView_OnItemInvoked(object? sender, NavigationViewItemInvokedEventArgs e)
+    private void AppNavigationView_OnItemInvoked(object? sender, NavigationViewItemInvokedEventArgs e)
     {
         if (e.IsSettingsInvoked)
         {
@@ -184,11 +181,6 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
 
         switch (e.InvokedItemContainer.Tag)
         {
-            case "BeatmapsNavigation":
-            {
-                ViewModel!.MainView = ViewModel.BeatmapView;
-                break;
-            }
             case "SearchNavigation":
             {
                 ViewModel!.MainView = ViewModel.SearchView;
@@ -204,36 +196,13 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
                 ViewModel!.MainView = ViewModel.HomeView;
                 break;
             }
-            case "UserNavigation":
-            {
-                ViewModel!.MainView = ViewModel.UserView;
-                break;
-            }
-            case "PartyNavigation":
-            {
-                ViewModel!.MainView = ViewModel.PartyView;
-                break;
-            }
-            case "StatisticsNavigation":
-            {
-                ViewModel!.MainView = ViewModel.StatisticsView;
-                break;
-            }
             case "MiniplayerNavigation":
             {
                 OpenMiniplayer();
                 break;
             }
-            case "LoginNavigation":
-                await OpenLoginWindow();
-                break;
-            case "EditUserNavigation":
-                OpenEditUserView();
-                break;
             case "SettingsNavigation":
                 ViewModel!.MainView = ViewModel.SettingsView;
-                break;
-            case "SocialNavigation":
                 break;
             default:
             {
@@ -348,28 +317,6 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
         Miniplayer.Show();
 
         WindowState = WindowState.Minimized;
-    }
-
-    private async Task OpenLoginWindow()
-    {
-        if (ViewModel == default) return;
-
-        var loginWindow = new LoginWindow();
-
-        await loginWindow.ShowDialog(this);
-
-        ViewModel.RaisePropertyChanged(nameof(ViewModel.HomeView.CurrentUser));
-        ViewModel.RaisePropertyChanged(nameof(ViewModel.HomeView.IsUserLoggedIn));
-        ViewModel.RaisePropertyChanged(nameof(ViewModel.HomeView.IsUserNotLoggedIn));
-
-        await ViewModel.HomeView.HomeUserPanelView.LoadUserProfileAsync();
-    }
-
-    private void OpenEditUserView()
-    {
-        if (ViewModel == default) return;
-
-        ViewModel.MainView = ViewModel.EditUserView;
     }
 
     public void SetRenderMode(BitmapInterpolationMode renderMode)

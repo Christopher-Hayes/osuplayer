@@ -12,11 +12,6 @@
         <Border Background="Transparent" PointerPressed="TopBarGrid_PointerPressed" />
 
         <DockPanel HorizontalAlignment="Center">
-            <!-- Beatmaps view -->
-            <Button Name="BeatmapsNavigation" Width="32" Height="32" CornerRadius="50" Click="Navigation_Clicked"
-                    Background="Transparent">
-                <avalonia:MaterialIcon Kind="FormatListBulleted" Height="24" Width="24" />
-            </Button>
             <!--Search Button-->
             <Button Name="SearchNavigation" Width="32" Height="32" CornerRadius="50" Click="Navigation_Clicked"
                     Background="Transparent">
@@ -31,21 +26,6 @@
             <Button Name="HomeNavigation" Width="42" Height="42" CornerRadius="50" Click="Navigation_Clicked"
                     Background="Transparent">
                 <avalonia:MaterialIcon Kind="Home" Height="32" Width="32" />
-            </Button>
-            <!--User Button-->
-            <Button Name="UserNavigation" Width="32" Height="32" CornerRadius="50" Click="Navigation_Clicked"
-                    Background="Transparent">
-                <avalonia:MaterialIcon Kind="Users" Height="24" Width="24" />
-            </Button>
-            <!--Party Button-->
-            <Button Name="PartyNavigation" Width="32" Height="32" CornerRadius="50" Click="Navigation_Clicked"
-                    Background="Transparent">
-                <avalonia:MaterialIcon Kind="PartyPopper" Height="24" Width="24" />
-            </Button>
-            <!--Statistics Button-->
-            <Button Name="StatisticsNavigation" Width="32" Height="32" CornerRadius="50" Click="Navigation_Clicked"
-                    Background="Transparent">
-                <avalonia:MaterialIcon Kind="ChartBar" Height="24" Width="24" />
             </Button>
         </DockPanel>
 

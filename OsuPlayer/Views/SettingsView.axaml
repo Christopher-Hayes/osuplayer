@@ -219,12 +219,6 @@
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
 
-                    <ui:SettingsExpanderItem Content="Display User Statistics on Home View"
-                                             Description="Toggle if you want to display your user stats and session graph on the home view">
-                        <ui:SettingsExpanderItem.Footer>
-                            <ToggleSwitch IsChecked="{Binding DisplayUserStats}" />
-                        </ui:SettingsExpanderItem.Footer>
-                    </ui:SettingsExpanderItem>
                 </ui:SettingsExpander>
 
                 <!-- —————————————— -->
@@ -271,12 +265,6 @@
                                      IconSource="Wifi4"
                                      Description="Settings regarding anything that goes beyond the application itself"
                                      Name="NetworkSettingsExpander">
-
-                    <ui:SettingsExpanderItem Content="Log into osu!player"
-                                             Description="Log into your osu!player profile"
-                                             IsClickEnabled="True"
-                                             ActionIconSource="ChevronRight"
-                                             Click="LoginClick" />
 
                     <ui:SettingsExpanderItem Content="Last.FM Scrobbler"
                                              Description="Log into your Last.FM account with your API-Key and API-Secret to scrobble your play activity">

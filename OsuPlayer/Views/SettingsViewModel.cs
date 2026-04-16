@@ -51,7 +51,6 @@ public class SettingsViewModel : BaseViewModel
 
     private bool _displayAudioVisualizer;
     private bool _displayBackgroundImage;
-    private bool _displayUserStats;
     private bool _enableScrobbling;
 
     private bool _isLastFmAuthorized;
@@ -156,25 +155,6 @@ public class SettingsViewModel : BaseViewModel
             config.Container.UseLeftNavigationPosition = value;
 
             MainWindow.AppNavigationView.PaneDisplayMode = value ? NavigationViewPaneDisplayMode.Left : NavigationViewPaneDisplayMode.Top;
-        }
-    }
-
-    public bool DisplayUserStats
-    {
-        get => _displayUserStats;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _displayUserStats, value);
-
-            using var config = new Config();
-
-            config.Container.DisplayerUserStats = value;
-
-            var mainWindowViewModel = Locator.Current.GetService<FluentAppWindowViewModel>();
-
-            mainWindowViewModel.HomeView.DisplayUserStats = value;
-
-            mainWindowViewModel.HomeView.RaisePropertyChanged();
         }
     }
 
@@ -635,7 +615,6 @@ public class SettingsViewModel : BaseViewModel
         _displayBackgroundImage = config.Container.DisplayBackgroundImage;
         _backgroundBlurRadius = config.Container.BackgroundBlurRadius;
         _enableScrobbling = config.Container.EnableScrobbling;
-        _displayUserStats = config.Container.DisplayerUserStats;
         _useLeftNavigationPosition = config.Container.UseLeftNavigationPosition;
         _renderingMode = GetRenderingModeString(config.Container.RenderingMode);
         _displayAudioVisualizer = config.Container.DisplayAudioVisualizer;

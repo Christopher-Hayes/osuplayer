@@ -24,9 +24,6 @@ internal partial class TopBarView : ReactiveControl<TopBarViewModel>
 
         switch ((sender as Control)?.Name)
         {
-            case "BeatmapsNavigation":
-                _mainWindow.ViewModel!.MainView = _mainWindow.ViewModel.BeatmapView;
-                break;
             case "SearchNavigation":
                 _mainWindow.ViewModel!.MainView = _mainWindow.ViewModel.SearchView;
                 break;
@@ -35,15 +32,6 @@ internal partial class TopBarView : ReactiveControl<TopBarViewModel>
                 break;
             case "HomeNavigation":
                 _mainWindow.ViewModel!.MainView = _mainWindow.ViewModel.HomeView;
-                break;
-            case "UserNavigation":
-                _mainWindow.ViewModel!.MainView = _mainWindow.ViewModel.UserView;
-                break;
-            case "PartyNavigation":
-                _mainWindow.ViewModel!.MainView = _mainWindow.ViewModel.PartyView;
-                break;
-            case "StatisticsNavigation":
-                _mainWindow.ViewModel!.MainView = _mainWindow.ViewModel.StatisticsView;
                 break;
         }
     }

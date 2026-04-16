@@ -100,16 +100,6 @@ public partial class SettingsView : ReactiveControl<SettingsViewModel>
         MessageBox.Show(_mainWindow, success ? "Import successful. Have fun!" : "There are no collections in osu!", "Import complete!");
     }
 
-    public async void LoginClick(object? sender, RoutedEventArgs routedEventArgs)
-    {
-        var loginWindow = new LoginWindow
-        {
-            ViewModel = new LoginWindowViewModel()
-        };
-
-        await loginWindow.ShowDialog(_mainWindow);
-    }
-
     private void OpenEqClick(object? sender, RoutedEventArgs e)
     {
         if (_mainWindow?.ViewModel == default) return;

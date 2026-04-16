@@ -28,19 +28,14 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
 
     public PlayerControlViewModel PlayerControl { get; }
 
-    public EditUserViewModel EditUserView { get; }
     public HomeViewModel HomeView { get; }
-    public PartyViewModel PartyView { get; }
     public BlacklistEditorViewModel BlacklistEditorView { get; }
     public PlaylistEditorViewModel PlaylistEditorView { get; }
     public PlaylistViewModel PlaylistView { get; }
     public SearchViewModel SearchView { get; }
     public SettingsViewModel SettingsView { get; }
-    public UserViewModel UserView { get; }
     public UpdateViewModel UpdateView { get; }
     public EqualizerViewModel EqualizerView { get; }
-    public StatisticsViewModel StatisticsView { get; }
-    public BeatmapsViewModel BeatmapView { get; }
     public ExportSongsViewModel ExportSongsView { get; }
     public PlayHistoryViewModel PlayHistoryView { get; }
 
@@ -50,9 +45,6 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
 
     public bool IsNonLinuxOs { get; }
     public bool IsLinuxOs { get; }
-
-    public bool IsUserLoggedIn => ProfileManager.User != null && ProfileManager.User?.UniqueId != Guid.Empty;
-    public bool IsUserNotLoggedIn => ProfileManager.User == null || ProfileManager.User?.UniqueId == Guid.Empty;
 
     private ReadOnlyObservableCollection<IMapEntryBase>? _songList;
 
@@ -87,7 +79,7 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
     }
 
     public FluentAppWindowViewModel(IAudioEngine engine, IPlayer player, IProfileManagerService profileManager, IShuffleServiceProvider? shuffleServiceProvider = null,
-        IStatisticsProvider? statisticsProvider = null, ISortProvider? sortProvider = null, IHistoryProvider? historyProvider = null)
+        ISortProvider? sortProvider = null, IHistoryProvider? historyProvider = null)
     {
         Player = player;
         ProfileManager = profileManager;
@@ -100,15 +92,10 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
         PlaylistView = new PlaylistViewModel(Player);
         PlaylistEditorView = new PlaylistEditorViewModel(Player);
         BlacklistEditorView = new BlacklistEditorViewModel(Player);
-        HomeView = new HomeViewModel(Player, statisticsProvider, profileManager);
-        UserView = new UserViewModel(Player, profileManager);
-        EditUserView = new EditUserViewModel(profileManager);
-        PartyView = new PartyViewModel();
+        HomeView = new HomeViewModel(Player);
         SettingsView = new SettingsViewModel(Player, sortProvider, shuffleServiceProvider, profileManager);
         EqualizerView = new EqualizerViewModel(Player);
         UpdateView = new UpdateViewModel();
-        StatisticsView = new StatisticsViewModel();
-        BeatmapView = new BeatmapsViewModel(Player);
         ExportSongsView = new ExportSongsViewModel(Player.SongSourceProvider);
         PlayHistoryView = new PlayHistoryViewModel(Player, historyProvider, Player.SongSourceProvider);
 
@@ -148,15 +135,5 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
                 BackgroundImage = null;
             });
         }, true, true);
-
-        if (!File.Exists("data/session.op"))
-            return;
-
-        var sessionToken = File.ReadAllText("data/session.op");
-
-        profileManager.Login(sessionToken);
-
-        this.RaisePropertyChanged(nameof(IsUserLoggedIn));
-        this.RaisePropertyChanged(nameof(IsUserNotLoggedIn));
     }
 }

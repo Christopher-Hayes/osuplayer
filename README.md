@@ -1,21 +1,51 @@
 <p align="center">
-    <img src="https://github.com/Founntain/osuplayer/assets/28785685/6f970ac4-7c22-408e-ab84-023fdbec37d9"/>
+    <img src="https://github.com/Christopher-Hayes/osuplayer/assets/28785685/6f970ac4-7c22-408e-ab84-023fdbec37d9"/>
 </P>
 
-# osu!player
-[![CodeFactor](https://www.codefactor.io/repository/github/Founntain/osuplayer/badge)](https://www.codefactor.io/repository/github/Founntain/osuplayer)
-[![GitHub release](https://img.shields.io/github/release-pre/Founntain/osuplayer.svg)](https://github.com/founntain/osuplayer/releases/latest)
-![](https://img.shields.io/github/languages/code-size/Founntain/osuplayer)
-![](https://img.shields.io/github/repo-size/Founntain/osuplayer)
-![](https://img.shields.io/github/issues/Founntain/osuplayer?color=red)
-![](https://img.shields.io/github/contributors/Founntain/osuplayer?color=blueviolet)  
-[![CI](https://github.com/Founntain/osuplayer/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/Founntain/osuplayer/actions/workflows/dotnet.yml)
-[![.NET Publish](https://github.com/Founntain/osuplayer/actions/workflows/dotnet-publish.yml/badge.svg)](https://github.com/Founntain/osuplayer/actions/workflows/dotnet-publish.yml)
- 
-osu!player is a music player for *osu!* with the focus of playing your osu! songs **without having to start osu!**.
-This is the *official* **osu!player** repository and is mainly developed by [@Founntain](https://github.com/Founntain), with the help of [@Cesan](https://github.com/Cesan).  
+# Music Player for osu!
 
-If you want to contribute, feel free to fork this repository, read the [contributing information](https://github.com/osu-player/osuplayer#-contributing-to-the-project) and head to the [official osu!player discord](https://discord.gg/RJQSc5B) (not mandatory, but helpful). There you can add all valuable ideas and discuss other stuff regarding development.
+[![CodeFactor](https://www.codefactor.io/repository/github/Christopher-Hayes/osuplayer/badge)](https://www.codefactor.io/repository/github/Christopher-Hayes/osuplayer)
+[![GitHub release](https://img.shields.io/github/release-pre/Christopher-Hayes/osuplayer.svg)](https://github.com/Christopher-Hayes/osuplayer/releases/latest)
+![](https://img.shields.io/github/languages/code-size/Christopher-Hayes/osuplayer)
+![](https://img.shields.io/github/repo-size/Christopher-Hayes/osuplayer)
+![](https://img.shields.io/github/issues/Christopher-Hayes/osuplayer?color=red)
+![](https://img.shields.io/github/contributors/Christopher-Hayes/osuplayer?color=blueviolet)  
+[![CI](https://github.com/Christopher-Hayes/osuplayer/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/Christopher-Hayes/osuplayer/actions/workflows/dotnet.yml)
+[![.NET Publish](https://github.com/Christopher-Hayes/osuplayer/actions/workflows/dotnet-publish.yml/badge.svg)](https://github.com/Christopher-Hayes/osuplayer/actions/workflows/dotnet-publish.yml)
+
+An [osu!player](https://github.com/Founntain/osuplayer) fork.
+
+This fork is solely focused on core music player features. Accounts / online features are absent.
+
+Music Player for osu! is well, a music player for *osu!* for playing your osu! songs **without having to start osu!**.
+
+### Differences from osu!player
+
+🔥 **Removed**
+
+- **Online accounts** / profiles:
+  - Users page
+  - Party page
+  - Stats page
+  - Beatmaps page
+
+✨ **Added**
+
+- The **song sort** dropdown was added to "Home"
+- Added support for **media keys** on Linux
+
+🏗️ **Changed**
+
+- The **repeat button** was simplified to only focus on whether songs repeat. Previously it would enable/disable playlists, which could be confusing.
+
+🐞 **Fixed**
+
+- **Last.FM Scrobble:** instead of scrobbling instantly, it waits until you've listen to at least 50% of the song.
+- **Previous song** button when shuffling would go to a random song rather than the last played song.
+
+```bash
+---- The original README continues below ----
+```
 
 ## ☝️ Requirements
 
@@ -26,7 +56,7 @@ If you want to contribute, feel free to fork this repository, read the [contribu
 ✔️ An internet connection if you want to use your osu!player plus profile
 
 #### Download osu!player
-To download the osu!player head to our [release](https://github.com/Founntain/osuplayer/releases) section to download the latest release.  
+To download the osu!player head to our [release](https://github.com/Christopher-Hayes/osuplayer/releases) section to download the latest release.  
 You can also build the project for yourself; see the section below!
 
 ## ⚒️Building the project

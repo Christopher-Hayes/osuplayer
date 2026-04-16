@@ -98,14 +98,22 @@
         </Grid>
 
         <DockPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
-          <TextBlock Name="ActivePlaylistLabel"
-                     Text="{Binding ActivePlaylist}"
-                     FontSize="12"
-                     Margin="4 0 4 0"
-                     Foreground="#FF88BBFF"
-                     IsVisible="{Binding IsPlayingFromPlaylist}"
-                     VerticalAlignment="Center"
-                     TextTrimming="CharacterEllipsis" />
+          <Button Name="ActivePlaylistLabel"
+                  Theme="{StaticResource TransparentButton}"
+                  Cursor="Hand"
+                  IsVisible="{Binding IsPlayingFromPlaylist}"
+                  VerticalAlignment="Center"
+                  Click="ActivePlaylistLabel_OnClick"
+                  Padding="6 2"
+                  Margin="0 0 2 0">
+            <ToolTip.Tip>
+              <TextBlock Text="{Binding ActivePlaylist}" />
+            </ToolTip.Tip>
+            <TextBlock Text="{Binding ActivePlaylist}"
+                       FontSize="12"
+                       Foreground="#FF88BBFF"
+                       TextTrimming="CharacterEllipsis" />
+          </Button>
           <Panel>
             <Button Name="Volume" Width="38" Height="38" CornerRadius="50"
                     Theme="{StaticResource TransparentButton}" PointerWheelChanged="Volume_OnPointerWheelChanged">

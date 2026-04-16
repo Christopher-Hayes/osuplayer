@@ -154,7 +154,9 @@
               Grid.Column="1"
               Text="{Binding TitleString}"
               FontSize="28"
-              FontWeight="SemiBold" />
+              FontWeight="SemiBold"
+              VerticalAlignment="Center"
+              />
               <!-- <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ArtistString}"
               FontSize="14"
               Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"

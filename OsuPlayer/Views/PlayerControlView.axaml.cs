@@ -128,6 +128,25 @@ public partial class PlayerControlView : ReactiveControl<PlayerControlViewModel>
         ViewModel.IsArtworkOverlayVisible = true;
     }
 
+    private void ActivePlaylistLabel_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_mainWindow?.ViewModel == default) return;
+
+        var player = ViewModel.Player;
+
+        if (player.ActiveArtistContext.Value != null)
+        {
+            var artistView = _mainWindow.ViewModel.ArtistView;
+            _ = artistView.LoadArtistAsync(player.ActiveArtistContext.Value);
+            _mainWindow.ViewModel.MainView = artistView;
+        }
+        else if (player.ActivePlaylistContext.Value != null)
+        {
+            _mainWindow.ViewModel.PlaylistView.SelectedPlaylist = player.ActivePlaylistContext.Value;
+            _mainWindow.ViewModel.MainView = _mainWindow.ViewModel.PlaylistView;
+        }
+    }
+
     private void ArtistText_OnClick(object? sender, RoutedEventArgs e)
     {
         if (_mainWindow?.ViewModel == default) return;

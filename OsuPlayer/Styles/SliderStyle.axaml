@@ -97,7 +97,7 @@
                                         </Track.DecreaseButton>
                                         <Track.IncreaseButton>
                                             <RepeatButton Name="PART_IncreaseButton"
-                                                          Background="{TemplateBinding Background}"
+                                                          Background="#1EA4A4A4"
                                                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                                 <RepeatButton.Template>
                                                     <ControlTemplate>
@@ -187,7 +187,7 @@
                                         </Track.DecreaseButton>
                                         <Track.IncreaseButton>
                                             <RepeatButton Name="PART_IncreaseButton"
-                                                          Background="{TemplateBinding Background}"
+                                                          Background="#1EA4A4A4"
                                                           VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                                                 <RepeatButton.Template>
                                                     <ControlTemplate>
@@ -231,6 +231,10 @@
     </Style>
 
     <!-- Normal State -->
+
+    <Style Selector="Slider /template/ RepeatButton#PART_IncreaseButton">
+        <Setter Property="Background" Value="#1EA4A4A4" />
+    </Style>
 
     <Style Selector="Slider /template/ Thumb.SliderThumbStyle">
         <Setter Property="Background" Value="{DynamicResource SliderThumbBackground}" />
@@ -295,7 +299,7 @@
 
     <!-- PointerOver State -->
     <Style Selector="Slider:pointerover /template/ RepeatButton#PART_IncreaseButton">
-        <Setter Property="Background" Value="{DynamicResource SliderTrackFillPointerOver}" />
+        <Setter Property="Background" Value="#3CA4A4A4" />
     </Style>
 
     <Style Selector="Slider:pointerover /template/ Thumb.SliderThumbStyle">
@@ -312,7 +316,7 @@
 
     <!-- Pressed State -->
     <Style Selector="Slider:pressed /template/ RepeatButton#PART_IncreaseButton">
-        <Setter Property="Background" Value="{DynamicResource SliderTrackFillPressed}" />
+        <Setter Property="Background" Value="#50A4A4A4" />
     </Style>
 
     <Style Selector="Slider:pressed /template/ Thumb.SliderThumbStyle">

@@ -88,6 +88,9 @@ public class DiscordService : OsuPlayerService, IDiscordService
     /// <param name="durationLeft">Optional duration left that is displayed in the RPC</param>
     public async Task UpdatePresence(string details, string state, int beatmapSetId = 0, Assets? assets = null, TimeSpan? durationLeft = null)
     {
+        if (!_client.IsInitialized)
+            return;
+
         if (assets == null && beatmapSetId != 0)
         {
             assets = await TryToGetThumbnail(beatmapSetId);

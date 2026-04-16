@@ -1,12 +1,9 @@
 # Music Player for osu!
 
-[![CodeFactor](https://www.codefactor.io/repository/github/Christopher-Hayes/osuplayer/badge)](https://www.codefactor.io/repository/github/Christopher-Hayes/osuplayer)
 [![GitHub release](https://img.shields.io/github/release-pre/Christopher-Hayes/osuplayer.svg)](https://github.com/Christopher-Hayes/osuplayer/releases/latest)
-![](https://img.shields.io/github/languages/code-size/Christopher-Hayes/osuplayer)
 ![](https://img.shields.io/github/repo-size/Christopher-Hayes/osuplayer)
 ![](https://img.shields.io/github/issues/Christopher-Hayes/osuplayer?color=red)
 ![](https://img.shields.io/github/contributors/Christopher-Hayes/osuplayer?color=blueviolet)  
-[![CI](https://github.com/Christopher-Hayes/osuplayer/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/Christopher-Hayes/osuplayer/actions/workflows/dotnet.yml)
 [![.NET Publish](https://github.com/Christopher-Hayes/osuplayer/actions/workflows/dotnet-publish.yml/badge.svg)](https://github.com/Christopher-Hayes/osuplayer/actions/workflows/dotnet-publish.yml)
 
 An [osu!player](https://github.com/Founntain/osuplayer) fork.

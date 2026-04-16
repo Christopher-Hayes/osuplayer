@@ -76,7 +76,7 @@
                     <ui:SettingsExpanderItem Content="Update Channel"
                                              Description="Which update channel to use. This settings requires a restart">
                         <ui:SettingsExpanderItem.Footer>
-                            <ui:FAComboBox ItemsSource="{Binding ReleaseChannels}"
+                            <ComboBox ItemsSource="{Binding ReleaseChannels}"
                                            SelectedItem="{Binding SelectedReleaseChannel}" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
@@ -84,7 +84,7 @@
                     <ui:SettingsExpanderItem Content="Startup song"
                                              Description="Select what song should be playing when the application started">
                         <ui:SettingsExpanderItem.Footer>
-                            <ui:FAComboBox ItemsSource="{Binding StartupSongs}"
+                            <ComboBox ItemsSource="{Binding StartupSongs}"
                                            SelectedItem="{Binding SelectedStartupSong}" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
@@ -92,7 +92,7 @@
                     <ui:SettingsExpanderItem Content="Song Sorting Mode"
                                              Description="Select in which order songs should be sorted in your song list">
                         <ui:SettingsExpanderItem.Footer>
-                            <ui:FAComboBox ItemsSource="{Binding SortingModes}"
+                            <ComboBox ItemsSource="{Binding SortingModes}"
                                            SelectedItem="{Binding SelectedSortingMode}" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
@@ -100,7 +100,7 @@
                     <ui:SettingsExpanderItem Content="Shuffle Algorithm"
                                              Description="{Binding SelectedShuffleAlgorithmInfoText}">
                         <ui:SettingsExpanderItem.Footer>
-                            <ui:FAComboBox ItemsSource="{Binding ShuffleAlgorithms}"
+                            <ComboBox ItemsSource="{Binding ShuffleAlgorithms}"
                                            SelectedItem="{Binding SelectedShuffleAlgorithm}" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
@@ -137,7 +137,7 @@
 
                     <ui:SettingsExpanderItem Content="App Theme" Description="Do you prefer the dark or light side? Or let your system decide">
                         <ui:SettingsExpanderItem.Footer>
-                            <ui:FAComboBox ItemsSource="{Binding AppThemes}" SelectedItem="{Binding CurrentAppTheme}" />
+                            <ComboBox ItemsSource="{Binding AppThemes}" SelectedItem="{Binding CurrentAppTheme}" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
 
@@ -156,7 +156,7 @@
 
                     <ui:SettingsExpanderItem Content="Image Rendering Mode" Description="Tell the application at which quality you want to render images e.g. profile pictures, banners etc. Requires restart to work">
                         <ui:SettingsExpanderItem.Footer>
-                            <ui:FAComboBox ItemsSource="{Binding RenderingModes}"
+                            <ComboBox ItemsSource="{Binding RenderingModes}"
                                            SelectedItem="{Binding RenderingMode}" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
@@ -170,27 +170,27 @@
                     <!-- <ui:SettingsExpanderItem Content="UI Font" -->
                     <!--                          Description="Select the font you want to use as UI Font. We recommend Montserrat"> -->
                     <!--     <ui:SettingsExpanderItem.Footer> -->
-                    <!--         <ui:FAComboBox ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}" IsEditable="True" /> -->
+                    <!--         <ComboBox ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}" IsEditable="True" /> -->
                     <!--     </ui:SettingsExpanderItem.Footer> -->
                     <!-- </ui:SettingsExpanderItem> -->
                     <!-- -->
                     <!-- <ui:SettingsExpanderItem Content="UI Font-Weight" -->
                     <!--                          Description="Select the font-weight you want to use as UI font-weight. We recommend something around SemiBold or Medium"> -->
                     <!--     <ui:SettingsExpanderItem.Footer> -->
-                    <!--         <ui:FAComboBox ItemsSource="{Binding AvailableFontWeights}" SelectedItem="{Binding SelectedFontWeight}" /> -->
+                    <!--         <ComboBox ItemsSource="{Binding AvailableFontWeights}" SelectedItem="{Binding SelectedFontWeight}" /> -->
                     <!--     </ui:SettingsExpanderItem.Footer> -->
                     <!-- </ui:SettingsExpanderItem> -->
 
                     <!-- <ui:SettingsExpanderItem Content="Accent Color" -->
                     <!--                          Description="Accent color you want to use"> -->
                     <!--     <ui:SettingsExpanderItem.Footer> -->
-                    <!--         <ui:FAComboBox ItemsSource="{Binding KnownColors}" SelectedItem="{Binding SelectedAccentColor}" IsEditable="True" /> -->
+                    <!--         <ComboBox ItemsSource="{Binding KnownColors}" SelectedItem="{Binding SelectedAccentColor}" IsEditable="True" /> -->
                     <!--     </ui:SettingsExpanderItem.Footer> -->
                     <!-- </ui:SettingsExpanderItem> -->
 
                     <ui:SettingsExpanderItem Content="Window Background Method" Description="The method that should be used for the window background">
                         <ui:SettingsExpanderItem.Footer>
-                            <ui:FAComboBox ItemsSource="{Binding BackgroundModes}"
+                            <ComboBox ItemsSource="{Binding BackgroundModes}"
                                            SelectedItem="{Binding BackgroundMode}" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
@@ -198,7 +198,7 @@
                     <ui:SettingsExpanderItem Content="Window Background Color"
                                              Description="The background color of the window">
                         <ui:SettingsExpanderItem.Footer>
-                            <ui:FAComboBox ItemsSource="{Binding KnownColors}"
+                            <ComboBox ItemsSource="{Binding KnownColors}"
                                            SelectedItem="{Binding SelectedBackgroundColor}" IsEditable="True" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
@@ -232,7 +232,7 @@
                     <ui:SettingsExpanderItem Content="Audio Device"
                                              Description="Select the audio device that you want to use for audio playback">
                         <ui:SettingsExpanderItem.Footer>
-                            <ui:FAComboBox ItemsSource="{Binding AvailableAudioDevices}"
+                            <ComboBox ItemsSource="{Binding AvailableAudioDevices}"
                                            SelectedItem="{Binding SelectedAudioDevice}" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>

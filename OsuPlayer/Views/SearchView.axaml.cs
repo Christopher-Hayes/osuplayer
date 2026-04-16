@@ -30,6 +30,7 @@ public partial class SearchView : ReactiveControl<SearchViewModel>
 
         // Playing from search clears any active playlist context
         ViewModel.Player.ActivePlaylistContext.Value = null;
+        ViewModel.Player.ActiveArtistContext.Value = null;
 
         await ViewModel.Player.TryPlaySongAsync(song);
     }

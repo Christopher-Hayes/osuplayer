@@ -45,6 +45,9 @@ public class AudioVisualizerViewModel : BaseViewModel
         {
             SeparatorsPaint = null,
             LabelsPaint = null,
+            TicksPaint = null,
+            SubticksPaint = null,
+            ZeroPaint = null,
             ShowSeparatorLines = false,
             MaxLimit = 256
         }
@@ -58,6 +61,8 @@ public class AudioVisualizerViewModel : BaseViewModel
             MaxLimit = 1,
             SeparatorsPaint = null,
             LabelsPaint = null,
+            TicksPaint = null,
+            SubticksPaint = null,
             ShowSeparatorLines = false,
         }
     };
@@ -66,7 +71,7 @@ public class AudioVisualizerViewModel : BaseViewModel
     {
         AudioEngine = audioEngine;
 
-        const int size = 4096;
+        const int size = 2048;
 
         SeriesValues = new ObservableValue[size].ToObservableCollection();
 
@@ -81,7 +86,8 @@ public class AudioVisualizerViewModel : BaseViewModel
             {
                 Values = SeriesValues,
                 IsHoverable = false,
-                Fill = new SolidColorPaint(new SKColor(164, 164, 164, 75)),
+                // Fill = new SolidColorPaint(new SKColor(164, 164, 164, 75)),
+                Fill = new SolidColorPaint(new SKColor(164, 164, 164, 30)),
                 Stroke = null
             }
         };

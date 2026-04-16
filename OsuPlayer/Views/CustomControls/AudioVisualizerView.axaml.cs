@@ -56,7 +56,9 @@ public partial class AudioVisualizerView : ReactiveUserControl<AudioVisualizerVi
 
                 for (var i = 0; i < vData.Length; i++)
                 {
-                    ViewModel.SeriesValues[i].Value = vData[i] * 5;
+                    // square root scaling for better visual distribution
+                    var scaled = Math.Pow(vData[i], 0.6) * 2; 
+                    ViewModel.SeriesValues[i].Value = scaled < 0.01 ? 0 : scaled;
                 }
             }
         });

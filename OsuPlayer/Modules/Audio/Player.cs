@@ -63,6 +63,7 @@ public class Player : IPlayer, IImportNotifications
 
     public Bindable<Playlist?> SelectedPlaylist { get; } = new();
     public Bindable<Playlist?> ActivePlaylistContext { get; } = new();
+    public Bindable<string?> ActiveArtistContext { get; } = new();
     private List<IMapEntryBase> ActivePlaylistSongs { get; set; } = new();
 
     public Player(IAudioEngine audioEngine, ISongSourceProvider songSourceProvider, IShuffleServiceProvider? shuffleProvider = null,
@@ -133,6 +134,7 @@ public class Player : IPlayer, IImportNotifications
         IsShuffle.BindValueChanged(_ => _shuffleProvider?.ShuffleImpl?.Init(0));
         SelectedPlaylist.BindValueChanged(OnSelectedPlaylistChanged, true);
         ActivePlaylistContext.BindValueChanged(OnActivePlaylistContextChanged, true);
+        ActiveArtistContext.BindValueChanged(OnActiveArtistContextChanged, true);
     }
 
     private async void OnSelectedPlaylistChanged(ValueChangedEvent<Playlist?> selectedPlaylist)
@@ -148,9 +150,14 @@ public class Player : IPlayer, IImportNotifications
     {
         if (playlistContext.NewValue == null)
         {
-            ActivePlaylistSongs = new List<IMapEntryBase>();
+            // Only clear songs if there's no artist context either
+            if (ActiveArtistContext.Value == null)
+                ActivePlaylistSongs = new List<IMapEntryBase>();
             return;
         }
+
+        // Clear artist context when switching to playlist context
+        ActiveArtistContext.Value = null;
 
         ActivePlaylistSongs = SongSourceProvider.GetMapEntriesFromHash(playlistContext.NewValue.Songs, out var invalidHashes);
 
@@ -162,6 +169,30 @@ public class Player : IPlayer, IImportNotifications
 
             playlist?.Songs.RemoveWhere(song => invalidHashes.Contains(song));
         }
+
+        if (CurrentSong.Value == null) return;
+
+        if (!ActivePlaylistSongs.Contains(CurrentSong.Value)) await NextSong(PlayDirection.Forward);
+    }
+
+    private async void OnActiveArtistContextChanged(ValueChangedEvent<string?> artistContext)
+    {
+        if (artistContext.NewValue == null)
+        {
+            // Only clear songs if there's no playlist context either
+            if (ActivePlaylistContext.Value == null)
+                ActivePlaylistSongs = new List<IMapEntryBase>();
+            return;
+        }
+
+        // Clear playlist context when switching to artist context
+        ActivePlaylistContext.Value = null;
+
+        if (SongSourceProvider.SongSourceList == null) return;
+
+        ActivePlaylistSongs = SongSourceProvider.SongSourceList
+            .Where(s => string.Equals(s.Artist, artistContext.NewValue, StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
         if (CurrentSong.Value == null) return;
 
@@ -329,10 +360,12 @@ public class Player : IPlayer, IImportNotifications
             return await TryStartSongAsync(CurrentSong.Value ?? SongSourceProvider.SongSourceList[0]);
         }
 
-        // Determine the active song source: playlist context if set, otherwise full library
-        var songSource = ActivePlaylistContext.Value != null && ActivePlaylistSongs.Any()
+        // Determine the active song source: artist context, playlist context, or full library
+        var songSource = ActiveArtistContext.Value != null && ActivePlaylistSongs.Any()
             ? ActivePlaylistSongs
-            : (IList<IMapEntryBase>) SongSourceProvider.SongSourceList;
+            : ActivePlaylistContext.Value != null && ActivePlaylistSongs.Any()
+                ? ActivePlaylistSongs
+                : (IList<IMapEntryBase>) SongSourceProvider.SongSourceList;
 
         return RepeatMode.Value switch
         {

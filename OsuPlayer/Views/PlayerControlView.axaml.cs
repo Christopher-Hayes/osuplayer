@@ -128,6 +128,20 @@ public partial class PlayerControlView : ReactiveControl<PlayerControlViewModel>
         ViewModel.IsArtworkOverlayVisible = true;
     }
 
+    private void ArtistText_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_mainWindow?.ViewModel == default) return;
+
+        var player = ViewModel.Player;
+        var artistName = player.ActiveArtistContext.Value ?? player.CurrentSong.Value?.ArtistString;
+
+        if (artistName == null) return;
+
+        var artistView = _mainWindow.ViewModel.ArtistView;
+        _ = artistView.LoadArtistAsync(artistName);
+        _mainWindow.ViewModel.MainView = artistView;
+    }
+
     private void CurrentSongLabel_OnClick(object? sender, RoutedEventArgs e)
     {
         if (_mainWindow?.ViewModel == default) return;
@@ -136,16 +150,26 @@ public partial class PlayerControlView : ReactiveControl<PlayerControlViewModel>
 
         if (player.ActivePlaylistContext.Value == null)
         {
-            switch (_mainWindow.ViewModel.MainView)
+            if (player.ActiveArtistContext.Value != null)
             {
-                case SearchViewModel:
-                    _mainWindow.ViewModel.SearchView.SelectedSong = player.CurrentSong.Value;
-                    _mainWindow.ViewModel.MainView = _mainWindow.ViewModel.SearchView;
-                    break;
-                default:
-                    _mainWindow.ViewModel.HomeView.SelectedSong = player.CurrentSong.Value;
-                    _mainWindow.ViewModel.MainView = _mainWindow.ViewModel.HomeView;
-                    break;
+                // Navigate to the artist view
+                var artistView = _mainWindow.ViewModel.ArtistView;
+                _ = artistView.LoadArtistAsync(player.ActiveArtistContext.Value);
+                _mainWindow.ViewModel.MainView = artistView;
+            }
+            else
+            {
+                switch (_mainWindow.ViewModel.MainView)
+                {
+                    case SearchViewModel:
+                        _mainWindow.ViewModel.SearchView.SelectedSong = player.CurrentSong.Value;
+                        _mainWindow.ViewModel.MainView = _mainWindow.ViewModel.SearchView;
+                        break;
+                    default:
+                        _mainWindow.ViewModel.HomeView.SelectedSong = player.CurrentSong.Value;
+                        _mainWindow.ViewModel.MainView = _mainWindow.ViewModel.HomeView;
+                        break;
+                }
             }
         }
         else

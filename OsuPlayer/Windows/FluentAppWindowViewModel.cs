@@ -38,6 +38,9 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
     public ExportSongsViewModel ExportSongsView { get; }
     public PlayHistoryViewModel PlayHistoryView { get; }
 
+    public ArtistsViewModel ArtistsView { get; }
+    public ArtistViewModel ArtistView { get; }
+
     public AudioVisualizerViewModel AudioVisualizer { get; }
 
     public ExperimentalAcrylicMaterial? PanelMaterial { get; set; }
@@ -96,6 +99,9 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
         UpdateView = new UpdateViewModel();
         ExportSongsView = new ExportSongsViewModel(Player.SongSourceProvider);
         PlayHistoryView = new PlayHistoryViewModel(Player, historyProvider, Player.SongSourceProvider);
+
+        ArtistsView = new ArtistsViewModel(Player);
+        ArtistView = new ArtistViewModel(Player);
 
         IsLinuxOs = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
         IsNonLinuxOs = !IsLinuxOs;

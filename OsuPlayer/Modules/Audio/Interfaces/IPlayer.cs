@@ -16,6 +16,12 @@ public interface IPlayer : ICommonFeatures, IPlayModes, IHasPlaylists, IHasBlack
     public int CurrentIndex { get; }
 
     /// <summary>
+    /// When set to a non-null artist name, next/prev will only navigate within songs by that artist.
+    /// Setting this clears ActivePlaylistContext and vice versa.
+    /// </summary>
+    public Bindable<string?> ActiveArtistContext { get; }
+
+    /// <summary>
     /// Toggles mute of the volume
     /// </summary>
     public void ToggleMute();

@@ -82,7 +82,7 @@
                 </ListBox.ContextMenu>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="interfaces:IMapEntryBase">
-                        <Grid ColumnDefinitions="Auto, *, Auto" RowDefinitions="Auto, Auto" DoubleTapped="PlaySong"
+                        <Grid ColumnDefinitions="Auto, *, Auto" RowDefinitions="Auto, Auto" Tapped="PlaySong"
                               Background="Transparent">
                             <customControls:AsyncCoverImage
                                 Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"

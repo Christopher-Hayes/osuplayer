@@ -27,6 +27,9 @@ internal partial class TopBarView : ReactiveControl<TopBarViewModel>
             case "SearchNavigation":
                 _mainWindow.ViewModel!.MainView = _mainWindow.ViewModel.SearchView;
                 break;
+            case "ArtistsNavigation":
+                _mainWindow.ViewModel!.MainView = _mainWindow.ViewModel.ArtistsView;
+                break;
             case "PlaylistNavigation":
                 _mainWindow.ViewModel!.MainView = _mainWindow.ViewModel.PlaylistView;
                 break;

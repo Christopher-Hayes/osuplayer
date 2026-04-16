@@ -1,97 +1,102 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "dotnet: restore",
-      "type": "shell",
-      "command": "dotnet",
-      "args": [
-        "restore"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "dotnet: build (Debug)",
-      "type": "shell",
-      "command": "dotnet",
-      "args": [
-        "build",
-        "OsuPlayer.sln",
-        "-c",
-        "Debug"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "problemMatcher": "$msCompile",
-      "dependsOn": "dotnet: restore"
-    },
-    {
-      "label": "dotnet: test (Debug)",
-      "type": "shell",
-      "command": "dotnet",
-      "args": [
-        "test",
-        "OsuPlayer.Tests/OsuPlayer.Tests.csproj",
-        "-c",
-        "Debug"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "test",
-      "problemMatcher": "$msCompile",
-      "dependsOn": "dotnet: build (Debug)"
-    },
-    {
-      "label": "dotnet: run app",
-      "type": "shell",
-      "command": "dotnet",
-      "args": [
-        "run",
-        "--project",
-        "OsuPlayer"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": [],
-      "dependsOn": "dotnet: build (Debug)"
-    },
-    {
-      "label": "dotnet: run crash handler",
-      "type": "shell",
-      "command": "dotnet",
-      "args": [
-        "run",
-        "--project",
-        "OsuPlayer.CrashHandler"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "dotnet: run updater",
-      "type": "shell",
-      "command": "dotnet",
-      "args": [
-        "run",
-        "--project",
-        "OsuPlayer.Updater"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    }
-  ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "dotnet: restore",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"restore"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "dotnet: build (Debug)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"OsuPlayer.sln",
+				"-c",
+				"Debug"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": "$msCompile",
+			"dependsOn": "dotnet: restore"
+		},
+		{
+			"label": "dotnet: test (Debug)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"test",
+				"OsuPlayer.Tests/OsuPlayer.Tests.csproj",
+				"-c",
+				"Debug"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "test",
+			"problemMatcher": "$msCompile",
+			"dependsOn": "dotnet: build (Debug)"
+		},
+		{
+			"label": "dotnet: run app",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"--project",
+				"OsuPlayer"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
+			"dependsOn": "dotnet: build (Debug)"
+		},
+		{
+			"label": "dotnet: run crash handler",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"--project",
+				"OsuPlayer.CrashHandler"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "dotnet: run updater",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"--project",
+				"OsuPlayer.Updater"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Clear artist cache",
+			"type": "shell",
+			"command": "rm -f data/artist_cache/*.png data/artist_cache/*_imageurl.* data/artist_cache/*_info.json data/artist_cache/*_similar.json && echo \"Artist cache cleared.\""
+		}
+	]
 }

@@ -22,4 +22,6 @@ public class LastFmService : OsuPlayerService, ILastFmApiService
     public Task Scrobble(string title, string artist) => _lastFmApiService.Scrobble(title, artist);
     public Task<bool> LoadSessionKeyAsync() => _lastFmApiService.LoadSessionKeyAsync();
     public Task<string> GetAuthToken() => _lastFmApiService.GetAuthToken();
+    public Task<string?> GetArtistInfoAsync(string artist) => _lastFmApiService.GetArtistInfoAsync(artist);
+    public Task<string?> GetSimilarArtistsAsync(string artist, int limit = 10) => _lastFmApiService.GetSimilarArtistsAsync(artist, limit);
 }

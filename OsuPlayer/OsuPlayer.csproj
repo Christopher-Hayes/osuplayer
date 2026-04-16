@@ -112,6 +112,20 @@
         <Compile Update="Views\HomeViewModel.cs">
             <DependentUpon>HomeView.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Views\ArtistsView.axaml.cs">
+            <DependentUpon>ArtistsView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\ArtistsViewModel.cs">
+            <DependentUpon>ArtistsView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\ArtistView.axaml.cs">
+            <DependentUpon>ArtistView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\ArtistViewModel.cs">
+            <DependentUpon>ArtistView.axaml</DependentUpon>
+        </Compile>
         <Compile Update="Views\ExportSongsViewModel.cs">
             <DependentUpon>ExportSongsView.axaml</DependentUpon>
         </Compile>

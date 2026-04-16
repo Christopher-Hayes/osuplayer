@@ -22,7 +22,7 @@
         <ListBox Grid.Row="1" ItemsSource="{Binding History}" SelectedItem="{Binding SelectedHistoricalMapEntry}"
                  Background="{DynamicResource BaseBrighterDarkTransparentColor}"
                  Margin="0 1"
-                 DoubleTapped="HistoryListBox_OnDoubleTapped">
+                 Tapped="HistoryListBox_OnDoubleTapped">
             <ListBox.DataTemplates>
                 <DataTemplate DataType="extensions:HistoricalMapEntry">
                     <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto">

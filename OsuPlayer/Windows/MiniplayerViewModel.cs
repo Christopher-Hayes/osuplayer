@@ -131,11 +131,13 @@ public class MiniplayerViewModel : BaseWindowViewModel
 
     public IEnumerable<Playlist>? Playlists => PlaylistManager.GetAllPlaylists()?.Where(x => x.Songs.Count > 0);
 
-    public string ActivePlaylist => Player.ActivePlaylistContext.Value != null
-        ? $"▶ Playlist: {Player.ActivePlaylistContext.Value.Name}"
-        : string.Empty;
+    public string ActivePlaylist => Player.ActiveArtistContext.Value != null
+        ? $"▶ Artist: {Player.ActiveArtistContext.Value}"
+        : Player.ActivePlaylistContext.Value != null
+            ? $"▶ Playlist: {Player.ActivePlaylistContext.Value.Name}"
+            : string.Empty;
 
-    public bool IsPlayingFromPlaylist => Player.ActivePlaylistContext.Value != null;
+    public bool IsPlayingFromPlaylist => Player.ActivePlaylistContext.Value != null || Player.ActiveArtistContext.Value != null;
 
     public MiniplayerViewModel(IPlayer player, IAudioEngine bassEngine, FluentAppWindowViewModel mainWindowViewModel)
     {
@@ -194,6 +196,12 @@ public class MiniplayerViewModel : BaseWindowViewModel
         }, true);
 
         Player.ActivePlaylistContext.BindValueChanged(_ =>
+        {
+            this.RaisePropertyChanged(nameof(ActivePlaylist));
+            this.RaisePropertyChanged(nameof(IsPlayingFromPlaylist));
+        }, true);
+
+        Player.ActiveArtistContext.BindValueChanged(_ =>
         {
             this.RaisePropertyChanged(nameof(ActivePlaylist));
             this.RaisePropertyChanged(nameof(IsPlayingFromPlaylist));

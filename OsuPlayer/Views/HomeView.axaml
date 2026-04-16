@@ -18,8 +18,8 @@
         <Grid Row="0" Column="0" ColumnSpan="2" RowDefinitions="50, *" Margin="0 1">
             <Border Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{DynamicResource BaseBrighterDarkTransparentColor}">
                 <Grid ColumnDefinitions="*, Auto">
-                    <TextBlock Grid.Column="0" Text="Your songs" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10 0 0 0" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="0 0 8 0">
+                    <TextBlock Grid.Column="0" Text="Your songs" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="16 12 0 8" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="0 0 24 0">
                         <TextBlock Text="Sort:" VerticalAlignment="Center" FontSize="14" />
                         <ComboBox ItemsSource="{Binding SortingModes}"
                                   SelectedItem="{Binding SelectedSortingMode}"
@@ -30,7 +30,7 @@
 
             <ListBox Grid.Row="1" x:Name="SongListBox"
                      ItemsSource="{Binding SortedSongEntries}" Background="Transparent"
-                     DoubleTapped="InputElement_OnDoubleTapped" SelectedItem="{Binding SelectedSong}">
+                     Tapped="InputElement_OnDoubleTapped" SelectedItem="{Binding SelectedSong}">
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem.playing">
                         <Setter Property="Background" Value="#28FFFFFF" />

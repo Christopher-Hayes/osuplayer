@@ -204,6 +204,11 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
                 ViewModel!.MainView = ViewModel.HomeView;
                 break;
             }
+            case "ArtistsNavigation":
+            {
+                ViewModel!.MainView = ViewModel.ArtistsView;
+                break;
+            }
             case "MiniplayerNavigation":
             {
                 OpenMiniplayer();

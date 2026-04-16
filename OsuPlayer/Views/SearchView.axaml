@@ -21,7 +21,7 @@
         <ListBox Margin="0 1" Grid.Row="1" x:Name="SongListBox"
                  ItemsSource="{Binding FilteredSongEntries}"
                  Background="{DynamicResource AcrylicBaseColor}"
-                 DoubleTapped="InputElement_OnDoubleTapped" SelectedItem="{Binding SelectedSong}">
+                 Tapped="InputElement_OnDoubleTapped" SelectedItem="{Binding SelectedSong}">
             <ListBox.Styles>
                 <Style Selector="ListBoxItem.playing">
                     <Setter Property="Background" Value="#28FFFFFF" />

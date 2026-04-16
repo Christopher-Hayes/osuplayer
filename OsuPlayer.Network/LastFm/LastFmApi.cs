@@ -205,6 +205,40 @@ public class LastFmApi : WebRequestBase, ILastFmApiService
 
     #region Helper Functions
 
+    public async Task<string?> GetArtistInfoAsync(string artist)
+    {
+        try
+        {
+            var url = $"{BaseUrl}&method=artist.getinfo&artist={Uri.EscapeDataString(artist)}&api_key={_apiKey}";
+
+            using var client = new HttpClient();
+            var response = await client.GetStringAsync(url);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Log($"Failed to get artist info for '{artist}': {ex.Message}", LogType.Warning);
+            return null;
+        }
+    }
+
+    public async Task<string?> GetSimilarArtistsAsync(string artist, int limit = 10)
+    {
+        try
+        {
+            var url = $"{BaseUrl}&method=artist.getsimilar&artist={Uri.EscapeDataString(artist)}&limit={limit}&api_key={_apiKey}";
+
+            using var client = new HttpClient();
+            var response = await client.GetStringAsync(url);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Log($"Failed to get similar artists for '{artist}': {ex.Message}", LogType.Warning);
+            return null;
+        }
+    }
+
     private Dictionary<string, string> GetBaseParameters()
     {
         var dict = new Dictionary<string, string>();

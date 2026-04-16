@@ -51,6 +51,7 @@ public partial class HomeView : ReactiveControl<HomeViewModel>
 
         // Playing from the library view clears any active playlist context
         ViewModel.Player.ActivePlaylistContext.Value = null;
+        ViewModel.Player.ActiveArtistContext.Value = null;
 
         await ViewModel.Player.TryPlaySongAsync(song);
     }

@@ -123,6 +123,11 @@ public partial class PlayerControlView : ReactiveControl<PlayerControlViewModel>
         ViewModel!.PlaybackSpeed = 0;
     }
 
+    private void ArtworkButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        ViewModel.IsArtworkOverlayVisible = true;
+    }
+
     private void CurrentSongLabel_OnClick(object? sender, RoutedEventArgs e)
     {
         if (_mainWindow?.ViewModel == default) return;

@@ -47,6 +47,16 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
         InitializeComponent();
 
         InitializeFluentAppWindow(player);
+
+        // Wire up artwork overlay dismiss handlers
+        ArtworkOverlayBackdrop.PointerPressed += (_, _) => DismissArtworkOverlay();
+        ArtworkOverlayCloseButton.Click += (_, _) => DismissArtworkOverlay();
+    }
+
+    private void DismissArtworkOverlay()
+    {
+        if (ViewModel?.PlayerControl != null)
+            ViewModel.PlayerControl.IsArtworkOverlayVisible = false;
     }
 
     private void InitializeFluentAppWindow(IPlayer player)

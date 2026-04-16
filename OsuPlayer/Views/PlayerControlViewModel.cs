@@ -64,6 +64,14 @@ public class PlayerControlViewModel : BaseViewModel
         set => this.RaiseAndSetIfChanged(ref _displayBackgroundImage, value);
     }
 
+    private bool _isArtworkOverlayVisible;
+
+    public bool IsArtworkOverlayVisible
+    {
+        get => _isArtworkOverlayVisible;
+        set => this.RaiseAndSetIfChanged(ref _isArtworkOverlayVisible, value);
+    }
+
     public double Volume
     {
         get => _volume.Value;

@@ -36,8 +36,31 @@
             <ContentControl Grid.ColumnSpan="3" Content="{Binding MainWindowViewModel.AudioVisualizer}" />
 
             <Grid Grid.Column="0" ColumnDefinitions="Auto, *">
-                <Image Grid.Column="0" Stretch="UniformToFill" Source="{Binding CurrentSongImage}" Margin="6"
-                       VerticalAlignment="Center" Width="80" Height="58" IsVisible="{Binding DisplayBackgroundImage}" />
+                <Button Grid.Column="0"
+                        Theme="{StaticResource TransparentButton}"
+                        Click="ArtworkButton_OnClick"
+                        Cursor="Hand"
+                        Width="80" Height="58"
+                        Margin="6"
+                        Padding="0"
+                        VerticalAlignment="Center"
+                        IsVisible="{Binding DisplayBackgroundImage}">
+                    <Panel>
+                        <Image Stretch="UniformToFill" Source="{Binding CurrentSongImage}" />
+                        <Panel Classes="ArtworkHint" Background="#99000000" IsHitTestVisible="False">
+                            <avalonia:MaterialIcon Kind="ChevronUp" Width="28" Height="28" Foreground="White"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Panel>
+                    </Panel>
+                    <Button.Styles>
+                        <Style Selector="Button Panel.ArtworkHint">
+                            <Setter Property="IsVisible" Value="False" />
+                        </Style>
+                        <Style Selector="Button:pointerover Panel.ArtworkHint">
+                            <Setter Property="IsVisible" Value="True" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8 0 0 0">
                     <ToolTip.Tip>
                         <TextBlock Text="{Binding SongText}" />

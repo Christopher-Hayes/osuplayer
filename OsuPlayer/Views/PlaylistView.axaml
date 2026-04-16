@@ -6,6 +6,7 @@
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:storageModels="clr-namespace:OsuPlayer.Data.OsuPlayer.StorageModels;assembly=OsuPlayer.Data"
              xmlns:interfaces="clr-namespace:OsuPlayer.Data.DataModels.Interfaces;assembly=OsuPlayer.Data"
+             xmlns:customControls="clr-namespace:OsuPlayer.Views.CustomControls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OsuPlayer.Views.PlaylistView"
              FontWeight="{DynamicResource DefaultFontWeight}">
@@ -81,14 +82,22 @@
                 </ListBox.ContextMenu>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="interfaces:IMapEntryBase">
-                        <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto" DoubleTapped="PlaySong"
+                        <Grid ColumnDefinitions="Auto, *, Auto" RowDefinitions="Auto, Auto" DoubleTapped="PlaySong"
                               Background="Transparent">
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding TitleString}" FontSize="20"
+                            <customControls:AsyncCoverImage
+                                Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                                Width="44" Height="44"
+                                Margin="0 0 10 0"
+                                CornerRadius="6"
+                                IsVisible="{Binding $parent[ListBox].((views:PlaylistViewModel)DataContext).DisplaySongListCovers}"
+                                Entry="{Binding .}" />
+
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TitleString}" FontSize="20"
                                        FontWeight="SemiBold" />
-                            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding ArtistString}"
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ArtistString}"
                                        FontSize="14" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" FontWeight="Medium" />
 
-                            <TextBlock Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Text="{Binding TotalTimeString}"
+                            <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Text="{Binding TotalTimeString}"
                                        FontSize="20" FontWeight="{DynamicResource BiggerFontWeight}"
                                        VerticalAlignment="Center" HorizontalAlignment="Center" />
                         </Grid>

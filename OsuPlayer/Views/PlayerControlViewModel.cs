@@ -100,8 +100,11 @@ public class PlayerControlViewModel : BaseViewModel
             Player.SetPlaybackSpeed(value);
             this.RaiseAndSetIfChanged(ref _playbackSpeed, value);
             this.RaisePropertyChanged(nameof(CurrentSongLength));
+            this.RaisePropertyChanged(nameof(PlaybackSpeedText));
         }
     }
+
+    public string PlaybackSpeedText => $"{1.0 + PlaybackSpeed:0.0}x";
 
     private double _maximumVolume;
 
@@ -173,7 +176,7 @@ public class PlayerControlViewModel : BaseViewModel
     public IEnumerable<Playlist>? Playlists => PlaylistManager.GetAllPlaylists()?.Where(x => x.Songs.Count > 0);
 
     public string ActivePlaylist => Player.ActivePlaylistContext.Value != null
-        ? $"▶ Playlist: {Player.ActivePlaylistContext.Value.Name}"
+        ? $"Playlist: {Player.ActivePlaylistContext.Value.Name}"
         : string.Empty;
 
     public bool IsPlayingFromPlaylist => Player.ActivePlaylistContext.Value != null;

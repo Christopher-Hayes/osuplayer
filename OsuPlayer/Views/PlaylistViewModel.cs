@@ -9,6 +9,7 @@ using Nein.Extensions;
 using OsuPlayer.Data.DataModels.Interfaces;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.Interfaces.Service;
+using OsuPlayer.IO.Storage.Config;
 using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.Modules.Audio.Interfaces;
 using ReactiveUI;
@@ -28,6 +29,8 @@ public class PlaylistViewModel : BaseViewModel
     private ObservableCollection<Playlist>? _playlists;
     private Playlist? _selectedPlaylist;
     private IMapEntryBase? _selectedSong;
+
+    public bool DisplaySongListCovers => new Config().Container.DisplaySongListCovers;
 
     public ObservableCollection<Playlist>? Playlists
     {

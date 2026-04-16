@@ -7,7 +7,7 @@ Complements `README.md` with implementation-focused context.
 
 Desktop music player for osu! songs, written in C# / .NET 8.
 
-- **UI framework:** Avalonia 11 + ReactiveUI + FluentAvalonia
+- **UI framework:** Avalonia 11.3.14 + ReactiveUI + FluentAvalonia 2.4.1
 - **Solution:** `OsuPlayer.sln` (multi-project)
 
 ### Projects
@@ -103,6 +103,7 @@ Value converters in `OsuPlayer.Extensions/ValueConverters/` implement `IValueCon
 |---|---|
 | `OsuPlayer/Modules/Audio/Player.cs` | Core player: next/prev, repeat, shuffle, song lifecycle |
 | `OsuPlayer/Modules/Audio/BassEngine.cs` | ManagedBass wrapper (low-level playback) |
+| `OsuPlayer/Modules/Audio/LinuxMprisService.cs` | MPRIS2 D-Bus service — routes GNOME/KDE media keys to the player on Linux |
 | `OsuPlayer/Modules/Audio/Interfaces/` | `IPlayer`, `IHasPlaylists`, `IPlayModes`, etc. |
 | `OsuPlayer.Services/OsuSongSourceService.cs` | Provides the full song library list |
 | `OsuPlayer.Services/ShuffleService.cs` | Shuffle state and algorithm selection |
@@ -170,6 +171,25 @@ Value converters in `OsuPlayer.Extensions/ValueConverters/` implement `IValueCon
 - **`PlayerControlView` and `Miniplayer` must stay behaviorally aligned.** If you change player behavior, update both.
 - **Value converters:** when a UI element needs a derived value from a model property, write a converter in `OsuPlayer.Extensions/ValueConverters/` rather than putting logic in code-behind.
 - **Tests:** unit tests live in `OsuPlayer.Tests/`. Add or update tests when changing public behavior. Tests use NUnit 4.
+
+---
+
+## Linux / MPRIS2
+
+`LinuxMprisService` implements the MPRIS2 D-Bus interface so GNOME Shell, KDE, and other desktop environments route hardware media keys to osu!player. It is instantiated by `Player.cs` on Linux only.
+
+- Do **not** add an explicit `Tmds.DBus.Protocol` package reference — it is resolved transitively from `Avalonia.FreeDesktop` and must stay in sync with Avalonia.
+- `PlayerControlView` and `Miniplayer` must remain aligned with any transport changes that also affect MPRIS.
+
+---
+
+## Avalonia 11.3 AXAML notes
+
+The project targets **Avalonia 11.3.14** / **FluentAvaloniaUI 2.4.1** / **SkiaSharp 2.88.9**. When writing AXAML:
+
+- **`ItemsRepeater`, `StackLayout`, `WrapLayout`** do not exist in Avalonia 11.2+. Do not add the old `Avalonia.Controls.ItemsRepeater` NuGet package. Use `ItemsControl` + `ItemsPanelTemplate` with `StackPanel` or `WrapPanel` instead.
+- **`HyperlinkButton`** is in Avalonia core — use it without a namespace prefix, not `ui:HyperlinkButton`.
+- **`Avalonia.ReactiveUI`** must stay pinned at **11.3.9** (11.3.14 does not exist for this package).
 
 ---
 

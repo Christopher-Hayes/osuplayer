@@ -385,14 +385,16 @@
                                      Name="ContributeSettingsExpander">
                     <StackPanel Margin="1" Spacing="1" Name="ContributePanel">
                         <Border>
-                            <ItemsRepeater ItemsSource="{Binding Contributors}">
-                                <ItemsRepeater.Layout>
-                                    <WrapLayout HorizontalSpacing="5" VerticalSpacing="5" Orientation="Horizontal" />
-                                </ItemsRepeater.Layout>
+                            <ItemsControl ItemsSource="{Binding Contributors}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel HorizontalAlignment="Stretch" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
 
-                                <ItemsRepeater.ItemTemplate>
+                                <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="data:OsuPlayerContributor">
-                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <StackPanel Orientation="Horizontal" Spacing="5" Margin="0 0 5 5">
                                             <Border CornerRadius="100" Width="50" Height="50"
                                                     VerticalAlignment="Center"
                                                     BorderBrush="White" BorderThickness="2">
@@ -404,8 +406,8 @@
                                             <TextBlock Text="{Binding Name}" FontSize="20" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </DataTemplate>
-                                </ItemsRepeater.ItemTemplate>
-                            </ItemsRepeater>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </Border>
                     </StackPanel>
                     <ui:SettingsExpanderItem Content="Want to contribute?"

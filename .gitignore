@@ -11,7 +11,10 @@ obj/
 # Cache
 /_ReSharper.Caches/
 
-# Misc
+# Logs
 *.log
+logs
+
+# Misc
 riderModule.iml
 .name

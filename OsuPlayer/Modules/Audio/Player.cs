@@ -31,6 +31,7 @@ public class Player : IPlayer, IImportNotifications
     private readonly IStatisticsProvider? _statisticsProvider;
     private readonly IHistoryProvider? _historyProvider;
     private readonly WindowsMediaTransportControls? _winMediaControls;
+    private readonly LinuxMprisService? _linuxMprisService;
     private readonly ILastFmApiService? _lastFmApi;
 
     private bool _isMuted;
@@ -80,6 +81,18 @@ public class Player : IPlayer, IImportNotifications
             catch
             {
                 _winMediaControls = null;
+            }
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            try
+            {
+                _linuxMprisService = new LinuxMprisService(this);
+                _ = Task.Run(() => _linuxMprisService.StartAsync());
+            }
+            catch
+            {
+                _linuxMprisService = null;
             }
         }
 
@@ -277,6 +290,7 @@ public class Player : IPlayer, IImportNotifications
         _currentSongTimer.Start();
 
         _winMediaControls?.UpdatePlayingStatus(true);
+        _linuxMprisService?.UpdatePlaybackStatus(true);
 
         var timestamp = TimeSpan.FromSeconds(_audioEngine.ChannelLength.Value * (1 - _audioEngine.PlaybackSpeed.Value) - _audioEngine.ChannelPosition.Value);
 
@@ -289,6 +303,7 @@ public class Player : IPlayer, IImportNotifications
         _currentSongTimer.Stop();
 
         _winMediaControls?.UpdatePlayingStatus(false);
+        _linuxMprisService?.UpdatePlaybackStatus(false);
 
         _discordService?.UpdatePresence(CurrentSong.Value.Title, $"by {CurrentSong.Value.Artist}", CurrentSong.Value.BeatmapSetId);
     }
@@ -497,6 +512,9 @@ public class Player : IPlayer, IImportNotifications
 
             _winMediaControls?.UpdatePlayingStatus(true);
             _winMediaControls?.SetMetadata(fullMapEntry);
+
+            _linuxMprisService?.UpdatePlaybackStatus(true);
+            _linuxMprisService?.UpdateMetadata(fullMapEntry, CurrentSongImage.Value);
 
             _currentSongTimer.Restart();
         }

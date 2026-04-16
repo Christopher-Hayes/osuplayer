@@ -28,7 +28,6 @@ namespace OsuPlayer.Windows;
 public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewModel>
 {
     private readonly ILoggingService _loggingService;
-    private readonly IProfileManagerService _profileManager;
 
     public Miniplayer? Miniplayer;
     public FullscreenWindow? FullscreenWindow;
@@ -41,7 +40,6 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
     {
         ViewModel = viewModel;
 
-        _profileManager = ViewModel.ProfileManager;
         _loggingService = loggingService;
 
         var player = ViewModel.Player;
@@ -241,7 +239,6 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
         using var config = new Config();
 
         config.Container.Volume = ViewModel.Player.Volume.Value;
-        config.Container.Username = _profileManager.User?.Name;
         config.Container.RepeatMode = ViewModel.Player.RepeatMode.Value;
         config.Container.IsShuffle = ViewModel.Player.IsShuffle.Value;
         config.Container.SelectedPlaylist = ViewModel.Player.SelectedPlaylist.Value?.Id;

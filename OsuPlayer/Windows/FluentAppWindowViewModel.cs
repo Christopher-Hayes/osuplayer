@@ -19,7 +19,6 @@ namespace OsuPlayer.Windows;
 public class FluentAppWindowViewModel : BaseWindowViewModel
 {
     public readonly IPlayer Player;
-    public readonly IProfileManagerService ProfileManager;
 
     private BaseViewModel? _mainView;
     private bool _displayBackgroundImage;
@@ -78,11 +77,10 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
         set => this.RaiseAndSetIfChanged(ref _backgroundImage, value);
     }
 
-    public FluentAppWindowViewModel(IAudioEngine engine, IPlayer player, IProfileManagerService profileManager, IShuffleServiceProvider? shuffleServiceProvider = null,
+    public FluentAppWindowViewModel(IAudioEngine engine, IPlayer player, IShuffleServiceProvider? shuffleServiceProvider = null,
         ISortProvider? sortProvider = null, IHistoryProvider? historyProvider = null)
     {
         Player = player;
-        ProfileManager = profileManager;
 
         AudioVisualizer = new AudioVisualizerViewModel(Locator.Current.GetRequiredService<IAudioEngine>());
 
@@ -93,7 +91,7 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
         PlaylistEditorView = new PlaylistEditorViewModel(Player);
         BlacklistEditorView = new BlacklistEditorViewModel(Player);
         HomeView = new HomeViewModel(Player);
-        SettingsView = new SettingsViewModel(Player, sortProvider, shuffleServiceProvider, profileManager);
+        SettingsView = new SettingsViewModel(Player, sortProvider, shuffleServiceProvider);
         EqualizerView = new EqualizerViewModel(Player);
         UpdateView = new UpdateViewModel();
         ExportSongsView = new ExportSongsViewModel(Player.SongSourceProvider);

@@ -47,7 +47,6 @@
         <PackageReference Include="ManagedBass.Fx" Version="3.1.1" />
         <PackageReference Include="Markdown.Avalonia" Version="11.0.2" />
         <PackageReference Include="Material.Icons.Avalonia" Version="2.1.9" />
-        <PackageReference Include="OsuPlayer.Api.Data" Version="1.0.12" />
         <PackageReference Include="SkiaSharp.Views" Version="2.88.9" />
         <PackageReference Include="TagLibSharp" Version="2.3.0" />
         <PackageReference Include="SkiaSharp" Version="2.88.9" />
@@ -85,20 +84,8 @@
         <Compile Update="Views\SearchViewModel.cs">
             <DependentUpon>SearchView.axaml</DependentUpon>
         </Compile>
-        <Compile Update="Windows\LoginWindowViewModel.cs">
-            <DependentUpon>LoginWindow.axaml</DependentUpon>
-        </Compile>
         <Compile Update="UI Extensions\MessageBoxViewModel.cs">
             <DependentUpon>MessageBoxWindow.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\PartyViewModel.cs">
-            <DependentUpon>PartyView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\UserViewModel.cs">
-            <DependentUpon>UserView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\EditUserViewModel.cs">
-            <DependentUpon>EditUserView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\EqualizerViewModel.cs">
             <DependentUpon>EqualizerView.axaml</DependentUpon>
@@ -112,21 +99,11 @@
         <Compile Update="Windows\MiniplayerViewModel.cs">
             <DependentUpon>Miniplayer.axaml</DependentUpon>
         </Compile>
-        <Compile Update="Views\StatisticsViewModel.cs">
-            <DependentUpon>StatisticsView.axaml</DependentUpon>
-        </Compile>
         <Compile Update="Views\SymmetricalViewModel.cs">
             <DependentUpon>SymmetricalView.axaml</DependentUpon>
         </Compile>
-        <Compile Update="Windows\CreateProfileWindowViewModel.cs">
-            <DependentUpon>CreateProfileWindow.axaml</DependentUpon>
-        </Compile>
         <Compile Update="Windows\FullscreenWindowViewModel.cs">
             <DependentUpon>FullscreenWindow.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\HomeView\HomeUserPanelView.axaml.cs">
-            <DependentUpon>HomeUserPanelView.axaml</DependentUpon>
-            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Views\HomeView.axaml.cs">
             <DependentUpon>HomeView.axaml</DependentUpon>
@@ -134,15 +111,6 @@
         </Compile>
         <Compile Update="Views\HomeViewModel.cs">
             <DependentUpon>HomeView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\HomeView\HomeUserPanelViewModel.cs">
-            <DependentUpon>HomeUserPanelView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\HomeSubViews\HomeUserPanelViewModel.cs">
-            <DependentUpon>HomeUserPanelView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\BeatmapsViewModel.cs">
-            <DependentUpon>BeatmapsView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\ExportSongsViewModel.cs">
             <DependentUpon>ExportSongsView.axaml</DependentUpon>

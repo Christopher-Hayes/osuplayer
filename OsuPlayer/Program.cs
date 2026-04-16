@@ -8,7 +8,6 @@ using OsuPlayer.Interfaces.Service;
 using OsuPlayer.IO.Importer;
 using OsuPlayer.Modules.Audio.Engine;
 using OsuPlayer.Modules.Audio.Interfaces;
-using OsuPlayer.Network.API.NorthFox;
 using OsuPlayer.Network.LastFm;
 using OsuPlayer.Services;
 using OsuPlayer.Windows;
@@ -87,7 +86,6 @@ internal static class Program
         services.Register(() => new FluentAppWindowViewModel(
             resolver.GetRequiredService<IAudioEngine>(),
             resolver.GetRequiredService<IPlayer>(),
-            resolver.GetRequiredService<IProfileManagerService>(),
             resolver.GetService<IShuffleServiceProvider>(),
             resolver.GetService<ISortProvider>(),
             resolver.GetService<IHistoryProvider>()));
@@ -104,13 +102,10 @@ internal static class Program
         services.RegisterLazySingleton<ILoggingService>(() => new LoggingService());
 
         services.RegisterLazySingleton<IDiscordService>(() => new DiscordService());
-        services.RegisterLazySingleton<IProfileManagerService>(() => new ProfileManagerService());
         services.RegisterLazySingleton<IShuffleServiceProvider>(() => new ShuffleService());
         services.RegisterLazySingleton<ISortProvider>(() => new SortService());
         services.RegisterLazySingleton<ISongSourceProvider>(() => new OsuSongSourceService(resolver.GetService<ISortProvider>()));
         services.RegisterLazySingleton<IHistoryProvider>(() => new HistoryService());
         services.RegisterLazySingleton<ILastFmApiService>(() => new LastFmService(new LastFmApi()));
-
-        services.RegisterLazySingleton<IOsuPlayerApiService>(() => new NorthFox());
     }
 }

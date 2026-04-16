@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Nein.Extensions;
 using Nein.Extensions.Exceptions;
-using OsuPlayer.Api.Data.API.Enums;
 using OsuPlayer.Data.DataModels.Extensions;
 using OsuPlayer.Data.DataModels.Interfaces;
 using OsuPlayer.Data.OsuPlayer.Classes;
@@ -28,7 +27,6 @@ public class Player : IPlayer, IImportNotifications
     private readonly Stopwatch _currentSongTimer = new();
     private readonly IDiscordService? _discordService;
     private readonly IShuffleServiceProvider? _shuffleProvider;
-    private readonly IStatisticsProvider? _statisticsProvider;
     private readonly IHistoryProvider? _historyProvider;
     private readonly WindowsMediaTransportControls? _winMediaControls;
     private readonly LinuxMprisService? _linuxMprisService;
@@ -68,7 +66,7 @@ public class Player : IPlayer, IImportNotifications
     private List<IMapEntryBase> ActivePlaylistSongs { get; set; } = new();
 
     public Player(IAudioEngine audioEngine, ISongSourceProvider songSourceProvider, IShuffleServiceProvider? shuffleProvider = null,
-        IStatisticsProvider? statisticsProvider = null, ISortProvider? sortProvider = null, IHistoryProvider? historyProvider = null,
+        ISortProvider? sortProvider = null, IHistoryProvider? historyProvider = null,
         IDiscordService? discordService = null,
         ILastFmApiService? lastFmApi = null)
     {
@@ -101,7 +99,6 @@ public class Player : IPlayer, IImportNotifications
         _audioEngine = audioEngine;
         _audioEngine.ChannelReachedEnd = async () => await NextSong(PlayDirection.Forward);
         _shuffleProvider = shuffleProvider;
-        _statisticsProvider = statisticsProvider;
         _historyProvider = historyProvider;
         _lastFmApi = lastFmApi;
         _discordService = discordService;
@@ -185,8 +182,6 @@ public class Player : IPlayer, IImportNotifications
         using var cfg = new Config();
 
         cfg.Container.LastPlayedSong = mapEntry.NewValue?.Hash;
-
-        _statisticsProvider?.UpdateOnlineStatus(UserOnlineStatusType.Listening, mapEntry.NewValue?.ToString(), mapEntry.NewValue?.Hash);
 
         if (mapEntry.NewValue is null) return;
 
@@ -273,14 +268,10 @@ public class Player : IPlayer, IImportNotifications
         if (!IsPlaying.Value)
         {
             Play();
-
-            _statisticsProvider?.UpdateOnlineStatus(UserOnlineStatusType.Listening, CurrentSong.Value?.ToString(), CurrentSong.Value?.Hash);
         }
         else
         {
             Pause();
-
-            _statisticsProvider?.UpdateOnlineStatus(UserOnlineStatusType.Idle);
         }
     }
 
@@ -501,8 +492,6 @@ public class Player : IPlayer, IImportNotifications
 
         _currentSongTimer.Stop();
 
-        UpdateXpOnApi(fullMapEntry);
-
         CurrentSongImage.Value = await findBackgroundTask;
 
         try
@@ -527,39 +516,13 @@ public class Player : IPlayer, IImportNotifications
         CurrentSong.Value = fullMapEntry;
         CurrentIndex = SongSourceProvider.SongSourceList.IndexOf(fullMapEntry);
 
-        await UpdateSongsPlayedOnApi(fullMapEntry, config, previousSong, previousSongElapsedMs, previousSongLengthMs);
+        await UpdateTrackMetadataAndScrobble(config, previousSong, previousSongElapsedMs, previousSongLengthMs);
 
         return true;
     }
 
-    private void UpdateXpOnApi(IMapEntryBase fullMapEntry)
+    private async Task UpdateTrackMetadataAndScrobble(Config config, IMapEntry? previousSong = null, long previousSongElapsedMs = 0, double previousSongLengthMs = 0)
     {
-        //We put the XP update to an own try catch because if the API fails or is not available,
-        //that the whole TryEnqueue does not fail
-        try
-        {
-            if (CurrentSong.Value != default)
-                _statisticsProvider?.UpdateXp(fullMapEntry.Hash, _currentSongTimer.ElapsedMilliseconds, _audioEngine.ChannelLength.Value);
-        }
-        catch (Exception e)
-        {
-            Debug.WriteLine($"Could not update XP error => {e}");
-        }
-    }
-
-    private async Task UpdateSongsPlayedOnApi(IMapEntryBase fullMapEntry, Config config, IMapEntry? previousSong = null, long previousSongElapsedMs = 0, double previousSongLengthMs = 0)
-    {
-        //Same as update XP mentioned Above
-        try
-        {
-            if (CurrentSong.Value != default)
-                _statisticsProvider?.UpdateSongsPlayed(fullMapEntry.BeatmapSetId);
-        }
-        catch (Exception e)
-        {
-            Debug.WriteLine($"Could not update Songs Played error => {e}");
-        }
-
         try
         {
             if (!config.Container.EnableScrobbling)

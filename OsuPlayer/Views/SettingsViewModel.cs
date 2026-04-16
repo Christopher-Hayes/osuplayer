@@ -10,7 +10,6 @@ using FluentAvalonia.UI.Controls;
 using Nein.Base;
 using Nein.Controls.Interfaces;
 using Nein.Extensions;
-using OsuPlayer.Api.Data.API.EntityModels;
 using OsuPlayer.Data.DataModels.Interfaces;
 using OsuPlayer.Data.OsuPlayer.Classes;
 using OsuPlayer.Data.OsuPlayer.Enums;
@@ -40,7 +39,6 @@ public class SettingsViewModel : BaseViewModel
     private readonly FluentAvaloniaTheme _faTheme;
     private readonly Bindable<bool> _playlistEnableOnPlay = new();
 
-    private readonly IProfileManagerService _profileManager;
     private readonly Bindable<SortingMode> _sortingMode = new();
 
     public readonly IPlayer Player;
@@ -262,8 +260,6 @@ public class SettingsViewModel : BaseViewModel
         get => _patchnotes;
         set => this.RaiseAndSetIfChanged(ref _patchnotes, value);
     }
-
-    public UserModel? CurrentUser => _profileManager.User;
 
     public string OsuLocation
     {
@@ -587,14 +583,13 @@ public class SettingsViewModel : BaseViewModel
         }
     }
 
-    public SettingsViewModel(IPlayer player, ISortProvider? sortProvider, IShuffleServiceProvider? shuffleServiceProvider, IProfileManagerService profileManager)
+    public SettingsViewModel(IPlayer player, ISortProvider? sortProvider, IShuffleServiceProvider? shuffleServiceProvider)
     {
         _faTheme = (Application.Current!.Styles[0] as FluentAvaloniaTheme)!;
 
         Player = player;
 
         _shuffleServiceProvider = shuffleServiceProvider;
-        _profileManager = profileManager;
 
         AvailableAudioDevices = Player.AvailableAudioDevices;
 

@@ -46,7 +46,6 @@
         <!-- Value Converters -->
         <internalValueConverters:PlaylistValueConverter x:Key="PlaylistValueConverter" />
 
-        <valueConverters:UsernameConverter x:Key="UsernameConverter" />
         <valueConverters:IconNameToIconKindConverter x:Key="IconNameToIconKindConverter" />
         <valueConverters:PlayPauseConverter x:Key="PlayPauseConverter" />
         <valueConverters:ShuffleConverter x:Key="ShuffleConverter" />
@@ -58,11 +57,6 @@
         <valueConverters:GridFormatter x:Key="GridFormatter" />
         <valueConverters:LastFmToAuthConverter x:Key="LastFmToAuthConverter" />
         <valueConverters:DecimalFormatter x:Key="DecimalFormatter" />
-        <valueConverters:OsuProfileConverter x:Key="OsuProfileConverter" />
-        <valueConverters:BeatmapModelFullSongNameConverter x:Key="FullSongNameConverter" />
-        <valueConverters:BeatmapModelLastPlayedConverter x:Key="LastPlayedConverter" />
-        <valueConverters:BeatmapModelMostPlayedConverter x:Key="MostPlayedConverter" />
-        <valueConverters:BeatmapModelTimesPlayedConverter x:Key="TimesPlayedConverter" />
     </Application.Resources>
 
     <Application.Styles>

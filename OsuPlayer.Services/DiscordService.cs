@@ -18,7 +18,6 @@ public class DiscordService : OsuPlayerService, IDiscordService
     private const string ApplicationId = "506435812397940736";
     private const string DefaultImageKey = "logo";
     private readonly DiscordRpcClient _client;
-    private readonly IProfileManagerService _profileManager;
     private readonly string _defaultOsuThumbnailUrl = "https://assets.ppy.sh/beatmaps/{0}/covers/list.jpg";
     private string _lastOsuThumbnailUrl = string.Empty;
 
@@ -27,13 +26,8 @@ public class DiscordService : OsuPlayerService, IDiscordService
     /// </summary>
     private readonly Assets _defaultAssets;
 
-    public DiscordService() : this(Locator.Current.GetRequiredService<IProfileManagerService>())
+    public DiscordService()
     {
-    }
-
-    public DiscordService(IProfileManagerService profileManager)
-    {
-        _profileManager = profileManager;
         _client = new DiscordRpcClient(ApplicationId);
 
         _defaultAssets = new Assets

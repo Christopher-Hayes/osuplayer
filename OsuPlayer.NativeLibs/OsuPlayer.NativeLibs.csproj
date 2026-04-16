@@ -4,9 +4,9 @@
         <OutputType>Library</OutputType>
         <AssemblyTitle>osu!player Libraries</AssemblyTitle>
         <AssemblyName>OsuPlayer.NativeLibs</AssemblyName>
-        <PackageProjectUrl>https://github.com/Founntain/osuplayer</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/Founntain/osuplayer</RepositoryUrl>
-        <Authors>Founntain</Authors>
+        <PackageProjectUrl>https://github.com/Christopher-Hayes/osuplayer</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Christopher-Hayes/osuplayer</RepositoryUrl>
+        <Authors>Chris Hayes</Authors>
         <PackageVersion>1.0.6</PackageVersion>
         <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     </PropertyGroup>
@@ -15,7 +15,7 @@
         <IsPackable>true</IsPackable>
         <Title>osu!player Libraries</Title>
         <Description>Native libraries for osu!player</Description>
-        <PackageId>Founntain.OsuPlayer.NativeLibs</PackageId>
+        <PackageId>ChrisHayes.OsuPlayer.NativeLibs</PackageId>
         <PackageTags>osuplayer libraries</PackageTags>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <PackageIcon>icon.png</PackageIcon>

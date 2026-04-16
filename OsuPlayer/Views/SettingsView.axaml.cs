@@ -175,11 +175,11 @@ public partial class SettingsView : ReactiveControl<SettingsViewModel>
         _mainWindow.ViewModel.MainView = _mainWindow.ViewModel.PlayHistoryView;
     }
 
-    private void ReportBug_OnClick(object? sender, RoutedEventArgs e) => GeneralExtensions.OpenUrl("https://github.com/founntain/osuplayer/issues/new/choose");
+    private void ReportBug_OnClick(object? sender, RoutedEventArgs e) => GeneralExtensions.OpenUrl("https://github.com/Christopher-Hayes/osuplayer/issues/new/choose");
 
     private void JoinDiscord_OnClick(object? sender, RoutedEventArgs e) => GeneralExtensions.OpenUrl("https://discord.gg/RJQSc5B");
 
-    private void ContactUs_OnClick(object? sender, RoutedEventArgs e) => GeneralExtensions.OpenUrl("https://github.com/founntain/osuplayer#-contact");
+    private void ContactUs_OnClick(object? sender, RoutedEventArgs e) => GeneralExtensions.OpenUrl("https://github.com/Christopher-Hayes/osuplayer#-contact");
 
-    private void Github_OnClick(object? sender, RoutedEventArgs e) => GeneralExtensions.OpenUrl("https://github.com/founntain/osuplayer");
+    private void Github_OnClick(object? sender, RoutedEventArgs e) => GeneralExtensions.OpenUrl("https://github.com/Christopher-Hayes/osuplayer");
 }

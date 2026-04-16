@@ -47,7 +47,7 @@ public partial class CrashHandlerMainWindow : ReactiveWindow<CrashHandlerMainWin
 
     private void GitHub_OnClick(object? sender, RoutedEventArgs e)
     {
-        GeneralExtensions.OpenUrl(@"https://github.com/osu-player/osuplayer/issues/new?assignees=&labels=bug&template=bug_report.md&title=%5BBUG%5D+");
+        GeneralExtensions.OpenUrl(@"https://github.com/Christopher-Hayes/osuplayer/issues/new?assignees=&labels=bug&template=bug_report.md&title=%5BBUG%5D+");
     }
 
     private void Discord_OnClick(object? sender, RoutedEventArgs e)
@@ -57,6 +57,6 @@ public partial class CrashHandlerMainWindow : ReactiveWindow<CrashHandlerMainWin
 
     private void Email_OnClick(object? sender, RoutedEventArgs e)
     {
-        GeneralExtensions.OpenUrl(@"mailto:7@founntain.dev");
+        GeneralExtensions.OpenUrl(@"https://github.com/Christopher-Hayes/osuplayer");
     }
 }

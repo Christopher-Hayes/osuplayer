@@ -76,7 +76,7 @@ public static class GitHub
         {
             var github = new GitHubClient(new ProductHeaderValue("osu!player"));
 
-            var releases = await github.Repository.Release.GetAll("Founntain", "osuplayer");
+            var releases = await github.Repository.Release.GetAll("Christopher-Hayes", "osuplayer");
 
             var includePreReleases = releaseChannel == ReleaseChannels.PreReleases;
 
@@ -134,7 +134,7 @@ public static class GitHub
         {
             var github = new GitHubClient(new ProductHeaderValue("osu!player"));
 
-            var githubData = await github.Repository.GetAllContributors("Founntain", "osuplayer");
+            var githubData = await github.Repository.GetAllContributors("Christopher-Hayes", "osuplayer");
 
             var result = new List<OsuPlayerContributor>();
 

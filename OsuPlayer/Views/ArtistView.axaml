@@ -6,6 +6,7 @@
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:interfaces="clr-namespace:OsuPlayer.Data.DataModels.Interfaces;assembly=OsuPlayer.Data"
              xmlns:customControls="clr-namespace:OsuPlayer.Views.CustomControls"
+             xmlns:classes="clr-namespace:OsuPlayer.Data.OsuPlayer.Classes;assembly=OsuPlayer.Data"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="OsuPlayer.Views.ArtistView"
              FontWeight="{DynamicResource DefaultFontWeight}">
@@ -17,7 +18,7 @@
   <ScrollViewer>
     <StackPanel Margin="0 1">
       <!-- Artist header: rounded square image + name/back-button -->
-      <Grid ColumnDefinitions="Auto, *" Margin="16 12">
+      <Grid ColumnDefinitions="Auto, *, Auto" Margin="16 12">
         <!-- Rounded square artist image (hidden until loaded) -->
         <Border Grid.Column="0"
                 Width="256" Height="256"
@@ -42,15 +43,49 @@
                      FontSize="64" FontWeight="Bold"
                      TextWrapping="Wrap" />
         </StackPanel>
-      </Grid>
 
-      <!-- Last.FM metadata (only visible when data is available) -->
-      <StackPanel IsVisible="{Binding HasLastFmData}" Margin="20 10 20 0">
-        <Grid ColumnDefinitions="*, Auto">
-          <!-- Tags (left) -->
-          <ItemsControl Grid.Column="0" ItemsSource="{Binding Tags}"
-                        IsVisible="{Binding Tags, Converter={x:Static ObjectConverters.IsNotNull}}"
-                        VerticalAlignment="Center">
+        <!-- Right-side header content (add to playlist, tags, stats) -->
+        <StackPanel
+        Grid.Column="2"
+        VerticalAlignment="Center"
+        HorizontalAlignment="Right"
+        Spacing="12"
+        Margin="8 8 16 8"
+        IsVisible="{Binding HasLastFmData}">
+          <!-- Add to playlist button -->
+          <Panel HorizontalAlignment="Right">
+            <Button Name="AddToPlaylistButton" Click="AddToPlaylistButton_Click"
+                    Padding="10 6" CornerRadius="6">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <avalonia:MaterialIcon Kind="PlaylistPlus" Height="18" Width="18" VerticalAlignment="Center" />
+                <TextBlock Text="Add to playlist" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <Popup PlacementMode="AnchorAndGravity"
+                   PlacementTarget="{Binding ElementName=AddToPlaylistButton}"
+                   Width="220" IsOpen="{Binding IsAddToPlaylistPopupOpen}"
+                   IsLightDismissEnabled="True">
+              <Border Background="{DynamicResource PopupBase}" CornerRadius="6" Padding="4">
+                <ItemsControl ItemsSource="{Binding PlaylistContextMenuEntries}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="classes:AddToPlaylistContextMenuEntry">
+                      <Button Background="Transparent" HorizontalAlignment="Stretch"
+                              HorizontalContentAlignment="Left"
+                              Padding="10 6"
+                              Click="PlaylistPopupItem_Click">
+                        <TextBlock Text="{Binding Name}" FontSize="13" />
+                      </Button>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Border>
+            </Popup>
+          </Panel>
+
+          <!-- Tags -->
+          <ItemsControl ItemsSource="{Binding Tags}"
+                        HorizontalAlignment="Right"
+                        IsVisible="{Binding Tags, Converter={x:Static ObjectConverters.IsNotNull}}">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <WrapPanel Orientation="Horizontal" />
@@ -58,17 +93,22 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                <Border Background="{DynamicResource BaseBrighterDarkTransparentColor}"
-                        CornerRadius="4" Padding="8 3" Margin="0 0 6 4">
+                <Border
+                  Background="Transparent"
+                  BorderBrush="{DynamicResource ButtonBorderBrush}"
+                  BorderThickness="1"
+                  CornerRadius="4"
+                  Padding="8 3"
+                  Margin="0 0 6 4">
                   <TextBlock Text="{Binding}" FontSize="12" />
                 </Border>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
 
-          <!-- Stats (right) -->
-          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16"
-                      VerticalAlignment="Center" Margin="12 0 0 0"
+          <!-- Stats -->
+          <StackPanel Orientation="Horizontal" Spacing="16"
+                      HorizontalAlignment="Right"
                       IsVisible="{Binding Listeners, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
             <StackPanel Orientation="Horizontal" Spacing="4">
               <avalonia:MaterialIcon Kind="AccountGroup" Height="16" Width="16" VerticalAlignment="Center" />
@@ -80,6 +120,10 @@
                 </TextBlock.Text>
               </TextBlock>
             </StackPanel>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="16"
+                      HorizontalAlignment="Right"
+                      IsVisible="{Binding Listeners, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
             <StackPanel Orientation="Horizontal" Spacing="4"
                         IsVisible="{Binding PlayCount, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
               <avalonia:MaterialIcon Kind="Play" Height="16" Width="16" VerticalAlignment="Center" />
@@ -92,15 +136,8 @@
               </TextBlock>
             </StackPanel>
           </StackPanel>
-        </Grid>
-
-        <!-- Biography
-        <TextBlock Text="{Binding Biography}" TextWrapping="Wrap" FontSize="13"
-        MaxLines="6" Margin="0 4 0 0"
-        IsVisible="{Binding Biography, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-        Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
-        -->
-      </StackPanel>
+        </StackPanel>
+      </Grid>
 
       <!-- Loading indicator -->
       <TextBlock Text="Loading Last.fm data..." FontSize="13" Margin="20 10"
@@ -109,7 +146,7 @@
 
       <!-- Songs header -->
       <Border Margin="0 10 0 0" Padding="20 8">
-        <TextBlock Text="Songs" FontSize="20" FontWeight="SemiBold" />
+        <TextBlock Text="Songs" FontSize="28" FontWeight="SemiBold" />
       </Border>
 
       <!-- Song list -->
@@ -153,19 +190,19 @@
               Grid.Row="0"
               Grid.Column="1"
               Text="{Binding TitleString}"
-              FontSize="28"
-              FontWeight="SemiBold"
+              FontSize="24"
+              FontWeight="Medium"
               VerticalAlignment="Center"
               />
-              <!-- <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ArtistString}"
-              FontSize="14"
-              Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
-              FontWeight="Medium" /> -->
 
-              <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
-                         Text="{Binding TotalTimeString}"
-                         FontSize="20" FontWeight="{DynamicResource BiggerFontWeight}"
-                         VerticalAlignment="Center" HorizontalAlignment="Center" />
+              <TextBlock
+              Grid.Column="2"
+              Grid.Row="0"
+              Grid.RowSpan="2"
+              Text="{Binding TotalTimeString}"
+              FontSize="16"
+              FontWeight="Medium"
+              VerticalAlignment="Center" HorizontalAlignment="Center" />
             </Grid>
           </DataTemplate>
         </ListBox.ItemTemplate>

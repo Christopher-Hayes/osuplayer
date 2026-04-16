@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using Nein.Base;
 using Nein.Extensions;
 using OsuPlayer.Data.DataModels.Interfaces;
+using OsuPlayer.Data.OsuPlayer.Classes;
 using OsuPlayer.Modules;
 using OsuPlayer.Modules.Audio.Interfaces;
 using OsuPlayer.Windows;
@@ -53,5 +54,18 @@ public partial class ArtistView : ReactiveControl<ArtistViewModel>
         var artistView = _mainWindow.ViewModel.ArtistView;
         _ = artistView.LoadArtistAsync(artist.Name);
         _mainWindow.ViewModel.MainView = artistView;
+    }
+
+    private void AddToPlaylistButton_Click(object? sender, RoutedEventArgs e)
+    {
+        ViewModel.IsAddToPlaylistPopupOpen = !ViewModel.IsAddToPlaylistPopupOpen;
+    }
+
+    private void PlaylistPopupItem_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Control { DataContext: AddToPlaylistContextMenuEntry entry }) return;
+
+        entry.Action(entry.Name);
+        ViewModel.IsAddToPlaylistPopupOpen = false;
     }
 }

@@ -150,12 +150,6 @@ public partial class PlaylistEditorView : ReactiveControl<PlaylistEditorViewMode
 
         if (ViewModel.CurrentSelectedPlaylist == null) return;
 
-        if (ViewModel.CurrentSelectedPlaylist.Name == "Favorites")
-        {
-            await MessageBox.ShowDialogAsync(_mainWindow, "No you can't delete your favorites! Sorry :(");
-            return;
-        }
-
         var playlists = await PlaylistManager.DeletePlaylistAsync(ViewModel.CurrentSelectedPlaylist);
 
         ViewModel.IsDeletePlaylistPopupOpen = false;

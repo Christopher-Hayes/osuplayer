@@ -237,7 +237,7 @@ public class Player : IPlayer, IImportNotifications
         var playlists = new PlaylistStorage();
 
         SelectedPlaylist.Value = playlists.Container.Playlists?.FirstOrDefault(x => x.Id == config.Container.SelectedPlaylist) ??
-                                 playlists.Container.Playlists?.First(y => y.Name == "Favorites");
+                                 playlists.Container.Playlists?.FirstOrDefault();
 
         switch (config.Container.StartupSong)
         {

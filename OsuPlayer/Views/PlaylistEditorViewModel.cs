@@ -57,12 +57,7 @@ public class PlaylistEditorViewModel : BaseViewModel
     public Playlist? CurrentSelectedPlaylist
     {
         get => _currentSelectedPlaylist;
-        set
-        {
-            _currentSelectedPlaylist = value;
-            this.RaisePropertyChanged();
-            this.RaisePropertyChanged(nameof(Playlists));
-        }
+        set => this.RaiseAndSetIfChanged(ref _currentSelectedPlaylist, value);
     }
 
     public SourceList<Playlist>? Playlists

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -11,7 +12,10 @@ using Nein.Base;
 using Nein.Extensions;
 using OsuPlayer.Data.DataModels;
 using OsuPlayer.Data.DataModels.Interfaces;
+using OsuPlayer.Data.OsuPlayer.Classes;
+using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.Interfaces.Service;
+using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.Modules.Audio.Interfaces;
 using OsuPlayer.Network.LastFm.Responses;
 using OsuPlayer.Network.MusicBrainz;
@@ -35,6 +39,9 @@ public class ArtistViewModel : BaseViewModel
     private bool _isLoading;
     private bool _hasLastFmData;
     private Bitmap? _artistImage;
+    private List<Playlist>? _playlists;
+    private List<AddToPlaylistContextMenuEntry>? _playlistContextMenuEntries;
+    private bool _isAddToPlaylistPopupOpen;
 
     public string ArtistName
     {
@@ -104,6 +111,18 @@ public class ArtistViewModel : BaseViewModel
 
     public bool DisplaySongListCovers => new Config().Container.DisplaySongListCovers;
 
+    public List<AddToPlaylistContextMenuEntry>? PlaylistContextMenuEntries
+    {
+        get => _playlistContextMenuEntries;
+        set => this.RaiseAndSetIfChanged(ref _playlistContextMenuEntries, value);
+    }
+
+    public bool IsAddToPlaylistPopupOpen
+    {
+        get => _isAddToPlaylistPopupOpen;
+        set => this.RaiseAndSetIfChanged(ref _isAddToPlaylistPopupOpen, value);
+    }
+
     public ArtistViewModel(IPlayer player)
     {
         Player = player;
@@ -128,6 +147,10 @@ public class ArtistViewModel : BaseViewModel
     {
         ArtistName = artistName;
         ArtistImage = null;
+
+        // Load playlists for the "Add to playlist" button
+        _playlists = (await PlaylistManager.GetAllPlaylistsAsync())?.ToList();
+        PlaylistContextMenuEntries = _playlists?.Select(x => new AddToPlaylistContextMenuEntry(x.Name, AddAllSongsToPlaylist)).ToList();
 
         // Populate songs by this artist
         var allSongs = Player.SongSourceProvider.SongSourceList;
@@ -229,6 +252,17 @@ public class ArtistViewModel : BaseViewModel
         Listeners = FormatStatNumber(info.Artist.Stats?.Listeners);
         PlayCount = FormatStatNumber(info.Artist.Stats?.Playcount);
         Tags = info.Artist.Tags?.Tag?.Select(t => t.Name ?? string.Empty).Where(t => !string.IsNullOrEmpty(t)).ToList();
+    }
+
+    private async void AddAllSongsToPlaylist(string name)
+    {
+        var playlist = _playlists?.FirstOrDefault(x => x.Name == name);
+        if (playlist == null || Songs == null) return;
+
+        foreach (var song in Songs)
+            await PlaylistManager.AddSongToPlaylistAsync(playlist, song);
+
+        Player.TriggerPlaylistChanged(new PropertyChangedEventArgs(name));
     }
 
     private void ApplySimilarArtists(SimilarArtistsResponse similar)

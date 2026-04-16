@@ -13,6 +13,7 @@ public class RealmMapEntryBase : IMapEntryBase
 
     public Guid Id { get; init; }
     public string? OsuPath { get; init; }
+    public string BackgroundFileLocation { get; init; } = string.Empty;
     public string Artist { get; init; } = string.Empty;
     public string ArtistUnicode { get; init; } = string.Empty;
     public string Title { get; init; } = string.Empty;

@@ -39,6 +39,7 @@ public class ConfigContainer : IStorableContainer
     public bool UseLeftNavigationPosition { get; set; } = true;
     public BitmapInterpolationMode RenderingMode { get; set; } = BitmapInterpolationMode.HighQuality;
     public bool DisplayAudioVisualizer { get; set; } = false;
+    public bool DisplaySongListCovers { get; set; } = true;
 
     public IStorableContainer Init()
     {

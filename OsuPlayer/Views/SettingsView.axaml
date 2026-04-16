@@ -167,6 +167,12 @@
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
 
+                    <ui:SettingsExpanderItem Content="Display Song List Covers" Description="Show the background image for each song in the song list. Disable if scrolling feels sluggish.">
+                        <ui:SettingsExpanderItem.Footer>
+                            <ToggleSwitch IsChecked="{Binding DisplaySongListCovers}" OnContent="On" OffContent="Off" />
+                        </ui:SettingsExpanderItem.Footer>
+                    </ui:SettingsExpanderItem>
+
                     <!-- <ui:SettingsExpanderItem Content="UI Font" -->
                     <!--                          Description="Select the font you want to use as UI Font. We recommend Montserrat"> -->
                     <!--     <ui:SettingsExpanderItem.Footer> -->

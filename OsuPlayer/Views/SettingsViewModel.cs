@@ -49,6 +49,7 @@ public class SettingsViewModel : BaseViewModel
 
     private bool _displayAudioVisualizer;
     private bool _displayBackgroundImage;
+    private bool _displaySongListCovers;
     private bool _enableScrobbling;
 
     private bool _isLastFmAuthorized;
@@ -98,6 +99,19 @@ public class SettingsViewModel : BaseViewModel
             config.Container.DisplayAudioVisualizer = value;
 
             MainWindow.SetAudioVisualization(value);
+        }
+    }
+
+    public bool DisplaySongListCovers
+    {
+        get => _displaySongListCovers;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _displaySongListCovers, value);
+
+            using var config = new Config();
+
+            config.Container.DisplaySongListCovers = value;
         }
     }
 
@@ -613,6 +627,7 @@ public class SettingsViewModel : BaseViewModel
         _useLeftNavigationPosition = config.Container.UseLeftNavigationPosition;
         _renderingMode = GetRenderingModeString(config.Container.RenderingMode);
         _displayAudioVisualizer = config.Container.DisplayAudioVisualizer;
+        _displaySongListCovers = config.Container.DisplaySongListCovers;
         _useSongNameUnicode = config.Container.UseSongNameUnicode;
 
         var lastFmApi = Locator.Current.GetService<ILastFmApiService>();

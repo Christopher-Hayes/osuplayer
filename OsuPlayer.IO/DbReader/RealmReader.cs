@@ -155,6 +155,18 @@ public class RealmReader : IDatabaseReader
             var totalTime = infos.Select(x => x.DynamicApi.Get<double>(nameof(BeatmapInfo.Length))).Max();
             var id = dynamicBeatmap.DynamicApi.Get<Guid>(nameof(BeatmapSetInfo.ID));
 
+            var backgroundFileName = metadata.Get<string>(nameof(BeatmapMetadata.BackgroundFile));
+            var files = (RealmList<DynamicEmbeddedObject>) dynamicBeatmap.DynamicApi.GetList<DynamicEmbeddedObject>(nameof(BeatmapSetInfo.Files));
+            var backgroundFile = (IRealmObjectBase) files.FirstOrDefault(x =>
+                string.Equals(x.DynamicApi.Get<string>(nameof(RealmNamedFileUsage.Filename)), backgroundFileName, StringComparison.CurrentCultureIgnoreCase));
+            var backgroundHash = backgroundFile?.DynamicApi.Get<IRealmObjectBase>(nameof(RealmNamedFileUsage.File)).DynamicApi.Get<string>(nameof(RealmFile.Hash));
+            var backgroundFolderName = backgroundHash != null
+                ? Path.Combine($"{backgroundHash[0]}", $"{backgroundHash[0]}{backgroundHash[1]}")
+                : string.Empty;
+            var backgroundFileLocation = string.IsNullOrEmpty(backgroundFolderName)
+                ? string.Empty
+                : Path.Combine(_path, "files", backgroundFolderName, backgroundHash!);
+
             minBeatMaps.Add(new RealmMapEntryBase
             {
                 DbReaderFactory = _readerFactory,
@@ -167,6 +179,7 @@ public class RealmReader : IDatabaseReader
                 TitleUnicode = string.Intern(titleUnicode),
                 TotalTime = (int) totalTime,
                 Id = id,
+                BackgroundFileLocation = backgroundFileLocation,
                 UseUnicode = config.Container.UseSongNameUnicode
             });
         }

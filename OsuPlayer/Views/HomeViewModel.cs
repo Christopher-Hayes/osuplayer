@@ -57,6 +57,8 @@ public class HomeViewModel : BaseViewModel
 
     public bool SongsLoading => new Config().Container.OsuPath != null && _songsLoading.Value;
 
+    public bool DisplaySongListCovers => new Config().Container.DisplaySongListCovers;
+
     public List<AddToPlaylistContextMenuEntry>? PlaylistContextMenuEntries
     {
         get => _playlistContextMenuEntries;

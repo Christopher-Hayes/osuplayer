@@ -95,6 +95,36 @@ Value converters in `OsuPlayer.Extensions/ValueConverters/` implement `IValueCon
 
 ---
 
+## Responsive UI
+
+Prefer declarative AXAML techniques over programmatic code-behind for responsive layout. Use the following priority order:
+
+1. **Container queries** — the preferred approach for anything size-driven. Mark an ancestor as a container and use `ContainerQuery` style blocks to change any property (font size, visibility, spacing, orientation, etc.) at breakpoints. This is the Avalonia equivalent of CSS media/container queries and keeps all layout logic in AXAML.
+
+   ```axaml
+   <ScrollViewer Container.Name="myView" Container.Sizing="Width">
+     <ScrollViewer.Styles>
+       <Style Selector="TextBlock#Title">
+         <Setter Property="FontSize" Value="48" />
+       </Style>
+       <ContainerQuery Name="myView" Query="max-width:800">
+         <Style Selector="TextBlock#Title">
+           <Setter Property="FontSize" Value="32" />
+         </Style>
+       </ContainerQuery>
+     </ScrollViewer.Styles>
+     ...
+   </ScrollViewer>
+   ```
+
+2. **`OnFormFactor`** — for structural differences between desktop and mobile that don't need to react to live resizing (resolved once at startup).
+
+3. **Reflowing panels** — `WrapPanel` or `UniformGridLayout` for collections of items that should naturally reflow without explicit breakpoints.
+
+4. **Breakpoint view models / code-behind** — last resort only, when the transition involves multiple coordinated changes, non-size triggers, or conditions that cannot be expressed in AXAML (e.g. dynamically changing `ColumnDefinitions` strings). Existing `SizeChanged` handlers in views like `ArtistView` are an example of this pattern where it was unavoidable.
+
+---
+
 ## Key areas and files
 
 ### Audio / playback
@@ -190,6 +220,59 @@ The project targets **Avalonia 11.3.14** / **FluentAvaloniaUI 2.4.1** / **SkiaSh
 - **`ItemsRepeater`, `StackLayout`, `WrapLayout`** do not exist in Avalonia 11.2+. Do not add the old `Avalonia.Controls.ItemsRepeater` NuGet package. Use `ItemsControl` + `ItemsPanelTemplate` with `StackPanel` or `WrapPanel` instead.
 - **`HyperlinkButton`** is in Avalonia core — use it without a namespace prefix, not `ui:HyperlinkButton`.
 - **`Avalonia.ReactiveUI`** must stay pinned at **11.3.9** (11.3.14 does not exist for this package).
+
+---
+
+## Threading
+
+Avalonia uses a single-threaded UI model. All control reads/writes must happen on the UI thread.
+
+- **Never block the UI thread** — use `async`/`await` instead of `.Result` or `.Wait()`, which risk deadlocks.
+- **Marshal background work to UI** — use `Dispatcher.UIThread.Post(() => ...)` (fire-and-forget) or `await Dispatcher.UIThread.InvokeAsync(() => ...)` (awaitable) to update controls from background threads.
+- **Event handlers already run on the UI thread** — don't wrap them in unnecessary `Dispatcher` calls.
+- **Use `Dispatcher.UIThread.CheckAccess()`** to verify thread before updating UI in shared code paths.
+- **Yield during heavy loops** — when processing many items on the UI thread, call `await Dispatcher.Yield(DispatcherPriority.Background)` between batches to keep the UI responsive.
+
+---
+
+## Performance
+
+### Virtualization
+
+- `ListBox` virtualizes by default — only visible items are rendered. **Do not place a `ListBox` inside a `StackPanel`** — it gives infinite height and disables virtualization. Use `Grid` with `RowDefinitions="*"` or `DockPanel` instead.
+- `ItemsControl` does **not** virtualize. For large collections, prefer `ListBox` (if selection is needed) or wrap items in a `ScrollViewer` for automatic virtualization.
+- Using `WrapPanel` or `StackPanel` as an `ItemsPanel` disables virtualization. Only `VirtualizingStackPanel` virtualizes.
+
+### Layout
+
+- Prefer simpler panels (`StackPanel`, `Panel`) over `Grid` when possible — they are lighter.
+- Avoid deeply nesting panels beyond 3 levels. A single `Grid` with proper row/column definitions is often better.
+- For large scrollable lists, always use `ListBox` with virtualization, not hundreds of controls in a `StackPanel` inside a `ScrollViewer`.
+
+### Rendering
+
+- **Hide unused controls with `IsVisible="False"`** instead of `Opacity="0"` — invisible controls skip layout and rendering entirely.
+- **Minimize blur effects** (`BlurEffect`, `DropShadowEffect` with blur) — they significantly impact frame rates, especially on lower-end hardware.
+- Ensure `UseLayoutRounding="True"` for crisp text and icon rendering.
+
+### Data binding
+
+- Resolve binding errors — they appear in the Output window and cause repeated failed lookups each frame.
+- Use `ObservableCollection<T>` for bound lists, not `List<T>` — plain lists don't notify the UI of changes.
+
+---
+
+## Styling best practices
+
+Avalonia uses a CSS-inspired styling system. Follow these guidelines:
+
+- **Prefer style classes over inline properties** — define shared visual attributes in `<Style>` blocks and apply via `Classes="my-class"` rather than repeating `Background`, `Padding`, etc. on every control.
+- **Order selectors general to specific** — later declarations win when specificity is equal. Place base styles first, then class-specific, then pseudo-class overrides.
+- **Local values beat styles** — a property set directly on a control (e.g. `FontSize="24"` in AXAML) overrides any style setter. Remove the inline value if you want a style to control it.
+- **Use `DynamicResource` for theme-aware values** — prefer `{DynamicResource SomeKey}` over hardcoded colors so the UI responds to theme changes.
+- **Scope styles appropriately** — app-wide styles go in `App.axaml` or shared style files; page-specific styles go in `<UserControl.Styles>`; component-specific styles go in `<Control.Styles>`.
+- **Use DevTools (F12) at runtime** to inspect the visual tree, active styles, and which value source is winning for a given property.
+- **Pseudo-classes in control themes** — overriding a property like `Background` on a `Button` style won't affect the `:pointerover` state if the button's control theme sets `Background` on an inner template element. Use `/template/` selectors or override the template to target inner parts.
 
 ---
 

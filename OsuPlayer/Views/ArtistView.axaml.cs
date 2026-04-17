@@ -68,4 +68,25 @@ public partial class ArtistView : ReactiveControl<ArtistViewModel>
         entry.Action(entry.Name);
         ViewModel.IsAddToPlaylistPopupOpen = false;
     }
+
+    private const double RightHeaderMinWidth = 1000;
+    private const double ArtistImageMinWidth = 800;
+
+    private void ArtistView_SizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        var showRightHeader = e.NewSize.Width >= RightHeaderMinWidth;
+        var showArtistImage = e.NewSize.Width >= ArtistImageMinWidth;
+
+        if (RightHeaderWrapper is { } wrapper)
+            wrapper.IsVisible = showRightHeader;
+
+        if (ArtistHeaderGrid is { } grid)
+        {
+            grid.ColumnDefinitions = new ColumnDefinitions(
+              $"{(showArtistImage ? "256" : "0")}, *, {(showRightHeader ? "Auto" : "0")}");
+
+            if (ArtistImageBorder is { } border)
+                border.IsVisible = showArtistImage && ViewModel?.ArtistImage != null;
+        }
+    }
 }

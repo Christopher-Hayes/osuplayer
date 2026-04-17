@@ -9,27 +9,50 @@
              xmlns:classes="clr-namespace:OsuPlayer.Data.OsuPlayer.Classes;assembly=OsuPlayer.Data"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="OsuPlayer.Views.ArtistView"
-             FontWeight="{DynamicResource DefaultFontWeight}">
+             FontWeight="{DynamicResource DefaultFontWeight}"
+             SizeChanged="ArtistView_SizeChanged">
 
   <Design.DataContext>
     <views:ArtistViewModel />
   </Design.DataContext>
 
-  <ScrollViewer>
+  <ScrollViewer Container.Name="artistView" Container.Sizing="Width">
+    <ScrollViewer.Styles>
+      <!-- Default font size (wide) -->
+      <Style Selector="TextBlock#ArtistNameText">
+        <Setter Property="FontSize" Value="64" />
+      </Style>
+      <ContainerQuery Name="artistView" Query="max-width:1199">
+        <Style Selector="TextBlock#ArtistNameText">
+          <Setter Property="FontSize" Value="48" />
+        </Style>
+      </ContainerQuery>
+      <ContainerQuery Name="artistView" Query="max-width:899">
+        <Style Selector="TextBlock#ArtistNameText">
+          <Setter Property="FontSize" Value="36" />
+        </Style>
+      </ContainerQuery>
+      <ContainerQuery Name="artistView" Query="max-width:799">
+        <Style Selector="TextBlock#ArtistNameText">
+          <Setter Property="FontSize" Value="48" />
+        </Style>
+      </ContainerQuery>
+    </ScrollViewer.Styles>
     <StackPanel Margin="0 1">
       <!-- Artist header: rounded square image + name/back-button -->
-      <Grid ColumnDefinitions="Auto, *, Auto" Margin="16 12">
+      <Grid x:Name="ArtistHeaderGrid" ColumnDefinitions="256, *, Auto" Margin="16 12">
         <!-- Rounded square artist image (hidden until loaded) -->
-        <Border Grid.Column="0"
-                Width="256" Height="256"
+        <Border x:Name="ArtistImageBorder"
+                Grid.Column="0"
+                Height="256"
                 CornerRadius="20"
                 ClipToBounds="True"
+                HorizontalAlignment="Stretch"
                 IsVisible="{Binding ArtistImage, Converter={x:Static ObjectConverters.IsNotNull}}"
                 Margin="0 0 32 0"
                 VerticalAlignment="Center">
           <Image Source="{Binding ArtistImage}"
-                 Stretch="UniformToFill"
-                 Width="256" Height="256" />
+                 Stretch="UniformToFill" />
         </Border>
 
         <!-- Name + back button -->
@@ -39,14 +62,15 @@
                   HorizontalAlignment="Left">
             <avalonia:MaterialIcon Kind="ArrowLeft" Height="24" Width="24" />
           </Button>
-          <TextBlock Text="{Binding ArtistName}"
-                     FontSize="64" FontWeight="Bold"
+          <TextBlock x:Name="ArtistNameText"
+                     Text="{Binding ArtistName}"
+                     FontWeight="Bold"
                      TextWrapping="Wrap" />
         </StackPanel>
 
         <!-- Right-side header content (add to playlist, tags, stats) -->
+        <Border x:Name="RightHeaderWrapper" Grid.Column="2">
         <StackPanel
-        Grid.Column="2"
         VerticalAlignment="Center"
         HorizontalAlignment="Right"
         Spacing="12"
@@ -137,6 +161,7 @@
             </StackPanel>
           </StackPanel>
         </StackPanel>
+        </Border>
       </Grid>
 
       <!-- Loading indicator -->

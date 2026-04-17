@@ -92,7 +92,13 @@
       </Border>
     </Grid>
 
-    <ui:NavigationView Grid.Row="1" Name="AppNavigationView" PaneDisplayMode="LeftCompact" ItemInvoked="AppNavigationView_OnItemInvoked" IsSettingsVisible="False">
+    <ui:NavigationView
+      Grid.Row="1"
+      CompactPaneLength="48"
+      OpenPaneLength="200"
+      PaneDisplayMode="LeftCompact"
+      Name="AppNavigationView"
+      ItemInvoked="AppNavigationView_OnItemInvoked" IsSettingsVisible="False">
       <ui:NavigationView.Resources>
         <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="Transparent" />
         <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />

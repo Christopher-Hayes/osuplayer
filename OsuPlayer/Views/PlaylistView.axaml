@@ -16,9 +16,9 @@
     <views:PlaylistViewModel />
   </Design.DataContext>
 
-  <Grid ColumnDefinitions="15*, 1, 85*">
-    <Grid Column="0" Margin="0 1" RowDefinitions="auto, *, auto, auto" Background="{DynamicResource BaseBrighterDarkTransparentColor}">
-      <Border Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{DynamicResource BaseBrightDarkTransparentColor}">
+  <Grid ColumnDefinitions="240, 1, *">
+    <Grid Column="0" Margin="0 1" RowDefinitions="auto, *, auto, auto">
+      <Border Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <TextBlock Text="Your Playlists" FontSize="24" Margin="16 12 4 8" VerticalAlignment="Center" HorizontalAlignment="Left" />
       </Border>
 

@@ -9,6 +9,7 @@ using Nein.Extensions;
 using OsuPlayer.Data.DataModels.Interfaces;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.Interfaces.Service;
+using OsuPlayer.IO.Importer;
 using OsuPlayer.IO.Storage.Config;
 using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.Modules.Audio.Interfaces;
@@ -139,6 +140,20 @@ public class PlaylistViewModel : BaseViewModel
                 var config = new Config();
                 SelectedPlaylist = Playlists.FirstOrDefault(x => x.Id == config.Container.SelectedPlaylist) ?? Playlists[0];
             }
+
+            // If songs haven't loaded yet, re-trigger the SelectedPlaylist setter once they do
+            // so the song list is populated with real entries rather than staying empty.
+            ((IImportNotifications)Player).SongsLoading.BindValueChanged(e =>
+            {
+                if (e.NewValue) return; // still loading
+                Dispatcher.UIThread.Post(() =>
+                {
+                    var current = SelectedPlaylist;
+                    if (current == null) return;
+                    SelectedPlaylist = null;
+                    SelectedPlaylist = current;
+                });
+            }, true);
         });
     }
 

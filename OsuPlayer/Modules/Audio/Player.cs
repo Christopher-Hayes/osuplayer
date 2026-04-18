@@ -125,6 +125,7 @@ public class Player : IPlayer, IImportNotifications
         PlaylistEnableOnPlay.Value = config.Container.PlaylistEnableOnPlay;
         RepeatMode.Value = config.Container.RepeatMode;
         IsShuffle.Value = config.Container.IsShuffle;
+        SetPlaybackSpeed(config.Container.PlaybackSpeed);
     }
 
     private void InitPlayer(ISongSourceProvider songSourceProvider)
@@ -173,10 +174,6 @@ public class Player : IPlayer, IImportNotifications
 
             playlist?.Songs.RemoveWhere(song => invalidHashes.Contains(song));
         }
-
-        if (CurrentSong.Value == null) return;
-
-        if (!ActivePlaylistSongs.Contains(CurrentSong.Value)) await NextSong(PlayDirection.Forward);
     }
 
     private async void OnActiveArtistContextChanged(ValueChangedEvent<string?> artistContext)
@@ -242,6 +239,16 @@ public class Player : IPlayer, IImportNotifications
 
         SelectedPlaylist.Value = playlists.Container.Playlists?.FirstOrDefault(x => x.Id == config.Container.SelectedPlaylist) ??
                                  playlists.Container.Playlists?.FirstOrDefault();
+
+        // Restore the active play context (playlist or artist) from last session
+        if (config.Container.LastActiveArtist != null)
+        {
+            ActiveArtistContext.Value = config.Container.LastActiveArtist;
+        }
+        else if (config.Container.ActivePlaylistContextId.HasValue)
+        {
+            ActivePlaylistContext.Value = playlists.Container.Playlists?.FirstOrDefault(x => x.Id == config.Container.ActivePlaylistContextId.Value);
+        }
 
         switch (config.Container.StartupSong)
         {

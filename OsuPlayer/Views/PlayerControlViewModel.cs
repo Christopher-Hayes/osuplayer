@@ -193,6 +193,7 @@ public class PlayerControlViewModel : BaseViewModel
         var config = new Config();
 
         _displayBackgroundImage = !config.Container.DisplayBackgroundImage;
+        _playbackSpeed = config.Container.PlaybackSpeed;
 
         // PanelMaterial = new ExperimentalAcrylicMaterial
         // {

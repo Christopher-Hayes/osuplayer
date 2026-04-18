@@ -6,6 +6,7 @@ using OsuPlayer.Data.DataModels.Interfaces;
 using OsuPlayer.Data.OsuPlayer.Enums;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.IO.Storage.Blacklist;
+using OsuPlayer.IO.Storage.Config;
 using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.Modules;
 using OsuPlayer.Modules.Audio.Interfaces;
@@ -153,6 +154,9 @@ public class MiniplayerViewModel : BaseWindowViewModel
 
         // Design-time: skip service wiring
         if (player is null) return;
+
+        var config = new Config();
+        _playbackSpeed = config.Container.PlaybackSpeed;
 
         _songTime.BindTo(bassEngine.ChannelPosition);
         _songTime.BindValueChanged(_ => this.RaisePropertyChanged(nameof(SongTime)));

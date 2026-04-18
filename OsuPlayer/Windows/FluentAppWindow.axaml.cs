@@ -1,10 +1,14 @@
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Styling;
+using Avalonia.Threading;
 using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Windowing;
 using LiveChartsCore.Defaults;
@@ -21,6 +25,7 @@ using OsuPlayer.Services;
 using OsuPlayer.Styles;
 using OsuPlayer.UI_Extensions;
 using OsuPlayer.Views;
+using System.Reactive.Disposables;
 using ReactiveUI;
 using Splat;
 
@@ -29,6 +34,12 @@ namespace OsuPlayer.Windows;
 public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewModel>
 {
     private readonly ILoggingService _loggingService;
+
+    /// <summary>The bitmap currently visible in the BgNew* slot (owned here for disposal).</summary>
+    private Bitmap? _currentBgBitmap;
+
+    /// <summary>Cancels any in-progress background crossfade so a new one can start immediately.</summary>
+    private CancellationTokenSource? _bgCts;
 
     public Miniplayer? Miniplayer;
     public FullscreenWindow? FullscreenWindow;
@@ -179,11 +190,39 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
             }
         });
 
-        this.WhenActivated(_ =>
+        this.WhenActivated(disposables =>
         {
             if (ViewModel == null) return;
 
-            ViewModel.MainView = ViewModel.HomeView;
+            using var startupConfig = new Config();
+            var lastView = startupConfig.Container.LastActiveView;
+
+            if (lastView != null && lastView.StartsWith("artist:"))
+            {
+                var artistName = lastView.Substring("artist:".Length);
+                ViewModel.MainView = ViewModel.ArtistView;
+
+                // Defer the actual artist load until songs have finished importing,
+                // otherwise the song list and cover image will be empty.
+                var importNotifications = (IImportNotifications)ViewModel.Player;
+                importNotifications.SongsLoading
+                    .BindValueChanged(e =>
+                    {
+                        if (e.NewValue) return; // still loading
+                        Dispatcher.UIThread.Post(() => _ = ViewModel.ArtistView.LoadArtistAsync(artistName));
+                    }, true);
+            }
+            else
+            {
+                ViewModel.MainView = lastView switch
+                {
+                    "ArtistsNavigation"  => (BaseViewModel)ViewModel.ArtistsView,
+                    "PlaylistNavigation" => ViewModel.PlaylistView,
+                    "SettingsNavigation" => ViewModel.SettingsView,
+                    "SearchNavigation"   => ViewModel.SearchView,
+                    _                    => ViewModel.HomeView
+                };
+            }
 
             // Keep the nav sidebar selection in sync when navigation happens programmatically
             // (e.g. clicking song name / artist / playlist label in the player bar).
@@ -207,7 +246,12 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
                     .FirstOrDefault(item => item.Tag as string == tag);
 
                 AppNavigationView.SelectedItem = match;
-            });
+            }).DisposeWith(disposables);
+
+            // Crossfade the background image whenever the current song changes.
+            ViewModel.WhenAnyValue(x => x.BackgroundImage)
+                .Subscribe(newBitmap => _ = CrossfadeBackgroundAsync(newBitmap))
+                .DisposeWith(disposables);
 
             using var config = new Config();
 
@@ -293,7 +337,21 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
         config.Container.Volume = ViewModel.Player.Volume.Value;
         config.Container.RepeatMode = ViewModel.Player.RepeatMode.Value;
         config.Container.IsShuffle = ViewModel.Player.IsShuffle.Value;
+        config.Container.PlaybackSpeed = ViewModel.PlayerControl.PlaybackSpeed;
         config.Container.SelectedPlaylist = ViewModel.Player.SelectedPlaylist.Value?.Id;
+        config.Container.ActivePlaylistContextId = ViewModel.Player.ActivePlaylistContext.Value?.Id;
+        config.Container.LastActiveArtist = ViewModel.Player.ActiveArtistContext.Value;
+
+        config.Container.LastActiveView = ViewModel.MainView switch
+        {
+            HomeViewModel     => "HomeNavigation",
+            ArtistsViewModel  => "ArtistsNavigation",
+            ArtistViewModel a => $"artist:{a.ArtistName}",
+            PlaylistViewModel => "PlaylistNavigation",
+            SettingsViewModel => "SettingsNavigation",
+            SearchViewModel   => "SearchNavigation",
+            _                 => "HomeNavigation"
+        };
 
         // Persist window size/state so it can be restored on next launch
         config.Container.WindowState = (int)WindowState;
@@ -381,6 +439,95 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
         RenderOptions.SetBitmapInterpolationMode(this, renderMode);
     }
 
+    /// <summary>
+    /// Crossfades the background from the previously displayed image to <paramref name="newBitmap"/>.
+    /// The outgoing image fades from 0.25 → 0 while the incoming image fades from 0 → 0.25.
+    /// Any in-progress crossfade is cancelled so fast song skipping stays responsive.
+    /// </summary>
+    private async Task CrossfadeBackgroundAsync(Bitmap? newBitmap)
+    {
+        // Cancel any in-progress fade so the new one starts immediately.
+        _bgCts?.Cancel();
+        _bgCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _bgCts = cts;
+
+        var oldBitmap = _currentBgBitmap;
+        _currentBgBitmap = newBitmap;
+
+        // Snapshot the current displayed opacity of the BgNew* slot (may be mid-animation).
+        var prevOpacity = BgNewAcrylic.Opacity;
+
+        // Promote current → prev slot.
+        BgPrevAcrylic.Source = BgNewAcrylic.Source;
+        BgPrevLinux.Source   = BgNewLinux.Source;
+        BgPrevAcrylic.Opacity = prevOpacity;
+        BgPrevLinux.Opacity   = prevOpacity;
+
+        // Load new image into the incoming slot, fully transparent.
+        BgNewAcrylic.Source = newBitmap;
+        BgNewLinux.Source   = newBitmap;
+        BgNewAcrylic.Opacity = 0;
+        BgNewLinux.Opacity   = 0;
+
+        // Nothing to animate if both are empty.
+        if (oldBitmap == null && newBitmap == null)
+            return;
+
+        const double TargetOpacity = 0.25;
+        var duration = TimeSpan.FromMilliseconds(600);
+
+        var fadeOut = new Animation
+        {
+            Duration = duration,
+            FillMode = FillMode.Forward,
+            Children =
+            {
+                new KeyFrame { Cue = new Cue(0d), Setters = { new Setter(OpacityProperty, prevOpacity) } },
+                new KeyFrame { Cue = new Cue(1d), Setters = { new Setter(OpacityProperty, 0d) } }
+            }
+        };
+
+        var targetOpacity = newBitmap != null ? TargetOpacity : 0d;
+        var fadeIn = new Animation
+        {
+            Duration = duration,
+            FillMode = FillMode.Forward,
+            Children =
+            {
+                new KeyFrame { Cue = new Cue(0d), Setters = { new Setter(OpacityProperty, 0d) } },
+                new KeyFrame { Cue = new Cue(1d), Setters = { new Setter(OpacityProperty, targetOpacity) } }
+            }
+        };
+
+        try
+        {
+            await Task.WhenAll(
+                fadeOut.RunAsync(BgPrevAcrylic, cts.Token),
+                fadeOut.RunAsync(BgPrevLinux,   cts.Token),
+                fadeIn.RunAsync(BgNewAcrylic,   cts.Token),
+                fadeIn.RunAsync(BgNewLinux,     cts.Token)
+            );
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (cts.Token.IsCancellationRequested) return;
+
+        // Settle final opacities and release the prev slot.
+        BgNewAcrylic.Opacity  = targetOpacity;
+        BgNewLinux.Opacity    = targetOpacity;
+        BgPrevAcrylic.Opacity = 0;
+        BgPrevLinux.Opacity   = 0;
+        BgPrevAcrylic.Source  = null;
+        BgPrevLinux.Source    = null;
+
+        // Dispose the bitmap that was showing before this transition.
+        oldBitmap?.Dispose();
+    }
+
     public void SetAudioVisualization(bool value)
     {
         if (ViewModel == default) return;
@@ -393,7 +540,7 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
         {
             ViewModel.AudioVisualizer.AudioVisualizerUpdateTimer.Stop();
 
-            for (var i = 0; i < 4096; i++)
+            for (var i = 0; i < ViewModel.AudioVisualizer.SeriesValues.Count; i++)
             {
                 ViewModel.AudioVisualizer.SeriesValues[i] = new ObservableValue(0);
             }

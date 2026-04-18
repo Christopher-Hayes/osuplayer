@@ -65,20 +65,25 @@ public partial class AudioVisualizerView : ReactiveUserControl<AudioVisualizerVi
 
                 var vData = ViewModel.AudioEngine.GetVisualizationData();
                 var barCount = ViewModel.SeriesValues.Count;
-                var step = vData.Length / (double)barCount;
+
+                // FFT bins span 0–Nyquist (≈22 kHz) linearly.
+                // Music energy above ~10 kHz is minimal, so cap at 45 % of the
+                // bin array to avoid a flat right-hand section in the visualizer.
+                var usableBins = (int)(vData.Length * 0.45);
+                var step = usableBins / (double)barCount;
 
                 for (var i = 0; i < barCount; i++)
                 {
                     // Average the FFT bins that map to this bar
                     var startBin = (int)(i * step);
-                    var endBin = Math.Min((int)((i + 1) * step), vData.Length);
+                    var endBin = Math.Min((int)((i + 1) * step), usableBins);
                     var sum = 0.0;
                     for (var b = startBin; b < endBin; b++)
                         sum += vData[b];
                     var avg = endBin > startBin ? sum / (endBin - startBin) : 0.0;
 
                     // square root scaling for better visual distribution, clamped to Y-axis MaxLimit
-                    var scaled = Math.Min(Math.Pow(avg, 0.6) * 3, 1.0);
+                    var scaled = Math.Min(Math.Pow(avg, 0.7) * 3, 1.0);
                     ViewModel.SeriesValues[i].Value = scaled < 0.01 ? 0 : scaled;
                 }
             }

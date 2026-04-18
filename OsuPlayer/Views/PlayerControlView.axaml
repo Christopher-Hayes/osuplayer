@@ -6,7 +6,7 @@
              xmlns:views="clr-namespace:OsuPlayer.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OsuPlayer.Views.PlayerControlView"
-        x:DataType="views:PlayerControlViewModel"
+             x:DataType="views:PlayerControlViewModel"
              FontWeight="{DynamicResource DefaultFontWeight}">
   <UserControl.Styles>
     <StyleInclude Source="/Styles/SliderStyle.axaml" />
@@ -18,10 +18,11 @@
   </Design.DataContext>
 
   <Border
-  Padding="16 24 16 8">
-  <!-- Background="{DynamicResource BaseBrightDarkTransparentColor}"> -->
+  Padding="16 24 24 0">
     <Grid
-    RowDefinitions="30, *">
+    RowDefinitions="30, *"
+    Height="110"
+    >
       <Grid Grid.Row="0" ColumnDefinitions="60, *, 60">
 
         <TextBlock x:Name="CurrentSongTimeText" Text="{Binding CurrentSongTime}" VerticalAlignment="Center"
@@ -39,34 +40,36 @@
 
       <Grid Grid.Row="1" ColumnDefinitions="*, Auto, *">
         <ContentControl
-          Grid.ColumnSpan="4"
-          Content="{Binding MainWindowViewModel.AudioVisualizer}"
-          Margin="0 0 0 -12"
-          Padding="96 0 0 0"
-          Height="96"
-          />
+        Grid.ColumnSpan="4"
+        Content="{Binding MainWindowViewModel.AudioVisualizer}"
+        Margin="0 0 0 54"
+        Padding="88 0 0 0"
+        Height="130"
+        />
 
         <Grid Grid.Column="0" ColumnDefinitions="Auto, *">
-          <Button Grid.Column="0"
-                  Theme="{StaticResource TransparentButton}"
-                  Click="ArtworkButton_OnClick"
-                  Cursor="Hand"
-                  Width="80" Height="58"
-                  Margin="6"
-                  Padding="0"
-                  VerticalAlignment="Center">
+          <Button
+          Grid.Column="0"
+          Theme="{StaticResource TransparentButton}"
+          Click="ArtworkButton_OnClick"
+          Cursor="Hand"
+          Width="80" Height="64"
+          Margin="6"
+          Padding="0"
+          VerticalAlignment="Center">
             <ToolTip.Tip>
               <TextBlock Text="Open artwork" />
             </ToolTip.Tip>
-            <Panel>
-              <Border CornerRadius="8" ClipToBounds="True">
+            <Border CornerRadius="8" ClipToBounds="True">
+              <Panel>
                 <Image Stretch="UniformToFill" Source="{Binding CurrentSongImage}" />
-              </Border>
-              <Panel Classes="ArtworkHint" Background="#99000000" IsHitTestVisible="False">
-                <avalonia:MaterialIcon Kind="ChevronUp" Width="28" Height="28" Foreground="White"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <Panel Classes="ArtworkHint" Background="#99000000" IsHitTestVisible="False">
+                  <avalonia:MaterialIcon
+                  Kind="ChevronUp" Width="28" Height="28" Foreground="White"
+                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Panel>
               </Panel>
-            </Panel>
+            </Border>
             <Button.Styles>
               <Style Selector="Button Panel.ArtworkHint">
                 <Setter Property="IsVisible" Value="False" />
@@ -88,7 +91,7 @@
               <TextBlock Name="TitleText" Text="{Binding TitleText}" FontSize="20" Foreground="White" TextTrimming="CharacterEllipsis" />
             </Button>
             <Button Name="ArtistText" Theme="{StaticResource TransparentButton}" Cursor="Hand"
-                    Click="ArtistText_OnClick" Margin="6 0 0 0" Padding="6 2">
+                    Click="ArtistText_OnClick" Margin="6 0 0 2" Padding="6 2">
               <ToolTip.Tip>
                 <TextBlock Text="Open artist" />
               </ToolTip.Tip>
@@ -185,7 +188,7 @@
             <avalonia:MaterialIcon Kind="{Binding IsCurrentSongInPlaylist, Converter={StaticResource IsCurrentSongInPlaylistConverter}}" Height="19" Width="19" />
           </Button>
 
-          <Button Name="Blacklist" Width="38" Height="38" CornerRadius="50" Click="Blacklist_OnClick" Theme="{StaticResource TransparentButton}">
+          <Button Name="Blacklist" Margin="0 0 8 0" Width="38" Height="38" CornerRadius="50" Click="Blacklist_OnClick" Theme="{StaticResource TransparentButton}">
             <ToolTip.Tip>
               <TextBlock Text="Add / remove from blacklist" />
             </ToolTip.Tip>
@@ -213,7 +216,7 @@
             <ToolTip.Tip>
               <TextBlock Text="Play / Pause" />
             </ToolTip.Tip>
-            <avalonia:MaterialIcon Kind="{Binding IsPlaying, Converter={StaticResource PlayPauseConverter}}" Height="40" Width="40" />
+            <avalonia:MaterialIcon Kind="{Binding IsPlaying, Converter={StaticResource PlayPauseConverter}}" Height="32" Width="32" />
           </Button>
 
           <Button Name="Next" Width="38" Height="38" CornerRadius="50" Margin="4 0" Click="SongControl" Theme="{StaticResource TransparentButton}">

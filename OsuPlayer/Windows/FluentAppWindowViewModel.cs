@@ -131,8 +131,6 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
         {
             Dispatcher.UIThread.Post(() =>
             {
-                BackgroundImage?.Dispose();
-
                 if (!DisplayBackgroundImage)
                 {
                     BackgroundImage = null;

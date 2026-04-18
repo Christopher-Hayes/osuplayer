@@ -17,12 +17,12 @@
 
     <Grid RowDefinitions="*" ColumnDefinitions="50*, 50*" Background="Transparent">
         <!--Songs Grid-->
-        <Grid Row="0" Column="0" ColumnSpan="2" RowDefinitions="50, *" Margin="0 1">
-            <Border Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{DynamicResource BaseBrighterDarkTransparentColor}">
+        <Grid Row="0" Column="0" ColumnSpan="2" RowDefinitions="Auto, *" Margin="0 1">
+            <Border Grid.Row="0" Padding="8 24 8 12" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                 <Grid ColumnDefinitions="*, Auto">
-                    <TextBlock Grid.Column="0" Text="Your songs" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="16 12 0 8" />
+                    <TextBlock Grid.Column="0" Text="Your songs" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="16 12 0 8" />
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="0 0 24 0">
-                        <TextBlock Text="Sort:" VerticalAlignment="Center" FontSize="14" />
+                        <TextBlock Text="Sort by" Margin="0 0 4 0" VerticalAlignment="Center" FontSize="14" />
                         <ComboBox ItemsSource="{Binding SortingModes}"
                                   SelectedItem="{Binding SelectedSortingMode}"
                                   VerticalAlignment="Center" />
@@ -31,9 +31,14 @@
             </Border>
 
             <ListBox Grid.Row="1" x:Name="SongListBox"
+              Padding="8 0"
                      ItemsSource="{Binding SortedSongEntries}" Background="Transparent"
                      Tapped="InputElement_OnDoubleTapped" SelectedItem="{Binding SelectedSong}">
+
                 <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Margin" Value="0 2" />
+                    </Style>
                     <Style Selector="ListBoxItem.playing">
                         <Setter Property="Background" Value="#28FFFFFF" />
                     </Style>

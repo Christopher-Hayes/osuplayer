@@ -6,47 +6,52 @@
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OsuPlayer.Views.ArtistsView"
-        x:DataType="views:ArtistsViewModel"
+             x:DataType="views:ArtistsViewModel"
              FontWeight="{DynamicResource DefaultFontWeight}">
 
-    <Design.DataContext>
-        <views:ArtistsViewModel />
-    </Design.DataContext>
+  <Design.DataContext>
+    <views:ArtistsViewModel />
+  </Design.DataContext>
 
-    <Grid RowDefinitions="50, Auto, *" Margin="0 1">
-        <Border Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                Background="{DynamicResource BaseBrighterDarkTransparentColor}">
-            <Grid ColumnDefinitions="*, Auto">
-                <TextBlock Grid.Column="0" Text="Artists" FontSize="24"
-                           VerticalAlignment="Center" HorizontalAlignment="Left" Margin="16 12 0 8" />
-            </Grid>
-        </Border>
+  <Grid RowDefinitions="50, Auto, *" Margin="0 1">
+    <Border Grid.Row="0" Padding="8 24 8 12" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+            >
+      <Grid ColumnDefinitions="*, Auto">
+        <TextBlock
+        Grid.Column="0"
+        Text="Artists"
+        FontSize="32"
+        Margin="16 12 0 8"
+        VerticalAlignment="Center"
+        HorizontalAlignment="Left" />
+      </Grid>
+    </Border>
 
-        <TextBox Grid.Row="1" Margin="10" Text="{Binding FilterText}" PlaceholderText="search artists..."
-                 TextChanged="FilterText_Changed" />
+    <TextBox Grid.Row="1" Margin="10" Text="{Binding FilterText}" PlaceholderText="search artists..."
+             TextChanged="FilterText_Changed" />
 
-        <ListBox Grid.Row="2" x:Name="ArtistListBox"
-                 ItemsSource="{Binding Artists}" Background="Transparent"
-                 SelectedItem="{Binding SelectedArtist}"
-                 Tapped="ArtistListBox_DoubleTapped">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="views:ArtistEntry">
-                    <Grid ColumnDefinitions="Auto, *, Auto" Margin="10 6">
-                        <avalonia:MaterialIcon Grid.Column="0" Kind="AccountMusic" Height="28" Width="28"
-                                               Margin="0 0 12 0" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="18" FontWeight="SemiBold"
-                                   VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" FontSize="14" VerticalAlignment="Center"
-                                   Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}">
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="{}{0} songs">
-                                    <Binding Path="SongCount" />
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-    </Grid>
+    <ListBox Grid.Row="2" x:Name="ArtistListBox"
+             ItemsSource="{Binding Artists}" Background="Transparent"
+             SelectedItem="{Binding SelectedArtist}"
+             Tapped="ArtistListBox_DoubleTapped">
+      <ListBox.ItemTemplate>
+        <DataTemplate DataType="views:ArtistEntry">
+          <Grid ColumnDefinitions="Auto, *, Auto" Margin="10 6">
+            <avalonia:MaterialIcon Grid.Column="0" Kind="AccountMusic" Height="28" Width="28"
+                                   Margin="0 0 12 0" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="18" FontWeight="SemiBold"
+                       VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" FontSize="14" VerticalAlignment="Center"
+                       Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}">
+              <TextBlock.Text>
+                <MultiBinding StringFormat="{}{0} songs">
+                  <Binding Path="SongCount" />
+                </MultiBinding>
+              </TextBlock.Text>
+            </TextBlock>
+          </Grid>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </Grid>
 </UserControl>

@@ -152,11 +152,12 @@ public abstract class Storable<T> : IDisposable, IAsyncDisposable where T : ISto
             try
             {
                 await _jsonService.SerializeToJsonFileAsync(Path!, container);
+                break;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                Thread.Sleep(50);
+                await Task.Delay(50);
             }
     }
 }

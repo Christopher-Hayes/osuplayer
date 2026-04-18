@@ -6,6 +6,7 @@ using Material.Icons.Avalonia;
 using Nein.Base;
 using Nein.Extensions;
 using OsuPlayer.Data.DataModels.Interfaces;
+using OsuPlayer.Data.OsuPlayer.Enums;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.Modules;
@@ -55,7 +56,7 @@ public partial class PlaylistView : ReactiveControl<PlaylistViewModel>
         await ViewModel.Player.TryPlaySongAsync(song);
     }
 
-    private void PlayPlaylist_OnClick(object? sender, RoutedEventArgs e)
+    private async void PlayPlaylist_OnClick(object? sender, RoutedEventArgs e)
     {
         if (sender is not Control {DataContext: Playlist playlist}) return;
 
@@ -68,6 +69,11 @@ public partial class PlaylistView : ReactiveControl<PlaylistViewModel>
 
         ViewModel.Player.SelectedPlaylist.Value = playlist;
         ViewModel.Player.ActivePlaylistContext.Value = playlist;
+
+        // Always start playing a song from the selected playlist. Setting ActivePlaylistContext
+        // alone only auto-advances when the current song isn't in the playlist; if it already
+        // is in the playlist the context label updates but playback never changes.
+        await ViewModel.Player.NextSong(PlayDirection.Forward);
     }
 
     private void PlaylistItemLoaded(object? sender, VisualTreeAttachmentEventArgs e)

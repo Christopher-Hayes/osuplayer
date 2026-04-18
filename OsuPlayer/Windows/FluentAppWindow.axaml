@@ -10,6 +10,7 @@
         x:Class="OsuPlayer.Windows.FluentAppWindow"
         x:DataType="windows:FluentAppWindowViewModel"
         Title="osu!player"
+        WindowStartupLocation="CenterScreen"
         Opened="Window_OnOpened">
 
   <Design.DataContext>
@@ -24,13 +25,21 @@
 
     <!-- BackgroundImage of Song -->
     <ExperimentalAcrylicBorder Grid.Row="0" Grid.RowSpan="3" Material="{Binding PanelMaterial}" IsVisible="{Binding IsNonLinuxOs}">
-      <Image Source="{Binding BackgroundImage}" IsVisible="{Binding DisplayBackgroundImage}" Opacity="0.25"
-             VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Stretch="UniformToFill" />
+      <Panel IsVisible="{Binding DisplayBackgroundImage}">
+        <Image x:Name="BgPrevAcrylic" Opacity="0"
+               VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Stretch="UniformToFill" />
+        <Image x:Name="BgNewAcrylic" Opacity="0"
+               VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Stretch="UniformToFill" />
+      </Panel>
     </ExperimentalAcrylicBorder>
 
     <Border Grid.Row="0" Grid.RowSpan="3" IsVisible="{Binding IsLinuxOs}">
-      <Image Source="{Binding BackgroundImage}" IsVisible="{Binding DisplayBackgroundImage}" Opacity="0.25"
-             VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Stretch="UniformToFill"/>
+      <Panel IsVisible="{Binding DisplayBackgroundImage}">
+        <Image x:Name="BgPrevLinux" Opacity="0"
+               VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Stretch="UniformToFill" />
+        <Image x:Name="BgNewLinux" Opacity="0"
+               VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Stretch="UniformToFill" />
+      </Panel>
     </Border>
 
     <!-- TitleBar Host -->

@@ -24,6 +24,7 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
     private bool _displayBackgroundImage;
     private Bitmap? _backgroundImage;
     private float _backgroundBlurRadius;
+    private bool _isCompactMode;
 
     public PlayerControlViewModel PlayerControl { get; }
 
@@ -72,6 +73,12 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
     {
         get => _mainView;
         set => this.RaiseAndSetIfChanged(ref _mainView, value);
+    }
+
+    public bool IsCompactMode
+    {
+        get => _isCompactMode;
+        set => this.RaiseAndSetIfChanged(ref _isCompactMode, value);
     }
 
     public Bitmap? BackgroundImage

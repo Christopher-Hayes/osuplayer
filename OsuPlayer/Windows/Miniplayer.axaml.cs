@@ -43,6 +43,8 @@ public partial class Miniplayer : FluentReactiveWindow<MiniplayerViewModel>
 
         DataContext = new MiniplayerViewModel(player, engine, _mainWindow!.ViewModel!);
 
+        Closed += Miniplayer_OnClosed;
+
         LoadSettings();
     }
 
@@ -111,6 +113,7 @@ public partial class Miniplayer : FluentReactiveWindow<MiniplayerViewModel>
         _mainWindow.Miniplayer = null;
 
         _mainWindow.WindowState = WindowState.Normal;
+        _mainWindow.Activate();
     }
 
     private async void Blacklist_OnClick(object? sender, RoutedEventArgs e)

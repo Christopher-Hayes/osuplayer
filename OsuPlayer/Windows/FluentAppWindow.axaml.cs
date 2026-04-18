@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
@@ -85,6 +86,9 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
     private void InitializeFluentAppWindow(IPlayer player)
     {
         Task.Run(() => SongImporter.ImportSongsAsync(player.SongSourceProvider, player as IImportNotifications));
+
+        // Auto-switch to miniplayer when the window is resized to roughly miniplayer dimensions.
+        SizeChanged += OnWindowSizeChanged;
 
         // Setting AppWindow Properties
         TitleBar.ExtendsContentIntoTitleBar = true;
@@ -458,6 +462,64 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
         Miniplayer.Show();
 
         WindowState = WindowState.Minimized;
+    }
+
+    /// <summary>
+    /// Automatically switches to compact mode when the window is resized smaller than the
+    /// miniplayer's approximate footprint, so the full UI never renders in an unusably small space.
+    /// Switches back to normal mode when the window grows large enough again.
+    /// </summary>
+    private void OnWindowSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        const double widthThreshold  = 600;
+        const double heightThreshold = 350;
+
+        if (ViewModel == null) return;
+        if (WindowState != WindowState.Normal) return;
+
+        var shouldBeCompact = e.NewSize.Width < widthThreshold && e.NewSize.Height < heightThreshold;
+
+        if (shouldBeCompact == ViewModel.IsCompactMode) return;
+
+        ViewModel.IsCompactMode = shouldBeCompact;
+    }
+
+    private void CompactTopBar_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        BeginMoveDrag(e);
+        e.Handled = false;
+    }
+
+    private void CompactRestore_Click(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel == null) return;
+        ViewModel.IsCompactMode = false;
+        Width  = 1280;
+        Height = 720;
+    }
+
+    private void CompactSongControl(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel == null) return;
+
+        switch ((sender as Control)?.Name)
+        {
+            case "CompactRepeat":
+                ViewModel.Player.RepeatMode.Value = ViewModel.Player.RepeatMode.Value.Next();
+                break;
+            case "CompactPrevious":
+                ViewModel.Player.NextSong(PlayDirection.Backwards);
+                break;
+            case "CompactPlayPause":
+                ViewModel.Player.PlayPause();
+                break;
+            case "CompactNext":
+                ViewModel.Player.NextSong(PlayDirection.Forward);
+                break;
+            case "CompactShuffle":
+                ViewModel.PlayerControl.IsShuffle = !ViewModel.PlayerControl.IsShuffle;
+                break;
+        }
     }
 
     public void SetRenderMode(BitmapInterpolationMode renderMode)

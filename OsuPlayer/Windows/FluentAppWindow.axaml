@@ -167,6 +167,83 @@
         </Button>
       </Panel>
     </Panel>
+
+    <!-- Compact / miniplayer-mode overlay shown when the window is resized small -->
+    <Grid Grid.Row="0" Grid.RowSpan="3" ZIndex="300"
+          IsVisible="{Binding IsCompactMode}"
+          RowDefinitions="35, Auto, Auto, *">
+
+      <!-- Blurred album art background -->
+      <Border Grid.Row="0" Grid.RowSpan="4">
+        <Image Source="{Binding PlayerControl.CurrentSongImage}" Stretch="UniformToFill" />
+      </Border>
+      <Border Grid.Row="0" Grid.RowSpan="4" Background="{DynamicResource AcrylicBaseColor}" />
+
+      <!-- Drag handle / restore button -->
+      <Border Grid.Row="0" Background="Transparent" PointerPressed="CompactTopBar_PointerPressed" />
+      <Button Grid.Row="0"
+              HorizontalAlignment="Right" VerticalAlignment="Center"
+              Margin="0 0 8 0"
+              Width="28" Height="28" CornerRadius="50"
+              Theme="{StaticResource TransparentButton}"
+              Click="CompactRestore_Click">
+        <avalonia:MaterialIcon Kind="ArrowExpand" Width="16" Height="16" />
+      </Button>
+
+      <!-- Song title / artist -->
+      <StackPanel Grid.Row="1" HorizontalAlignment="Stretch">
+        <TextBlock Margin="10 0" Text="{Binding PlayerControl.TitleText}"
+                   HorizontalAlignment="Center" FontSize="18"
+                   FontWeight="{DynamicResource BiggerFontWeight}"
+                   TextTrimming="CharacterEllipsis" />
+        <TextBlock Margin="10 0" Text="{Binding PlayerControl.ArtistText}"
+                   FontWeight="{DynamicResource SmallerFontWeight}"
+                   HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
+      </StackPanel>
+
+      <!-- Progress row -->
+      <Grid Grid.Row="2" ColumnDefinitions="60,*,60">
+        <TextBlock Text="{Binding PlayerControl.CurrentSongTime}"
+                   VerticalAlignment="Center" Margin="8 0"
+                   Grid.Column="0" FontSize="12" HorizontalAlignment="Center" />
+        <Slider VerticalAlignment="Center"
+                Maximum="{Binding PlayerControl.SongLength}"
+                Value="{Binding PlayerControl.SongTime}"
+                Margin="4 0" UseLayoutRounding="False" Grid.Column="1" />
+        <TextBlock Text="{Binding PlayerControl.CurrentSongLength}"
+                   VerticalAlignment="Center" Grid.Column="2"
+                   Margin="8 0" FontSize="12" HorizontalAlignment="Center" />
+      </Grid>
+
+      <!-- Transport controls -->
+      <Border Grid.Row="3" Background="{DynamicResource AcrylicBaseColor}" />
+      <ContentControl Grid.Row="3" Content="{Binding AudioVisualizer}" />
+      <DockPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Button Name="CompactRepeat" Width="38" Height="38" CornerRadius="50"
+                Theme="{StaticResource TransparentButton}" Click="CompactSongControl">
+          <avalonia:MaterialIcon Kind="{Binding PlayerControl.IsRepeating, Converter={StaticResource RepeatConverter}}"
+                                 Height="19" Width="19" />
+        </Button>
+        <Button Name="CompactPrevious" Width="38" Height="38" CornerRadius="50"
+                Theme="{StaticResource TransparentButton}" Click="CompactSongControl">
+          <avalonia:MaterialIcon Kind="SkipBackward" Height="19" Width="19" />
+        </Button>
+        <Button Name="CompactPlayPause" Width="50" Height="50" CornerRadius="50" Margin="8 0"
+                Click="CompactSongControl">
+          <avalonia:MaterialIcon Kind="{Binding PlayerControl.IsPlaying, Converter={StaticResource PlayPauseConverter}}"
+                                 Height="40" Width="40" />
+        </Button>
+        <Button Name="CompactNext" Width="38" Height="38" CornerRadius="50"
+                Theme="{StaticResource TransparentButton}" Click="CompactSongControl">
+          <avalonia:MaterialIcon Kind="SkipForward" Height="19" Width="19" />
+        </Button>
+        <Button Name="CompactShuffle" Width="38" Height="38" CornerRadius="50"
+                Theme="{StaticResource TransparentButton}" Click="CompactSongControl">
+          <avalonia:MaterialIcon Kind="{Binding PlayerControl.IsShuffle, Converter={StaticResource ShuffleConverter}}"
+                                 Height="19" Width="19" />
+        </Button>
+      </DockPanel>
+    </Grid>
   </Grid>
 
 </Window>

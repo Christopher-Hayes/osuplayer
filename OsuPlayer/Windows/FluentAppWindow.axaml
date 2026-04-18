@@ -13,6 +13,12 @@
         WindowStartupLocation="CenterScreen"
         Opened="Window_OnOpened">
 
+  <Window.Styles>
+    <Style Selector="ui|FANavigationView /template/ SplitView#RootSplitView /template/ Panel#PART_PaneRoot">
+      <Setter Property="Margin" Value="12,8,12,0" />
+    </Style>
+  </Window.Styles>
+
   <Design.DataContext>
     <windows:FluentAppWindowViewModel />
   </Design.DataContext>
@@ -45,6 +51,7 @@
     <!-- TitleBar Host -->
     <Grid Row="0" Name="TitleBarHost"
           ColumnDefinitions="Auto,Auto,*,Auto"
+          Margin="0,12,0,0"
           Background="Transparent">
       <Image Margin="12 4"
              IsHitTestVisible="False"
@@ -78,7 +85,8 @@
                          MaxDropDownHeight="500"
                          PlaceholderText="Search songs (hit enter to play)" ItemsSource="{Binding SongList}"
                          FilterMode="ContainsOrdinal"
-                         KeyUp="SearchBox_OnKeyUp">
+                         KeyUp="SearchBox_OnKeyUp"
+                         SelectionChanged="SearchBox_OnSelectionChanged">
           <!-- wnd:AppWindow.AllowInteractionInTitleBar="True" -->
           <AutoCompleteBox.ItemTemplate>
             <DataTemplate x:DataType="interfaces:IMapEntryBase">
@@ -104,8 +112,8 @@
 
     <ui:FANavigationView
       Grid.Row="1"
-      CompactPaneLength="48"
-      OpenPaneLength="200"
+      CompactPaneLength="60"
+      OpenPaneLength="216"
       PaneDisplayMode="LeftCompact"
       Name="AppNavigationView"
       ItemInvoked="AppNavigationView_OnItemInvoked" IsSettingsVisible="False">
@@ -124,7 +132,7 @@
         <ui:FANavigationViewItem Name="Settings" Content="Settings" Tag="SettingsNavigation" IconSource="Settings" />
       </ui:FANavigationView.FooterMenuItems>
       <ui:FANavigationView.Content>
-        <Border CornerRadius="28,0,0,28" ClipToBounds="True" Margin="16 16 0 0"
+        <Border CornerRadius="20,0,0,20" ClipToBounds="True" Margin="0 16 0 0"
                 Background="{DynamicResource BaseBrighterDarkTransparentColor}">
           <TransitioningContentControl Name="MainViewPanel" Content="{Binding MainView}"
                                        PageTransition="{x:Null}" />

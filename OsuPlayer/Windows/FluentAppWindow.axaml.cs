@@ -60,6 +60,12 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
 
         InitializeComponent();
 
+        AppNavigationView.TemplateApplied += (_, e) =>
+        {
+            if (e.NameScope.Find<Grid>("PaneToggleButtonGrid") is { } grid)
+                grid.Margin = new Thickness(12, 0, 0, 0);
+        };
+
         var player = ViewModel?.Player;
         if (player is null) return; // Design-time: skip runtime wiring
 
@@ -304,6 +310,26 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
                 break;
             }
         }
+    }
+
+    private async void SearchBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (ViewModel == default) return;
+
+        var acb = sender as AutoCompleteBox;
+        if (acb?.SelectedItem is not IMapEntryBase map) return;
+
+        // Clear the box immediately so the dropdown closes and the field is reset
+        acb.Text = null;
+
+        // Play the song
+        ViewModel.Player.ActivePlaylistContext.Value = null;
+        ViewModel.Player.ActiveArtistContext.Value = null;
+        await ViewModel.Player.TryPlaySongAsync(map);
+
+        // Navigate to Home and scroll to the song
+        ViewModel.MainView = ViewModel.HomeView;
+        ViewModel.HomeView.SelectedSong = map;
     }
 
     private async void SearchBox_OnKeyUp(object? sender, KeyEventArgs e)

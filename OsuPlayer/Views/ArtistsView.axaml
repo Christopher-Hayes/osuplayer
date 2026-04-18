@@ -13,7 +13,7 @@
     <views:ArtistsViewModel />
   </Design.DataContext>
 
-  <Grid RowDefinitions="50, Auto, *" Margin="0 1">
+  <Grid RowDefinitions="Auto, Auto, *" Margin="0 1">
     <Border Grid.Row="0" Padding="8 24 8 12" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
             >
       <Grid ColumnDefinitions="*, Auto">
@@ -21,6 +21,7 @@
         Grid.Column="0"
         Text="Artists"
         FontSize="32"
+        FontWeight="Bold"
         Margin="16 12 0 8"
         VerticalAlignment="Center"
         HorizontalAlignment="Left" />

@@ -5,9 +5,9 @@ Complements `README.md` with implementation-focused context.
 
 ## Project overview
 
-Desktop music player for osu! songs, written in C# / .NET 8.
+Desktop music player for osu! songs, written in C# / .NET 10.
 
-- **UI framework:** Avalonia 11.3.14 + ReactiveUI + FluentAvalonia 2.4.1
+- **UI framework:** Avalonia 12.0.1 + ReactiveUI + FluentAvaloniaUI 3.0.0-preview1
 - **Solution:** `OsuPlayer.sln` (multi-project)
 
 ### Projects
@@ -213,13 +213,14 @@ Prefer declarative AXAML techniques over programmatic code-behind for responsive
 
 ---
 
-## Avalonia 11.3 AXAML notes
+## Avalonia 12 AXAML notes
 
-The project targets **Avalonia 11.3.14** / **FluentAvaloniaUI 2.4.1** / **SkiaSharp 2.88.9**. When writing AXAML:
+The project targets **Avalonia 12.0.1** / **FluentAvaloniaUI 3.0.0-preview1** / **SkiaSharp 3.119.3-preview** / **ReactiveUI.Avalonia 14.7.1**. When writing AXAML:
 
-- **`ItemsRepeater`, `StackLayout`, `WrapLayout`** do not exist in Avalonia 11.2+. Do not add the old `Avalonia.Controls.ItemsRepeater` NuGet package. Use `ItemsControl` + `ItemsPanelTemplate` with `StackPanel` or `WrapPanel` instead.
+- **`ItemsRepeater`, `StackLayout`, `WrapLayout`** do not exist in Avalonia 12. Do not add the old `Avalonia.Controls.ItemsRepeater` NuGet package. Use `ItemsControl` + `ItemsPanelTemplate` with `StackPanel` or `WrapPanel` instead.
 - **`HyperlinkButton`** is in Avalonia core — use it without a namespace prefix, not `ui:HyperlinkButton`.
-- **`Avalonia.ReactiveUI`** must stay pinned at **11.3.9** (11.3.14 does not exist for this package).
+- **`Avalonia.ReactiveUI`** is replaced by **`ReactiveUI.Avalonia`** in Avalonia 12 — do not reference the old package name.
+- **`Avalonia.Diagnostics`** (the old embedded DevTools package) is **not used** in Avalonia 12. The project uses **`AvaloniaUI.DiagnosticsSupport`** instead, with `this.AttachDeveloperTools()` called in `App.Initialize()`. The DevTools UI is a separate global tool (`dotnet tool install --global AvaloniaUI.DeveloperTools`); press F12 at runtime to connect.
 
 ---
 

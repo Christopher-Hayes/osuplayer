@@ -20,7 +20,7 @@
         <Grid Row="0" Column="0" ColumnSpan="2" RowDefinitions="Auto, *" Margin="0 1">
             <Border Grid.Row="0" Padding="8 24 8 12" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                 <Grid ColumnDefinitions="*, Auto">
-                    <TextBlock Grid.Column="0" Text="Your songs" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="16 12 0 8" />
+                    <TextBlock Grid.Column="0" Text="Your songs" FontSize="32" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="16 12 0 8" />
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="0 0 24 0">
                         <TextBlock Text="Sort by" Margin="0 0 4 0" VerticalAlignment="Center" FontSize="14" />
                         <ComboBox ItemsSource="{Binding SortingModes}"
@@ -39,6 +39,17 @@
                     <Style Selector="ListBoxItem">
                         <Setter Property="Margin" Value="0 2" />
                     </Style>
+                    <!-- Suppress the default selection highlight -->
+                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                    <Style Selector="ListBoxItem:selected /template/ Rectangle#SelectionIndicator">
+                        <Setter Property="IsVisible" Value="False" />
+                    </Style>
+                    <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBackground}" />
+                    </Style>
+                    <!-- Currently-playing item keeps its distinct styling -->
                     <Style Selector="ListBoxItem.playing">
                         <Setter Property="Background" Value="#28FFFFFF" />
                     </Style>

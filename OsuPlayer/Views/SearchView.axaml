@@ -25,6 +25,17 @@
                  Background="{DynamicResource AcrylicBaseColor}"
                  Tapped="InputElement_OnDoubleTapped" SelectedItem="{Binding SelectedSong}">
             <ListBox.Styles>
+                <!-- Suppress the default selection highlight -->
+                <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+                <Style Selector="ListBoxItem:selected /template/ Rectangle#SelectionIndicator">
+                    <Setter Property="IsVisible" Value="False" />
+                </Style>
+                <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBackground}" />
+                </Style>
+                <!-- Currently-playing item keeps its distinct styling -->
                 <Style Selector="ListBoxItem.playing">
                     <Setter Property="Background" Value="#28FFFFFF" />
                 </Style>

@@ -6,35 +6,32 @@
 ![](https://img.shields.io/github/contributors/Christopher-Hayes/osuplayer?color=blueviolet)
 [![.NET Publish](https://github.com/Christopher-Hayes/osuplayer/actions/workflows/dotnet-publish.yml/badge.svg)](https://github.com/Christopher-Hayes/osuplayer/actions/workflows/dotnet-publish.yml)
 
-An [osu!player](https://github.com/Founntain/osuplayer) fork.
+An [osu!player](https://github.com/Founntain/osuplayer) fork. This is a music player for playing the songs you've downloaded in the game, osu!
 
 This fork is solely focused on core music player features. Accounts / online features are absent.
 
-Music Player for osu! is well, a music player for *osu!* for playing your osu! songs **without having to start osu!**.
+<img width="1546" height="1005" alt="image" src="https://github.com/user-attachments/assets/cb5a5955-da7a-4ccd-bc6c-d1adc31a300f" />
 
-### Differences from osu!player
-
-🔥 **Removed**
-
-- **Online accounts** / profiles:
-  - Users page
-  - Party page
-  - Stats page
-  - Beatmaps page
+## Differences from osu!player
 
 ✨ **Added**
 
-- Song lists **show cover images** (optional setting).
+- A **new "Artists" page**, making it easier to play songs from a specific artist.
+- **Cover images** are added to the song list.
 - The **song sort** dropdown from settings was also added to the "Songs" view.
 - Added support for **media keys** on Linux.
 - The song list **highlights** the currently playing song.
 - Song control icon buttons now have **tooltips.**
-
-🏗️ **Changed**
-
-- The **repeat button** was simplified to only focus on whether songs repeat. Previously it would enable/disable playlists, which could be confusing.
-- **Song cover image** now always shows to the left of the song title (regardless of app background).
 - Clicking on the cover image now shows a **full-size song cover image**.
+
+🔥 **Removed**
+
+- **Online accounts / profiles** - Users page, Party page, Stats page, Beatmaps page
+
+🏗️ **Tweaked**
+
+- The **repeat button** was simplified to only focus on whether songs repeat. Previously it would enable/disable playlists, which could be confusing. How playlists work is still a WIP.
+- **Song cover image** now always shows to the left of the song title (regardless of app background).
 - **Playback speed** snaps to 0.1x increments and shows the actual playback speed.
 
 🐞 **Fixed**
@@ -42,48 +39,31 @@ Music Player for osu! is well, a music player for *osu!* for playing your osu! s
 - **Last.FM Scrobble:** instead of scrobbling instantly, it waits until you've listen to at least 50% of the song.
 - **Previous song** button when shuffling would go to a random song rather than the last played song.
 
-```bash
----- The original README continues below ----
-```
+## Install
 
-## ☝️ Requirements
+You can either go to the ["Releases" GitHub page](https://github.com/Christopher-Hayes/osuplayer/releases) to download a build, or build it yourself following the instructions below. Of course this music player depends on you already having osu! installed with songs downloaded.
 
-#### osu!player requirements
-✔️ A working computer  
-✔️ .NET 8 or later installed  
-✔️ osu! installed with an **osu!.db file** or **osu!lazer client.realm** *(Beatmaps imported in osu!)*  
-✔️ An internet connection if you want to use your osu!player plus profile
+**Supported platforms:** Windows, Linux, Mac OS
 
-#### Download osu!player
-To download the osu!player head to our [release](https://github.com/Christopher-Hayes/osuplayer/releases) section to download the latest release.  
-You can also build the project for yourself; see the section below!
+## Development
 
-## ⚒️Building the project
- - Clone / Download the source
- - Open it with Visual Studio, Visual Studio Code, Rider or an IDE of your choice that supports C# and .NET
- - Run `dotnet restore` (or IDE tools) to restore all packages and dependencies
- - Build/Run the project
+### Pre-requisistes
 
-## 👋 Contributing to the project
-#### ☝️Requirements
- - .NET 8 SDK
- - [Avalonia .NET Templates](https://github.com/AvaloniaUI/avalonia-dotnet-templates)
- - [Check out the Avalonia getting started](https://github.com/AvaloniaUI/Avalonia#-getting-started)
- - *Have a **decent understanding of the internal osu!** structure and know osu! (the game) as well.*
+- .NET **10** SDK
 
-#### 🚀 How to contribute
- - Make a fork of this repository
- - Implement your ideas and features
- - Make a pull request (PR) on this repository
- - Pray that I accept your PR 😂 (I'm joking)
- - Profit 📈
+### Dev Tooling
 
-> [!WARNING]\
-> You should implement features that are asked for and not ones you like or think will be good additions.
-A rule of thumb is: If you want a new feature, discuss it with us to see if it makes sense implement, if it does the feature may be added. So don't be afraid to ask!
-**We appreciate your ideas and feedback!**
+- An Avalonia account is recommended for some dev tools, but not required.
 
-## 📦 Dependencies
+### Build
+
+1. Clone project.
+2. Open in an IDE like Visual Studio, VS Code, or JetBrains Rider.
+3.  Run `dotnet restore` to restore all packages and dependencies.
+4.  Build the project with `dotnet build` and then run it with `dotnet run --project OsuPlayer`
+
+### Dependencies
+
 | Dependency                                                        | Description                                       |
 |-------------------------------------------------------------------|---------------------------------------------------|
 | [AvaloniaUI](https://github.com/AvaloniaUI/Avalonia)              | The UI-Framework                                  |
@@ -91,24 +71,9 @@ A rule of thumb is: If you want a new feature, discuss it with us to see if it m
 | [ManagedBass](https://github.com/ManagedBass/ManagedBass)         | The Audio-Engine                                  |
 | [discord-rpc-sharp](https://github.com/Lachee/discord-rpc-csharp) | Used to display Discord RPC                       |
 
-## ✨ Special thanks
-- ***SourRaindrop***: for creating a lot of custom images and assets like our logo
-- ***You, the user***: for using this project and helping us improving it and simply enjoying your osu! music
+## Original (upstream) creators of osu!player
 
-## 🪛 Features that are missing to have the full osu!player plus feature set
-
-#### 🔧 Features with lower priority
-- [x] Audio-Equalizer 
-- [x] Miniplayer to save some space
-- [x] Export songs to directory    
-- [ ] Localization 
-- [ ] Hotkey support  
-- [ ] Synced play via osu!player API  
-
-#### 🎱 Stop asking for it
-❌ Steering wheel support
-
-## 🎵 We are the creators of the osu!player (about us)
+**SourRaindrop**: for creating a lot of custom images and assets like our logo
 
 ### 🦊 Founntain
 
@@ -149,21 +114,3 @@ In university, I learned C and Java. However I would never use Java personally.
 When I joined the development team of the osu!player, I mostly did design stuff in WPF as I understood it best, but now we both do more or less the same stuff because we have quite some experience with the osu!player by now, to make the player look and feel like how it is today.
 
 Thanks for reading and have fun with the player, cheers.
-
-## 📫 Contact
-- [✉️ 7@founntain.dev](mailto:7@founntain.dev)
-- 📣 [Discord](https://discord.gg/RJQSc5B)
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=founntain/osuplayer&type=Date)](https://star-history.com/#founntain/osuplayer&Date)
-
-## 🖼️ Screenshots
-
-![image](https://github.com/user-attachments/assets/4d5c7ba2-1b40-4c1e-aeab-867f5d72b0da)  
-![image](https://github.com/user-attachments/assets/e9894f29-8958-47f7-95ff-1af0261b1726)  
-![image](https://github.com/user-attachments/assets/43c30551-3b51-408f-a464-9521798a166d)
-
-### Miniplayer  
-![image](https://github.com/user-attachments/assets/edb674d3-edc7-4457-81c8-60b833115fcc)
-

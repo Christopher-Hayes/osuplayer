@@ -243,11 +243,31 @@ public class Player : IPlayer, IImportNotifications
         // Restore the active play context (playlist or artist) from last session
         if (config.Container.LastActiveArtist != null)
         {
-            ActiveArtistContext.Value = config.Container.LastActiveArtist;
+            // Only restore the artist context if the previously playing song is actually by that
+            // artist. If it isn't, leave the context null so playback falls back to the full library.
+            var lastSongEntry = !string.IsNullOrWhiteSpace(config.Container.LastPlayedSong)
+                ? SongSourceProvider.GetMapEntryFromHash(config.Container.LastPlayedSong)
+                : null;
+
+            if (lastSongEntry != null
+                && string.Equals(lastSongEntry.Artist, config.Container.LastActiveArtist, StringComparison.OrdinalIgnoreCase))
+            {
+                ActiveArtistContext.Value = config.Container.LastActiveArtist;
+            }
         }
         else if (config.Container.ActivePlaylistContextId.HasValue)
         {
-            ActivePlaylistContext.Value = playlists.Container.Playlists?.FirstOrDefault(x => x.Id == config.Container.ActivePlaylistContextId.Value);
+            var restoredPlaylist = playlists.Container.Playlists?.FirstOrDefault(x => x.Id == config.Container.ActivePlaylistContextId.Value);
+
+            // Only restore the playlist context if the previously playing song is actually in the
+            // playlist. If it isn't (e.g. the song was removed from the playlist between sessions),
+            // leave the context as null so playback falls back to the full library.
+            if (restoredPlaylist != null
+                && !string.IsNullOrWhiteSpace(config.Container.LastPlayedSong)
+                && restoredPlaylist.Songs.Contains(config.Container.LastPlayedSong))
+            {
+                ActivePlaylistContext.Value = restoredPlaylist;
+            }
         }
 
         switch (config.Container.StartupSong)

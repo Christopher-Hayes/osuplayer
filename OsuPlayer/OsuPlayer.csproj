@@ -145,6 +145,9 @@
         <Compile Update="Views\CustomControls\AudioVisualizerViewModel.cs">
           <DependentUpon>AudioVisualizerView.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Views\CustomControls\MiniAudioVisualizerView.axaml.cs">
+          <DependentUpon>MiniAudioVisualizerView.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <UpToDateCheckInput Remove="Resources\Fonts\Montserrat-VariableFont_wght.ttf" />

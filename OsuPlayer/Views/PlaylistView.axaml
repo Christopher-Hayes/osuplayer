@@ -89,13 +89,22 @@
           <DataTemplate DataType="interfaces:IMapEntryBase">
             <Grid ColumnDefinitions="Auto, *, Auto" RowDefinitions="Auto, Auto" Tapped="PlaySong"
                   Background="Transparent">
-              <customControls:AsyncCoverImage
-              Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
-              Width="44" Height="44"
-              Margin="0 0 10 0"
-              CornerRadius="6"
-              IsVisible="{Binding $parent[ListBox].((views:PlaylistViewModel)DataContext).DisplaySongListCovers}"
-              Entry="{Binding .}" />
+              <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                      Width="44" Height="44"
+                      Margin="0 0 10 0"
+                      CornerRadius="6"
+                      ClipToBounds="True"
+                      IsVisible="{Binding $parent[ListBox].((views:PlaylistViewModel)DataContext).DisplaySongListCovers}">
+                <Panel>
+                  <customControls:AsyncCoverImage
+                    Width="44" Height="44"
+                    CornerRadius="6"
+                    Entry="{Binding .}" />
+                  <customControls:MiniAudioVisualizerView
+                    Width="44" Height="44"
+                    Entry="{Binding .}" />
+                </Panel>
+              </Border>
 
               <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TitleString}" FontSize="20"
                          FontWeight="SemiBold" />

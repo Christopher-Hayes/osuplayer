@@ -71,14 +71,23 @@
                 <ListBox.DataTemplates>
                     <DataTemplate DataType="interfaces:IMapEntryBase">
                         <Grid ColumnDefinitions="Auto, *, 100" RowDefinitions="Auto, Auto">
-                            <!-- Cover image: async-loaded with debounce, rounded corners -->
-                            <customControls:AsyncCoverImage
-                                Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
-                                Width="44" Height="44"
-                                Margin="0 0 10 0"
-                                CornerRadius="6"
-                                IsVisible="{Binding $parent[ListBox].((views:HomeViewModel)DataContext).DisplaySongListCovers}"
-                                Entry="{Binding .}" />
+                            <!-- Cover image with mini visualizer overlay -->
+                            <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                                    Width="44" Height="44"
+                                    Margin="0 0 10 0"
+                                    CornerRadius="7"
+                                    ClipToBounds="True"
+                                    IsVisible="{Binding $parent[ListBox].((views:HomeViewModel)DataContext).DisplaySongListCovers}">
+                                <Panel>
+                                    <customControls:AsyncCoverImage
+                                        Width="44" Height="44"
+                                        CornerRadius="6"
+                                        Entry="{Binding .}" />
+                                    <customControls:MiniAudioVisualizerView
+                                        Width="44" Height="44"
+                                        Entry="{Binding .}" />
+                                </Panel>
+                            </Border>
 
                             <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TitleString}" FontSize="20" />
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ArtistString}"

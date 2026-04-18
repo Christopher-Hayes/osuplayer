@@ -204,13 +204,23 @@
             VerticalAlignment="Center"
             Tapped="SongItem_DoubleTapped"
             Background="Transparent">
-              <customControls:AsyncCoverImage
+              <Border
               Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
               Width="64" Height="64"
               Margin="0 4 16 4"
               CornerRadius="8"
-              IsVisible="{Binding $parent[ListBox].((views:ArtistViewModel)DataContext).DisplaySongListCovers}"
-              Entry="{Binding .}" />
+              ClipToBounds="True"
+              IsVisible="{Binding $parent[ListBox].((views:ArtistViewModel)DataContext).DisplaySongListCovers}">
+                <Panel>
+                  <customControls:AsyncCoverImage
+                    Width="64" Height="64"
+                    CornerRadius="8"
+                    Entry="{Binding .}" />
+                  <customControls:MiniAudioVisualizerView
+                    Width="64" Height="64"
+                    Entry="{Binding .}" />
+                </Panel>
+              </Border>
 
               <TextBlock
               Grid.Row="0"

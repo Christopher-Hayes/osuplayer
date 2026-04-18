@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="44" d:DesignHeight="44"
+             x:Class="OsuPlayer.Views.CustomControls.MiniAudioVisualizerView"
+             IsHitTestVisible="False"
+             IsVisible="False">
+
+    <Grid>
+        <!-- Dim the entire cover so bars are legible over any artwork -->
+        <Border Background="#99000000"
+                CornerRadius="6" />
+
+        <!-- 5 animated bars on a Canvas so Y-position is set programmatically,
+             keeping the visual center stable as height changes. -->
+        <Canvas x:Name="BarsCanvas"
+                Width="37" Height="44"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+            <Border x:Name="Bar1" Canvas.Left="0"  Width="5" Height="5" Background="#46ffffff" CornerRadius="3" />
+            <Border x:Name="Bar2" Canvas.Left="8"  Width="5" Height="5" Background="#46ffffff" CornerRadius="3" />
+            <Border x:Name="Bar3" Canvas.Left="16" Width="5" Height="5" Background="#46ffffff" CornerRadius="3" />
+            <Border x:Name="Bar4" Canvas.Left="24" Width="5" Height="5" Background="#46ffffff" CornerRadius="3" />
+            <Border x:Name="Bar5" Canvas.Left="32" Width="5" Height="5" Background="#46ffffff" CornerRadius="3" />
+        </Canvas>
+    </Grid>
+</UserControl>

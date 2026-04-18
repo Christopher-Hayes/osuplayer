@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>annotations</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="12.0.1" />
+        <PackageReference Include="FluentAvaloniaUI" Version="3.0.0-preview1" />
+        <PackageReference Include="ReactiveUI.Avalonia" Version="14.7.1" />
+    </ItemGroup>
+</Project>

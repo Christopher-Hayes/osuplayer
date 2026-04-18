@@ -4,9 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:views="clr-namespace:OsuPlayer.Views"
              xmlns:interfaces="clr-namespace:OsuPlayer.Data.DataModels.Interfaces;assembly=OsuPlayer.Data"
+             xmlns:classes="clr-namespace:OsuPlayer.Data.OsuPlayer.Classes;assembly=OsuPlayer.Data"
              xmlns:customControls="clr-namespace:OsuPlayer.Views.CustomControls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OsuPlayer.Views.HomeView"
+        x:DataType="views:HomeViewModel"
              FontWeight="{DynamicResource DefaultFontWeight}">
 
     <Design.DataContext>
@@ -51,7 +53,7 @@
                                   ItemsSource="{Binding PlaylistContextMenuEntries}"
                                   Classes="SubItems">
                             <MenuItem.Styles>
-                                <Style Selector="MenuItem.SubItems MenuItem">
+                                <Style Selector="MenuItem.SubItems MenuItem" x:CompileBindings="False">
                                     <Setter Property="Header" Value="{Binding Name}" />
                                     <Setter Property="Command" Value="{Binding AddToPlaylist}" />
                                     <Setter Property="CommandParameter" Value="{Binding Name}" />

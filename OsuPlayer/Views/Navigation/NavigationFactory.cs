@@ -3,7 +3,7 @@ using FluentAvalonia.UI.Controls;
 
 namespace OsuPlayer.Views.Navigation;
 
-public class NavigationFactory : INavigationPageFactory
+public class NavigationFactory : IFANavigationPageFactory
 {
     public Control GetPage(Type srcType)
     {

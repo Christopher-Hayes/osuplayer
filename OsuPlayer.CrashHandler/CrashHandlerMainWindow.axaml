@@ -5,6 +5,7 @@
         xmlns:window="clr-namespace:OsuPlayer.CrashHandler"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
         x:Class="OsuPlayer.CrashHandler.CrashHandlerMainWindow"
+        x:DataType="window:CrashHandlerMainWindowViewModel"
         Title="osu!player crashed :("
         Width="600" Height="400"
         WindowStartupLocation="CenterScreen"
@@ -20,7 +21,7 @@
                 HorizontalContentAlignment="Center"
                 Click="Copy_OnClick" />
 
-        <Grid Row="2" ColumnDefinitions="*, *, *">
+        <Grid Grid.Row="2" ColumnDefinitions="*, *, *">
             <Button Grid.Column="0" Content="Report on GitHub" VerticalAlignment="Center" HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Center"
                     Click="GitHub_OnClick" />

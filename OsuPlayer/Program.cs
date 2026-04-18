@@ -61,6 +61,7 @@ internal static class Program
             .UsePlatformDetect()
             .LogToTrace()
             .UseSkia()
+            .UseHarfBuzz()
             .UseReactiveUI()
             .With(new Win32PlatformOptions());
     }

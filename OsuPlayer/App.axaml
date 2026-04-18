@@ -1,6 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:nein="clr-namespace:Nein.View;assembly=Nein"
+             xmlns:nein="clr-namespace:Nein.View;assembly=OsuPlayer.Nein"
              xmlns:sty="using:FluentAvalonia.Styling"
              xmlns:ui="using:FluentAvalonia.UI.Controls"
              xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
@@ -8,6 +8,7 @@
              xmlns:valueConverters="clr-namespace:OsuPlayer.Extensions.ValueConverters;assembly=OsuPlayer.Extensions"
              xmlns:internalValueConverters="clr-namespace:OsuPlayer.ValueConverters"
              x:Class="OsuPlayer.App"
+             x:CompileBindings="False"
              RequestedThemeVariant="Dark">
     <Application.DataTemplates>
         <nein:ViewLocator />

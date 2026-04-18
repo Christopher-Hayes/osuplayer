@@ -20,6 +20,7 @@ using OsuPlayer.Network;
 using OsuPlayer.Services;
 using OsuPlayer.Styles;
 using OsuPlayer.UI_Extensions;
+using OsuPlayer.Views;
 using ReactiveUI;
 using Splat;
 
@@ -65,7 +66,7 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
 
         // Setting AppWindow Properties
         TitleBar.ExtendsContentIntoTitleBar = true;
-        TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
+        TitleBar.TitleBarHitTestType = FATitleBarHitTestType.Complex;
 
         // Loading config stuff
 
@@ -100,7 +101,7 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
 
             SetRenderMode(config.Container.RenderingMode);
 
-            AppNavigationView.PaneDisplayMode = config.Container.UseLeftNavigationPosition ? NavigationViewPaneDisplayMode.Left : NavigationViewPaneDisplayMode.Top;
+            AppNavigationView.PaneDisplayMode = config.Container.UseLeftNavigationPosition ? FANavigationViewPaneDisplayMode.Left : FANavigationViewPaneDisplayMode.Top;
 
             var backgroundColor = config.Container.BackgroundColor;
             ViewModel!.DisplayBackgroundImage = config.Container.DisplayBackgroundImage;
@@ -172,13 +173,37 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
 
             ViewModel.MainView = ViewModel.HomeView;
 
+            // Keep the nav sidebar selection in sync when navigation happens programmatically
+            // (e.g. clicking song name / artist / playlist label in the player bar).
+            ViewModel.WhenAnyValue(x => x.MainView).Subscribe(view =>
+            {
+                var tag = view switch
+                {
+                    HomeViewModel     => "HomeNavigation",
+                    ArtistsViewModel  => "ArtistsNavigation",
+                    ArtistViewModel   => "ArtistsNavigation",
+                    PlaylistViewModel => "PlaylistNavigation",
+                    SettingsViewModel => "SettingsNavigation",
+                    SearchViewModel   => null,
+                    _                 => null
+                };
+
+                // Find the matching nav item and select it; clear selection for views with no nav entry.
+                var match = AppNavigationView.MenuItems
+                    .OfType<FANavigationViewItem>()
+                    .Concat(AppNavigationView.FooterMenuItems.OfType<FANavigationViewItem>())
+                    .FirstOrDefault(item => item.Tag as string == tag);
+
+                AppNavigationView.SelectedItem = match;
+            });
+
             using var config = new Config();
 
             SetAudioVisualization(config.Container.DisplayAudioVisualizer);
         });
     }
 
-    private void AppNavigationView_OnItemInvoked(object? sender, NavigationViewItemInvokedEventArgs e)
+    private void AppNavigationView_OnItemInvoked(object? sender, FANavigationViewItemInvokedEventArgs e)
     {
         if (e.IsSettingsInvoked)
         {

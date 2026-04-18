@@ -8,6 +8,7 @@
         xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OsuPlayer.Windows.Miniplayer"
+        x:DataType="views:MiniplayerViewModel"
         Title="osu!player miniplayer"
 
         MinWidth="375"
@@ -27,7 +28,7 @@
         Background="Transparent"
         TransparencyLevelHint="None"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="PreferSystemChrome"
+       
 
         Topmost="True"
 
@@ -105,18 +106,15 @@
             <Button Name="Repeat" Width="38" Height="38" CornerRadius="50" Click="SongControl"
                     Theme="{StaticResource TransparentButton}">
                 <Button.ContextMenu>
-                    <ContextMenu IsVisible="{Binding IsRepeating, Converter={StaticResource RepeatConverter}}"
+                    <ContextMenu IsVisible="{Binding IsPlayingFromPlaylist}"
                                  ItemsSource="{Binding Playlists}" PointerReleased="RepeatContextMenu_OnPointerReleased" />
                 </Button.ContextMenu>
-                <Panel>
-                    <avalonia:MaterialIcon Kind="{Binding IsRepeating, Converter={StaticResource RepeatConverter}}"
-                                           Height="19" Width="19" />
-                    <ToolTip IsVisible="{Binding IsRepeating, Converter={StaticResource RepeatConverter}}">
-                        <ToolTip.Tip>
-                            <TextBlock Text="{Binding ActivePlaylist}" />
-                        </ToolTip.Tip>
-                    </ToolTip>
-                </Panel>
+                <avalonia:MaterialIcon Kind="{Binding IsRepeating, Converter={StaticResource RepeatConverter}}"
+                                       Height="19" Width="19">
+                    <ToolTip.Tip>
+                        <TextBlock Text="{Binding ActivePlaylist}" IsVisible="{Binding IsPlayingFromPlaylist}" />
+                    </ToolTip.Tip>
+                </avalonia:MaterialIcon>
             </Button>
 
             <Button Name="Previous" Width="38" Height="38" CornerRadius="50" Click="SongControl"

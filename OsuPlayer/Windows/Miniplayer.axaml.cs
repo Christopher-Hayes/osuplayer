@@ -26,7 +26,7 @@ public partial class Miniplayer : FluentReactiveWindow<MiniplayerViewModel>
         InitializeComponent();
 
         TitleBar.ExtendsContentIntoTitleBar = true;
-        TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
+        TitleBar.TitleBarHitTestType = FATitleBarHitTestType.Complex;
 
         LoadSettings();
     }
@@ -36,7 +36,7 @@ public partial class Miniplayer : FluentReactiveWindow<MiniplayerViewModel>
         InitializeComponent();
 
         TitleBar.ExtendsContentIntoTitleBar = true;
-        TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
+        TitleBar.TitleBarHitTestType = FATitleBarHitTestType.Complex;
 
         _mainWindow = Locator.GetLocator().GetRequiredService<FluentAppWindow>();
 

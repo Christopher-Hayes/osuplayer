@@ -7,6 +7,7 @@
              xmlns:interfaces="clr-namespace:OsuPlayer.Data.DataModels.Interfaces;assembly=OsuPlayer.Data"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OsuPlayer.Views.BlacklistEditorView"
+        x:DataType="views:BlacklistEditorViewModel"
              FontWeight="{DynamicResource DefaultFontWeight}">
     <Design.DataContext>
         <views:BlacklistEditorViewModel />
@@ -30,7 +31,7 @@
             <Border Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{DynamicResource BaseBrightDarkTransparentColor}">
                 <Grid ColumnDefinitions="Auto, *">
                     <TextBlock Grid.Column="0" Text="Your songs" FontSize="22" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10 0" />
-                    <TextBox Grid.Column="1" Margin="10" Text="{Binding FilterText}" Watermark="type to search..." />
+                    <TextBox Grid.Column="1" Margin="10" Text="{Binding FilterText}" PlaceholderText="type to search..." />
                 </Grid>
             </Border>
 

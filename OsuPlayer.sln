@@ -1,5 +1,6 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuPlayer", "OsuPlayer\OsuPlayer.csproj", "{600BF274-0B41-4748-A679-95F90F1DE679}"
 	ProjectSection(ProjectDependencies) = postProject
 		{99497585-DB09-4427-8813-88CE41BB392E} = {99497585-DB09-4427-8813-88CE41BB392E}
@@ -28,6 +29,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuPlayer.Interfaces", "OsuPlayer.Interfaces\OsuPlayer.Interfaces.csproj", "{959F77A7-DC5D-4C01-8291-2660683C099C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuPlayer.Updater", "OsuPlayer.Updater\OsuPlayer.Updater.csproj", "{47DBB049-30B7-4A4A-ABEA-2105AD945D9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuPlayer.Nein", "OsuPlayer.Nein\OsuPlayer.Nein.csproj", "{21A795D8-5F07-4139-8F0B-E7674CB96A10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +82,10 @@ Global
 		{47DBB049-30B7-4A4A-ABEA-2105AD945D9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47DBB049-30B7-4A4A-ABEA-2105AD945D9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47DBB049-30B7-4A4A-ABEA-2105AD945D9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21A795D8-5F07-4139-8F0B-E7674CB96A10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21A795D8-5F07-4139-8F0B-E7674CB96A10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21A795D8-5F07-4139-8F0B-E7674CB96A10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21A795D8-5F07-4139-8F0B-E7674CB96A10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0034AEFA-ED66-47FA-AA37-1AB01F371AAF} = {AF8CA35D-63B3-4B8B-95B1-4717C57ED0E1}

@@ -9,6 +9,7 @@
              xmlns:classes="clr-namespace:OsuPlayer.Data.OsuPlayer.Classes;assembly=OsuPlayer.Data"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="OsuPlayer.Views.ArtistView"
+        x:DataType="views:ArtistViewModel"
              FontWeight="{DynamicResource DefaultFontWeight}"
              SizeChanged="ArtistView_SizeChanged">
 
@@ -85,7 +86,7 @@
                 <TextBlock Text="Add to playlist" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
               </StackPanel>
             </Button>
-            <Popup PlacementMode="AnchorAndGravity"
+            <Popup Placement="AnchorAndGravity"
                    PlacementTarget="{Binding ElementName=AddToPlaylistButton}"
                    Width="220" IsOpen="{Binding IsAddToPlaylistPopupOpen}"
                    IsLightDismissEnabled="True">

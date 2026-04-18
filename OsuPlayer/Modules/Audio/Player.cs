@@ -28,7 +28,9 @@ public class Player : IPlayer, IImportNotifications
     private readonly IDiscordService? _discordService;
     private readonly IShuffleServiceProvider? _shuffleProvider;
     private readonly IHistoryProvider? _historyProvider;
+#if WINDOWS
     private readonly WindowsMediaTransportControls? _winMediaControls;
+#endif
     private readonly LinuxMprisService? _linuxMprisService;
     private readonly ILastFmApiService? _lastFmApi;
 
@@ -73,6 +75,7 @@ public class Player : IPlayer, IImportNotifications
     {
         if (OperatingSystem.IsWindows())
         {
+#if WINDOWS
             try
             {
                 _winMediaControls = new WindowsMediaTransportControls(this);
@@ -81,6 +84,7 @@ public class Player : IPlayer, IImportNotifications
             {
                 _winMediaControls = null;
             }
+#endif
         }
         else if (OperatingSystem.IsLinux())
         {
@@ -311,7 +315,9 @@ public class Player : IPlayer, IImportNotifications
         _audioEngine.Play();
         _currentSongTimer.Start();
 
+#if WINDOWS
         _winMediaControls?.UpdatePlayingStatus(true);
+#endif
         _linuxMprisService?.UpdatePlaybackStatus(true);
 
         var timestamp = TimeSpan.FromSeconds(_audioEngine.ChannelLength.Value * (1 - _audioEngine.PlaybackSpeed.Value) - _audioEngine.ChannelPosition.Value);
@@ -324,7 +330,9 @@ public class Player : IPlayer, IImportNotifications
         _audioEngine.Pause();
         _currentSongTimer.Stop();
 
+#if WINDOWS
         _winMediaControls?.UpdatePlayingStatus(false);
+#endif
         _linuxMprisService?.UpdatePlaybackStatus(false);
 
         _discordService?.UpdatePresence(CurrentSong.Value.Title, $"by {CurrentSong.Value.Artist}", CurrentSong.Value.BeatmapSetId);
@@ -532,8 +540,10 @@ public class Player : IPlayer, IImportNotifications
             _audioEngine.OpenFile(fullMapEntry.FullPath!);
             _audioEngine.Play();
 
+#if WINDOWS
             _winMediaControls?.UpdatePlayingStatus(true);
             _winMediaControls?.SetMetadata(fullMapEntry);
+#endif
 
             _linuxMprisService?.UpdatePlaybackStatus(true);
             _linuxMprisService?.UpdateMetadata(fullMapEntry, CurrentSongImage.Value);

@@ -218,16 +218,16 @@
         </Setter>
     </Style>
     <Style Selector="Slider /template/ Track#PART_Track">
-        <Setter Property="Minimum" Value="{TemplateBinding Minimum}" />
-        <Setter Property="Maximum" Value="{TemplateBinding Maximum}" />
-        <Setter Property="Value" Value="{TemplateBinding Value, Mode=TwoWay}" />
+        <Setter Property="Minimum" Value="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}}" />
+        <Setter Property="Maximum" Value="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}" />
+        <Setter Property="Value" Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
     </Style>
     <Style Selector="Slider /template/ TickBar">
         <Setter Property="Fill" Value="{DynamicResource SliderTickBarFill}" />
-        <Setter Property="TickFrequency" Value="{TemplateBinding Slider.TickFrequency}" />
-        <Setter Property="Orientation" Value="{TemplateBinding Slider.Orientation}" />
-        <Setter Property="Minimum" Value="{TemplateBinding Slider.Minimum}" />
-        <Setter Property="Maximum" Value="{TemplateBinding Slider.Maximum}" />
+        <Setter Property="TickFrequency" Value="{Binding TickFrequency, RelativeSource={RelativeSource TemplatedParent}}" />
+        <Setter Property="Orientation" Value="{Binding Orientation, RelativeSource={RelativeSource TemplatedParent}}" />
+        <Setter Property="Minimum" Value="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}}" />
+        <Setter Property="Maximum" Value="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}" />
     </Style>
 
     <!-- Normal State -->
@@ -246,7 +246,7 @@
 
     <Style Selector="Slider /template/ TickBar">
         <Setter Property="IsVisible" Value="False" />
-        <Setter Property="Ticks" Value="{TemplateBinding Ticks}" />
+        <Setter Property="Ticks" Value="{Binding Ticks, RelativeSource={RelativeSource TemplatedParent}}" />
     </Style>
 
     <!-- TickBar Placement States -->

@@ -1,4 +1,5 @@
-﻿using Windows.Media;
+﻿#if WINDOWS
+using Windows.Media;
 using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -103,3 +104,4 @@ public class WindowsMediaTransportControls
         _mediaPlayer.Play();
     }
 }
+#endif

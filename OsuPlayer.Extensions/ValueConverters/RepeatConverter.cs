@@ -11,16 +11,13 @@ public class RepeatConverter : IValueConverter
     {
         if (value is not RepeatMode val) return MaterialIconKind.QuestionMark;
 
-        if (targetType == typeof(MaterialIconKind))
-            return val switch
-            {
-                RepeatMode.NoRepeat => MaterialIconKind.RepeatOff,
-                RepeatMode.RepeatAll => MaterialIconKind.Repeat,
-                RepeatMode.RepeatOne => MaterialIconKind.RepeatOnce,
-                _ => MaterialIconKind.RepeatOff
-            };
-
-        return null;
+        return val switch
+        {
+            RepeatMode.NoRepeat => MaterialIconKind.RepeatOff,
+            RepeatMode.RepeatAll => MaterialIconKind.Repeat,
+            RepeatMode.RepeatOne => MaterialIconKind.RepeatOnce,
+            _ => MaterialIconKind.RepeatOff
+        };
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

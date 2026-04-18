@@ -2,7 +2,6 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.VisualTree;
 using Nein.Base;
 using Nein.Extensions;
 using OsuPlayer.Data.OsuPlayer.Enums;
@@ -11,6 +10,7 @@ using OsuPlayer.IO.Storage.Blacklist;
 using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.Windows;
 using ReactiveUI;
+using Splat;
 
 namespace OsuPlayer.Views;
 
@@ -22,11 +22,10 @@ public partial class PlayerControlView : ReactiveControl<PlayerControlViewModel>
     {
         InitializeComponent();
 
+        _mainWindow = Locator.Current.GetRequiredService<FluentAppWindow>();
+
         this.WhenActivated(_ =>
         {
-            if (this.GetVisualRoot() is FluentAppWindow mainWindow)
-                _mainWindow = mainWindow;
-
             SongProgressSlider.AddHandler(PointerPressedEvent, SongProgressSlider_OnPointerPressed, RoutingStrategies.Tunnel);
 
             SongProgressSlider.AddHandler(PointerReleasedEvent, SongProgressSlider_OnPointerReleased, RoutingStrategies.Tunnel);

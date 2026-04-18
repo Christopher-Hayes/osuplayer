@@ -5,6 +5,7 @@
         xmlns:windows="clr-namespace:OsuPlayer.Windows"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OsuPlayer.Windows.FullscreenWindow"
+        x:DataType="windows:FullscreenWindowViewModel"
         Title="Fullscreen Mode"
         
         Foreground="White"
@@ -17,7 +18,7 @@
         
         TransparencyLevelHint="None"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="PreferSystemChrome">
+       >
     
     <Design.DataContext>
         <windows:FullscreenWindowViewModel />

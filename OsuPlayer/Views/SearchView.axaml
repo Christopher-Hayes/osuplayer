@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:views="clr-namespace:OsuPlayer.Views"
              xmlns:interfaces="clr-namespace:OsuPlayer.Data.DataModels.Interfaces;assembly=OsuPlayer.Data"
+             xmlns:classes="clr-namespace:OsuPlayer.Data.OsuPlayer.Classes;assembly=OsuPlayer.Data"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OsuPlayer.Views.SearchView"
+        x:DataType="views:SearchViewModel"
              FontWeight="{DynamicResource DefaultFontWeight}">
 
     <Design.DataContext>
@@ -14,7 +16,7 @@
 
     <Grid RowDefinitions="Auto, *">
         <Grid Row="0" Background="{DynamicResource AcrylicSecondaryColor}" Margin="0">
-            <TextBox Margin="5" Text="{Binding FilterText}" Watermark="type to search..." />
+            <TextBox Margin="5" Text="{Binding FilterText}" PlaceholderText="type to search..." />
         </Grid>
         <!-- <AutoCompleteBox Margin="0 2" Grid.Row="0" Text="{Binding FilterText}" ItemsSource="{Binding $parent[Window].DataContext.FilteredSongEntries}"/> -->
 
@@ -42,7 +44,7 @@
                               ItemsSource="{Binding PlaylistContextMenuEntries}"
                               Classes="SubItems">
                         <MenuItem.Styles>
-                            <Style Selector="MenuItem.SubItems MenuItem">
+                            <Style Selector="MenuItem.SubItems MenuItem" x:DataType="classes:AddToPlaylistContextMenuEntry">
                                 <Setter Property="Header" Value="{Binding Name}" />
                                 <Setter Property="Command" Value="{Binding Action}" />
                                 <Setter Property="CommandParameter" Value="{Binding Name}" />

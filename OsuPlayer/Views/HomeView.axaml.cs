@@ -8,6 +8,7 @@ using OsuPlayer.Modules;
 using OsuPlayer.Modules.Audio.Interfaces;
 using OsuPlayer.UI_Extensions;
 using OsuPlayer.Windows;
+using ReactiveUI;
 using Splat;
 using TappedEventArgs = Avalonia.Input.TappedEventArgs;
 
@@ -28,6 +29,19 @@ public partial class HomeView : ReactiveControl<HomeViewModel>
         _highlighter = new NowPlayingHighlighter(SongListBox, player);
 
         HomeViewInitialized();
+
+        this.WhenActivated(_ =>
+        {
+            // When SelectedSong is set (e.g. by clicking the song name in PlayerControlView),
+            // scroll the ListBox to that item so it's visible.
+            this.WhenAnyValue(x => x.ViewModel!.SelectedSong)
+                .Subscribe(song =>
+                {
+                    if (song == null) return;
+                    SongListBox.SelectedItem = song;
+                    SongListBox.ScrollIntoView(song);
+                });
+        });
     }
 
     private async void HomeViewInitialized()

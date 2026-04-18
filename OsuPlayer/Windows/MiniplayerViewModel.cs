@@ -139,11 +139,20 @@ public class MiniplayerViewModel : BaseWindowViewModel
 
     public bool IsPlayingFromPlaylist => Player.ActivePlaylistContext.Value != null || Player.ActiveArtistContext.Value != null;
 
+    /// <summary>Parameterless constructor for the AXAML designer / previewer.</summary>
+    [Obsolete("Designer-only")]
+    public MiniplayerViewModel() : this(null!, null!, null!)
+    {
+    }
+
     public MiniplayerViewModel(IPlayer player, IAudioEngine bassEngine, FluentAppWindowViewModel mainWindowViewModel)
     {
         Player = player;
 
         MainWindowViewModel = mainWindowViewModel;
+
+        // Design-time: skip service wiring
+        if (player is null) return;
 
         _songTime.BindTo(bassEngine.ChannelPosition);
         _songTime.BindValueChanged(_ => this.RaisePropertyChanged(nameof(SongTime)));

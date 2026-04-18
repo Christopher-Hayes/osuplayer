@@ -33,9 +33,13 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
     public Miniplayer? Miniplayer;
     public FullscreenWindow? FullscreenWindow;
 
-    public FluentAppWindow() : this(Locator.Current.GetRequiredService<FluentAppWindowViewModel>(), Locator.Current.GetRequiredService<ILoggingService>())
+    #pragma warning disable CS0618 // Designer-only constructor
+    public FluentAppWindow() : this(
+        Locator.Current.GetService<FluentAppWindowViewModel>() ?? new FluentAppWindowViewModel(),
+        Locator.Current.GetService<ILoggingService>()!)
     {
     }
+    #pragma warning restore CS0618
 
     public FluentAppWindow(FluentAppWindowViewModel viewModel, ILoggingService loggingService)
     {
@@ -43,9 +47,10 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
 
         _loggingService = loggingService;
 
-        var player = ViewModel.Player;
-
         InitializeComponent();
+
+        var player = ViewModel?.Player;
+        if (player is null) return; // Design-time: skip runtime wiring
 
         InitializeFluentAppWindow(player);
 
@@ -120,6 +125,13 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
             // Disabled for now
             // FontFamily = config.Container.Font ?? FontManager.Current.DefaultFontFamily;
             // config.Container.Font ??= FontFamily.Name;
+
+            // Restore window size and state from last session
+            Width = config.Container.WindowWidth > 0 ? config.Container.WindowWidth : 1280;
+            Height = config.Container.WindowHeight > 0 ? config.Container.WindowHeight : 720;
+            var savedState = (WindowState)config.Container.WindowState;
+            // Never restore Minimized or FullScreen on startup
+            WindowState = savedState == WindowState.Maximized ? WindowState.Maximized : WindowState.Normal;
         }
 
         // Setting up last.fm stuff if enabled
@@ -282,6 +294,14 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
         config.Container.RepeatMode = ViewModel.Player.RepeatMode.Value;
         config.Container.IsShuffle = ViewModel.Player.IsShuffle.Value;
         config.Container.SelectedPlaylist = ViewModel.Player.SelectedPlaylist.Value?.Id;
+
+        // Persist window size/state so it can be restored on next launch
+        config.Container.WindowState = (int)WindowState;
+        if (WindowState == WindowState.Normal)
+        {
+            config.Container.WindowWidth = Width;
+            config.Container.WindowHeight = Height;
+        }
 
         ViewModel.Player.DisposeDiscordClient();
     }

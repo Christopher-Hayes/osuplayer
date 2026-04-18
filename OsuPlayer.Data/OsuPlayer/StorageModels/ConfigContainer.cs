@@ -40,6 +40,10 @@ public class ConfigContainer : IStorableContainer
     public BitmapInterpolationMode RenderingMode { get; set; } = BitmapInterpolationMode.HighQuality;
     public bool DisplayAudioVisualizer { get; set; } = false;
     public bool DisplaySongListCovers { get; set; } = true;
+    public double WindowWidth { get; set; } = 1280;
+    public double WindowHeight { get; set; } = 720;
+    /// <summary>Saved window state: 0 = Normal, 1 = Minimized, 2 = Maximized, 3 = FullScreen</summary>
+    public int WindowState { get; set; } = 0;
 
     public IStorableContainer Init()
     {

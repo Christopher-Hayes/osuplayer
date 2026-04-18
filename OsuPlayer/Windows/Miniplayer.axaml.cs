@@ -9,6 +9,7 @@ using Nein.Extensions;
 using OsuPlayer.Data.OsuPlayer.Enums;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.Extensions.EnumExtensions;
+using OsuPlayer.Interfaces.Service;
 using OsuPlayer.IO.Storage.Blacklist;
 using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.Modules.Audio.Interfaces;
@@ -47,6 +48,8 @@ public partial class Miniplayer : FluentReactiveWindow<MiniplayerViewModel>
 
     private void LoadSettings()
     {
+        if (Locator.Current.GetService<IJsonService>() is null) return; // Design-time guard
+
         using var config = new Config();
 
         Background = new SolidColorBrush(config.Container.BackgroundColor.ToColor());

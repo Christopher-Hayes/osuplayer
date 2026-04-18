@@ -80,10 +80,21 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
         set => this.RaiseAndSetIfChanged(ref _backgroundImage, value);
     }
 
+    /// <summary>
+    /// Parameterless constructor for the AXAML designer / previewer.
+    /// </summary>
+    [Obsolete("Designer-only")]
+    public FluentAppWindowViewModel() : this(null!, null!)
+    {
+    }
+
     public FluentAppWindowViewModel(IAudioEngine engine, IPlayer player, IShuffleServiceProvider? shuffleServiceProvider = null,
         ISortProvider? sortProvider = null, IHistoryProvider? historyProvider = null)
     {
         Player = player;
+
+        // Design-time: skip service wiring
+        if (player is null) return;
 
         AudioVisualizer = new AudioVisualizerViewModel(Locator.Current.GetRequiredService<IAudioEngine>());
 

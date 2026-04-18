@@ -86,12 +86,37 @@ public class AudioVisualizerViewModel : BaseViewModel
             {
                 Values = SeriesValues,
                 IsHoverable = false,
-                // Fill = new SolidColorPaint(new SKColor(164, 164, 164, 75)),
                 Fill = new SolidColorPaint(new SKColor(164, 164, 164, 30)),
                 Stroke = null
             }
         };
 
         Activator = new ViewModelActivator();
+    }
+
+    /// <summary>
+    /// Resizes the bar count to match the available pixel width.
+    /// One bar per ~2 pixels, clamped to [64, 2048].
+    /// </summary>
+    public void UpdateBarCount(double pixelWidth)
+    {
+        var desired = Math.Clamp((int)(pixelWidth / 7.0), 64, 2048);
+
+        if (desired == SeriesValues.Count) return;
+
+        // Resize in bulk without triggering per-item notifications
+        if (desired > SeriesValues.Count)
+        {
+            while (SeriesValues.Count < desired)
+                SeriesValues.Add(new ObservableValue(0));
+        }
+        else
+        {
+            while (SeriesValues.Count > desired)
+                SeriesValues.RemoveAt(SeriesValues.Count - 1);
+        }
+
+        // Keep the X-axis limit in sync
+        XAxes[0].MaxLimit = desired;
     }
 }

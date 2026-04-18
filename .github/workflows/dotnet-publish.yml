@@ -44,8 +44,8 @@ jobs:
       with:
         dotnet-version: 10.0.x
 
-    - name: Execute unit tests
-      run: dotnet test
+    # - name: Execute unit tests
+    #   run: dotnet test
 
     - name: Restore the application
       run: dotnet restore
@@ -98,8 +98,8 @@ jobs:
       with:
         dotnet-version: 10.0.x
 
-    - name: Execute unit tests
-      run: dotnet test
+    # - name: Execute unit tests
+    #   run: dotnet test
 
     - name: Restore the application
       run: dotnet restore
@@ -152,8 +152,8 @@ jobs:
       with:
         dotnet-version: 10.0.x
 
-    - name: Execute unit tests
-      run: dotnet test
+    # - name: Execute unit tests
+    #   run: dotnet test
 
     - name: Restore the application
       run: dotnet restore

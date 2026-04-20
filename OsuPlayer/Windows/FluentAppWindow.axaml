@@ -123,13 +123,13 @@
         <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="Transparent" />
       </ui:FANavigationView.Resources>
       <ui:FANavigationView.MenuItems>
-        <ui:FANavigationViewItem Content="Songs" Tag="HomeNavigation" IconSource="Audio"/>
-        <ui:FANavigationViewItem Content="Artists" Tag="ArtistsNavigation" IconSource="People"/>
-        <ui:FANavigationViewItem Content="Playlists" Tag="PlaylistNavigation" IconSource="Library" />
+        <ui:FANavigationViewItem Content="Songs" Tag="HomeNavigation" IconSource="Audio" Cursor="Hand" />
+        <ui:FANavigationViewItem Content="Artists" Tag="ArtistsNavigation" IconSource="People" Cursor="Hand" />
+        <ui:FANavigationViewItem Content="Playlists" Tag="PlaylistNavigation" IconSource="Library" Cursor="Hand" />
       </ui:FANavigationView.MenuItems>
       <ui:FANavigationView.FooterMenuItems>
-        <ui:FANavigationViewItem Content="Open Miniplayer" Tag="MiniplayerNavigation" IconSource="FullScreenMinimize" />
-        <ui:FANavigationViewItem Name="Settings" Content="Settings" Tag="SettingsNavigation" IconSource="Settings" />
+        <ui:FANavigationViewItem Content="Open Miniplayer" Tag="MiniplayerNavigation" IconSource="FullScreenMinimize" Cursor="Hand" />
+        <ui:FANavigationViewItem Name="Settings" Content="Settings" Tag="SettingsNavigation" IconSource="Settings" Cursor="Hand" />
       </ui:FANavigationView.FooterMenuItems>
       <ui:FANavigationView.Content>
         <Border CornerRadius="20,0,0,20" ClipToBounds="True" Margin="0 16 0 0"

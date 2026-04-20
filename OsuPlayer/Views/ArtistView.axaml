@@ -214,6 +214,7 @@
             RowDefinitions="Auto"
             VerticalAlignment="Center"
             Tapped="SongItem_DoubleTapped"
+            Cursor="Hand"
             Background="Transparent">
               <Border
               Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"

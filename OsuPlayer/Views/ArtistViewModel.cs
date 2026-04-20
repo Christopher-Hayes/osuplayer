@@ -147,6 +147,12 @@ public class ArtistViewModel : BaseViewModel
     {
         ArtistName = artistName;
         ArtistImage = null;
+        HasLastFmData = false;
+        Biography = null;
+        Listeners = null;
+        PlayCount = null;
+        Tags = null;
+        SimilarArtists = null;
 
         // Load playlists for the "Add to playlist" button
         _playlists = (await PlaylistManager.GetAllPlaylistsAsync())?.ToList();

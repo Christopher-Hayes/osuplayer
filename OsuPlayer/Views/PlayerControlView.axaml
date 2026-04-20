@@ -105,6 +105,7 @@
         <DockPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
           <Button Name="ActivePlaylistLabel"
                   Theme="{StaticResource TransparentButton}"
+                  Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
                   Cursor="Hand"
                   IsVisible="{Binding IsPlayingFromPlaylist}"
                   VerticalAlignment="Center"

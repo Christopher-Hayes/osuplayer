@@ -100,7 +100,7 @@
                     <Panel>
                       <Panel.Background>
                         <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
-                          <GradientStop Offset="0.1" Color="#CC000000" />
+                          <GradientStop Offset="0.0" Color="#CC000000" />
                           <GradientStop Offset="0.5" Color="#55000000" />
                           <GradientStop Offset="1.0" Color="#00000000" />
                         </LinearGradientBrush>

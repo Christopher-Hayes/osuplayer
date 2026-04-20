@@ -1,5 +1,6 @@
 ﻿using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
@@ -136,23 +137,41 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
 
         Player.CurrentSongImage.BindValueChanged(d =>
         {
+            var path = d.NewValue;
+
+            // Defer to the UI thread so that properties like DisplayBackgroundImage
+            // (set from config after the VM constructor) are already populated on the
+            // initial fire (BindValueChanged with runOnceImmediately: true).
             Dispatcher.UIThread.Post(() =>
             {
-                if (!DisplayBackgroundImage)
+                if (!DisplayBackgroundImage || string.IsNullOrEmpty(path) || !File.Exists(path))
                 {
                     BackgroundImage = null;
-
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(d.NewValue) && File.Exists(d.NewValue))
+                // Capture blur radius here (inside the Post) so config values are
+                // guaranteed to be loaded — the VM constructor runs before config is applied.
+                var blur = BackgroundBlurRadius;
+
+                // Run the expensive blur on a background thread to avoid blocking the UI
+                Task.Run(() =>
                 {
-                    BackgroundImage = BitmapExtensions.BlurBitmap(d.NewValue, BackgroundBlurRadius, 0.75f, 25);
-
-                    return;
-                }
-
-                BackgroundImage = null;
+                    try
+                    {
+                        var bmp = BitmapExtensions.BlurBitmap(path, blur, 1.0f, 40);
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            // Don't dispose the old BackgroundImage here — CrossfadeBackgroundAsync
+                            // owns the lifecycle of the outgoing bitmap and disposes it after the fade.
+                            BackgroundImage = bmp;
+                        });
+                    }
+                    catch
+                    {
+                        Dispatcher.UIThread.Post(() => BackgroundImage = null);
+                    }
+                });
             });
         }, true, true);
     }

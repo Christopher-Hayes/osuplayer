@@ -17,6 +17,7 @@ public class LastFmService : OsuPlayerService, ILastFmApiService
     public void SetApiKeyAndSecret(string apiKey, string secret) => _lastFmApiService.SetApiKeyAndSecret(apiKey, secret);
     public bool LoadSessionKey() => _lastFmApiService.LoadSessionKey();
     public bool IsAuthorized() => _lastFmApiService.IsAuthorized();
+    public Task<bool> ValidateSessionAsync() => _lastFmApiService.ValidateSessionAsync();
     public Task GetSessionKey() => _lastFmApiService.GetSessionKey();
     public Task SaveSessionKeyAsync() => _lastFmApiService.SaveSessionKeyAsync();
     public Task Scrobble(string title, string artist) => _lastFmApiService.Scrobble(title, artist);

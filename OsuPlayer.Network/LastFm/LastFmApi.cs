@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Xml;
 using Nein.Extensions;
 using OsuPlayer.Data.LazerModels.Extensions;
@@ -36,7 +37,7 @@ public class LastFmApi : WebRequestBase, ILastFmApiService
     {
         _loggingService = Locator.Current.GetRequiredService<ILoggingService>();
 
-        BaseUrl = "http://ws.audioscrobbler.com/2.0/?format=json";
+        BaseUrl = "https://ws.audioscrobbler.com/2.0/?format=json";
 
         using var config = new Config();
 
@@ -75,7 +76,48 @@ public class LastFmApi : WebRequestBase, ILastFmApiService
 
         parameters.Add("api_sig", apiSignature);
 
-        var response = await PostRequest<object, object>(string.Empty, new FormUrlEncodedContent(parameters));
+        try
+        {
+            using var client = new HttpClient();
+            var req = new HttpRequestMessage(HttpMethod.Post, new Uri(BaseUrl));
+            req.Content = new FormUrlEncodedContent(parameters);
+            var result = await client.SendAsync(req);
+            var body = await result.Content.ReadAsStringAsync();
+
+            if (!result.IsSuccessStatusCode)
+            {
+                // Error 9 = "Invalid session key - Please re-authenticate"
+                // Wipe the stale key so IsAuthorized() returns false and the UI shows
+                // the yellow border, prompting the user to re-authorize in Settings.
+                var isInvalidSession = false;
+                try
+                {
+                    var err = JsonSerializer.Deserialize<JsonElement>(body);
+                    isInvalidSession = err.TryGetProperty("error", out var code) && code.GetInt32() == 9;
+                }
+                catch { /* not JSON — fall through */ }
+
+                if (isInvalidSession)
+                {
+                    _sessionKey = null;
+                    // Wipe the on-disk session file so the next startup doesn't reuse the bad key.
+                    if (File.Exists("data/lastfm.session"))
+                        await File.WriteAllBytesAsync("data/lastfm.session", Array.Empty<byte>());
+
+                    _loggingService.Log(
+                        "Last.FM session key has been revoked or expired. Please re-authorize in Settings → Network Settings → Last.FM Scrobbler.",
+                        LogType.Warning);
+                }
+                else
+                {
+                    _loggingService.Log($"Scrobble failed ({(int)result.StatusCode}): {body}", LogType.Warning);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Log($"Scrobble exception: {ex.Message}", LogType.Warning);
+        }
     }
 
     /// <summary>
@@ -85,10 +127,13 @@ public class LastFmApi : WebRequestBase, ILastFmApiService
     {
         await File.WriteAllBytesAsync("data/lastfm.session", Encoding.UTF8.GetBytes(_sessionKey ?? string.Empty));
 
-        using var config = new Config();
+        await using var config = new Config();
 
         config.Container.LastFmApiKey = _apiKey;
         config.Container.LastFmSecret = _secret;
+
+        // Explicit save — don't rely solely on DisposeAsync to persist credentials
+        await config.SaveAsync(config.Container);
     }
 
     /// <summary>
@@ -125,6 +170,44 @@ public class LastFmApi : WebRequestBase, ILastFmApiService
     public bool IsAuthorized()
     {
         return !string.IsNullOrWhiteSpace(_sessionKey);
+    }
+
+    /// <summary>
+    /// Validates the in-memory session key against the Last.fm server using a lightweight
+    /// authenticated call (user.getInfo with no username, which requires a valid sk).
+    /// Returns false and clears the key when Last.fm returns error 9 (invalid/revoked session).
+    /// </summary>
+    public async Task<bool> ValidateSessionAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_sessionKey))
+            return false;
+
+        try
+        {
+            var parameters = new Dictionary<string, string>();
+            var sig = GetApiSignature("user.getInfo", parameters);
+
+            var url = $"{BaseUrl}&method=user.getInfo&api_key={_apiKey}&sk={Uri.EscapeDataString(_sessionKey)}&api_sig={sig}";
+
+            using var client = new HttpClient();
+            var response = await client.GetStringAsync(url);
+
+            var doc = JsonSerializer.Deserialize<JsonElement>(response);
+            if (doc.TryGetProperty("error", out var code) && code.GetInt32() == 9)
+            {
+                _sessionKey = null;
+                if (File.Exists("data/lastfm.session"))
+                    await File.WriteAllBytesAsync("data/lastfm.session", Array.Empty<byte>());
+                return false;
+            }
+
+            return true;
+        }
+        catch
+        {
+            // Network error — don't invalidate the key, just report as unverified
+            return false;
+        }
     }
 
     #region Last.FM Authorization
@@ -174,7 +257,7 @@ public class LastFmApi : WebRequestBase, ILastFmApiService
     /// <returns>a <see cref="SessionRequest"/></returns>
     private async Task<SessionResponse?> SessionRequest(string route)
     {
-        var baseUrl = $"http://ws.audioscrobbler.com/2.0/?api_key={_apiKey}";
+        var baseUrl = $"https://ws.audioscrobbler.com/2.0/?api_key={_apiKey}";
         var url = new Uri($"{baseUrl}{route}");
 
         try

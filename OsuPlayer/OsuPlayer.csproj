@@ -9,6 +9,7 @@
         <EnableWindowsTargeting>true</EnableWindowsTargeting>
         <Version Condition="'$(RELEASE_VERSION)' != ''">$(RELEASE_VERSION)</Version>
         <VersionPrefix Condition="'$(RELEASE_VERSION)' == ''">$([System.DateTime]::UtcNow.ToString(`yyyy.Mdd`))</VersionPrefix>
+        <DefineConstants Condition="'$(RELEASE_VERSION)' == ''">$(DefineConstants);DEV_BUILD</DefineConstants>
         <ApplicationIcon>Resources\x96.ico</ApplicationIcon>
         <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     </PropertyGroup>

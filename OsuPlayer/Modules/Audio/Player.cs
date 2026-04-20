@@ -465,8 +465,6 @@ public class Player : IPlayer, IImportNotifications
 
     private IMapEntryBase GetNextSongToPlay(IList<IMapEntryBase> songSource, int currentIndex, PlayDirection playDirection)
     {
-        IMapEntryBase songToPlay;
-
         var offset = (int) playDirection;
 
         if (SongSourceProvider.SongSourceList == null || !SongSourceProvider.SongSourceList.Any())
@@ -475,6 +473,7 @@ public class Player : IPlayer, IImportNotifications
         if (!SongSourceProvider.SongSourceList.IsInBounds(currentIndex))
             currentIndex = 0;
 
+        // Remap from the global SongSourceList index into the active songSource index.
         currentIndex = songSource.IndexOf(SongSourceProvider.SongSourceList[currentIndex]);
 
         if (!songSource.Any())
@@ -513,20 +512,45 @@ public class Player : IPlayer, IImportNotifications
 
             _shuffleProvider.ShuffleImpl.Init(songSource.Count);
 
-            songToPlay = songSource[_shuffleProvider.ShuffleImpl.DoShuffle(currentIndex, (ShuffleDirection) playDirection)];
+            // Iteratively skip blacklisted songs without unbounded recursion.
+            var shuffleVisited = new HashSet<int>();
+            var shuffleIndex = currentIndex;
+            while (true)
+            {
+                var nextIdx = _shuffleProvider.ShuffleImpl.DoShuffle(shuffleIndex, (ShuffleDirection) playDirection);
+                var candidate = songSource[nextIdx];
+
+                if (!BlacklistSkip.Value || !new Blacklist().Container.Songs.Contains(candidate.Hash))
+                    return candidate;
+
+                // Song is blacklisted — try advancing again, but bail out if every song has
+                // been visited to avoid an infinite loop when the entire list is blacklisted.
+                if (!shuffleVisited.Add(nextIdx) || shuffleVisited.Count >= songSource.Count)
+                    return candidate;
+
+                shuffleIndex = nextIdx;
+            }
         }
         else
         {
-            var x = (currentIndex + offset) % songSource!.Count;
-            currentIndex = x < 0 ? x + songSource!.Count : x;
+            // Iteratively skip blacklisted songs without unbounded recursion.
+            // All index arithmetic stays in songSource-space to avoid the index-translation
+            // bug that existed in the old recursive implementation.
+            var visited = new HashSet<int>();
+            while (true)
+            {
+                var x = (currentIndex + offset) % songSource.Count;
+                currentIndex = x < 0 ? x + songSource.Count : x;
 
-            songToPlay = songSource[currentIndex];
+                var candidate = songSource[currentIndex];
+
+                if (!BlacklistSkip.Value || !new Blacklist().Container.Songs.Contains(candidate.Hash))
+                    return candidate;
+
+                if (!visited.Add(currentIndex) || visited.Count >= songSource.Count)
+                    return candidate;
+            }
         }
-
-        if (BlacklistSkip.Value && new Blacklist().Container.Songs.Contains(songToPlay.Hash))
-            songToPlay = GetNextSongToPlay(songSource, currentIndex, playDirection);
-
-        return songToPlay;
     }
 
     /// <summary>

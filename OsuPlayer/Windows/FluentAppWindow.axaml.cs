@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -75,6 +76,87 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
         // Wire up artwork overlay dismiss handlers
         ArtworkOverlayBackdrop.PointerPressed += (_, _) => DismissArtworkOverlay();
         ArtworkOverlayCloseButton.Click += (_, _) => DismissArtworkOverlay();
+
+        // Subscribe to artwork overlay visibility changes to drive entrance / exit animations
+        ViewModel!.PlayerControl
+            .WhenAnyValue(pc => pc.IsArtworkOverlayVisible)
+            .Subscribe(visible =>
+            {
+                if (visible)
+                    _ = ShowArtworkOverlayAsync();
+                else
+                    _ = HideArtworkOverlayAsync();
+            });
+    }
+
+    private CancellationTokenSource? _overlayCts;
+
+    private async Task ShowArtworkOverlayAsync()
+    {
+        _overlayCts?.Cancel();
+        var cts = new CancellationTokenSource();
+        _overlayCts = cts;
+
+        // Reset starting state
+        ArtworkOverlayBackdrop.Opacity = 0;
+        ArtworkOverlayContent.Opacity = 0;
+        ArtworkOverlayRoot.IsVisible = true;
+
+        var duration = TimeSpan.FromMilliseconds(350);
+        var easing = new CubicEaseOut();
+
+        var fade = new Animation
+        {
+            Duration = duration,
+            Easing = easing,
+            FillMode = FillMode.Forward,
+            Children =
+            {
+                new KeyFrame { Cue = new Cue(0d), Setters = { new Setter(OpacityProperty, 0d) } },
+                new KeyFrame { Cue = new Cue(1d), Setters = { new Setter(OpacityProperty, 1d) } }
+            }
+        };
+
+        try
+        {
+            await Task.WhenAll(
+                fade.RunAsync(ArtworkOverlayBackdrop, cts.Token),
+                fade.RunAsync(ArtworkOverlayContent, cts.Token));
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    private async Task HideArtworkOverlayAsync()
+    {
+        _overlayCts?.Cancel();
+        var cts = new CancellationTokenSource();
+        _overlayCts = cts;
+
+        var duration = TimeSpan.FromMilliseconds(200);
+        var easing = new CubicEaseIn();
+
+        var fadeAll = new Animation
+        {
+            Duration = duration,
+            Easing = easing,
+            FillMode = FillMode.Forward,
+            Children =
+            {
+                new KeyFrame { Cue = new Cue(0d), Setters = { new Setter(OpacityProperty, 1d) } },
+                new KeyFrame { Cue = new Cue(1d), Setters = { new Setter(OpacityProperty, 0d) } }
+            }
+        };
+
+        try
+        {
+            await Task.WhenAll(
+                fadeAll.RunAsync(ArtworkOverlayBackdrop, cts.Token),
+                fadeAll.RunAsync(ArtworkOverlayContent, cts.Token));
+        }
+        catch (OperationCanceledException) { }
+
+        if (!cts.IsCancellationRequested)
+            ArtworkOverlayRoot.IsVisible = false;
     }
 
     private void DismissArtworkOverlay()
@@ -170,16 +252,18 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
                 var apiSecret = config.Container.LastFmSecret;
                 var sessionKey = await lastFmApi.LoadSessionKeyAsync();
 
-                if (!string.IsNullOrWhiteSpace(apiKey) || !string.IsNullOrWhiteSpace(apiSecret) || !sessionKey)
+                if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(apiSecret) || !sessionKey)
                 {
-                    loggingService.Log("Can't connect to last.fm, because no apikey, apisecret or session key fast found", LogType.Warning);
+                    loggingService.Log($"Can't connect to last.fm: apiKey={!string.IsNullOrWhiteSpace(apiKey)}, apiSecret={!string.IsNullOrWhiteSpace(apiSecret)}, sessionKey={sessionKey}", LogType.Warning);
                     return;
                 }
 
-                // We only load the APIKey from the config, as it is the only key that we save
-                // 1. Because we always need the api key for all the request
-                // 2. The secret is only used for the first authentication of the token
-                // 3. After that all subsequent last.fm api calls only need the api key and session key
+                if (apiKey == apiSecret)
+                {
+                    loggingService.Log("Last.FM API key and secret are identical — the secret appears to be wrong. Please re-enter your credentials in Settings → Last.FM Scrobbler and click Authorize.", LogType.Warning);
+                    return;
+                }
+
                 lastFmApi.SetApiKeyAndSecret(apiKey, apiSecret);
 
                 if (!lastFmApi.IsAuthorized())
@@ -187,7 +271,9 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
                     await lastFmApi.GetAuthToken();
                     lastFmApi.AuthorizeToken();
 
-                    await MessageBox.ShowDialogAsync(window, "Close this window, when you are done, authenticating in the browser");
+                    await MessageBox.ShowDialogAsync(window,
+                        "A Last.FM authorization page has been opened in your browser.\n\nGo to that tab, log in, and approve access for osu!player. Once you've clicked \"Allow\" in the browser, come back here and click OK.",
+                        "Authorize Last.FM");
 
                     await lastFmApi.GetSessionKey();
 
@@ -396,6 +482,9 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
 
     private async void Window_OnOpened(object? sender, EventArgs e)
     {
+#if DEV_BUILD
+        return;
+#else
         if (Debugger.IsAttached) return;
 
         if (ViewModel == default) return;
@@ -413,6 +502,7 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
 
         ViewModel.UpdateView.Update = result;
         ViewModel.MainView = ViewModel.UpdateView;
+#endif
     }
 
     private async Task CleanupAfterUpdate()

@@ -42,6 +42,7 @@ public class ArtistViewModel : BaseViewModel
     private List<Playlist>? _playlists;
     private List<AddToPlaylistContextMenuEntry>? _playlistContextMenuEntries;
     private bool _isAddToPlaylistPopupOpen;
+    private bool _isInAnyPlaylist;
 
     public string ArtistName
     {
@@ -111,6 +112,8 @@ public class ArtistViewModel : BaseViewModel
 
     public bool DisplaySongListCovers => new Config().Container.DisplaySongListCovers;
 
+    public bool HasNoSongs => Songs == null || Songs.Count == 0;
+
     public List<AddToPlaylistContextMenuEntry>? PlaylistContextMenuEntries
     {
         get => _playlistContextMenuEntries;
@@ -121,6 +124,16 @@ public class ArtistViewModel : BaseViewModel
     {
         get => _isAddToPlaylistPopupOpen;
         set => this.RaiseAndSetIfChanged(ref _isAddToPlaylistPopupOpen, value);
+    }
+
+    /// <summary>
+    /// True when at least one playlist contains ALL songs by this artist.
+    /// Used to switch the button icon between PlaylistPlus and PlaylistEdit.
+    /// </summary>
+    public bool IsInAnyPlaylist
+    {
+        get => _isInAnyPlaylist;
+        set => this.RaiseAndSetIfChanged(ref _isInAnyPlaylist, value);
     }
 
     public ArtistViewModel(IPlayer player)
@@ -153,10 +166,16 @@ public class ArtistViewModel : BaseViewModel
         PlayCount = null;
         Tags = null;
         SimilarArtists = null;
+        IsInAnyPlaylist = false;
+        IsAddToPlaylistPopupOpen = false;
+
+        // Reset songs so HasNoSongs reflects the cleared state immediately
+        _songs = null;
+        this.RaisePropertyChanged(nameof(Songs));
+        this.RaisePropertyChanged(nameof(HasNoSongs));
 
         // Load playlists for the "Add to playlist" button
         _playlists = (await PlaylistManager.GetAllPlaylistsAsync())?.ToList();
-        PlaylistContextMenuEntries = _playlists?.Select(x => new AddToPlaylistContextMenuEntry(x.Name, AddAllSongsToPlaylist)).ToList();
 
         // Populate songs by this artist
         var allSongs = Player.SongSourceProvider.SongSourceList;
@@ -171,7 +190,12 @@ public class ArtistViewModel : BaseViewModel
 
             _songs = new ReadOnlyObservableCollection<IMapEntryBase>(new ObservableCollection<IMapEntryBase>(artistSongs));
             this.RaisePropertyChanged(nameof(Songs));
+            this.RaisePropertyChanged(nameof(HasNoSongs));
         }
+
+        // Build context menu entries now that we know which songs belong to this artist.
+        // For each playlist, check if ALL artist songs are already in it.
+        RebuildPlaylistContextMenuEntries();
 
         // Load the first song's cover as a fallback while we wait for the real artist image.
         // The fallback is only applied when no other image has been set yet.
@@ -258,6 +282,62 @@ public class ArtistViewModel : BaseViewModel
         Listeners = FormatStatNumber(info.Artist.Stats?.Listeners);
         PlayCount = FormatStatNumber(info.Artist.Stats?.Playcount);
         Tags = info.Artist.Tags?.Tag?.Select(t => t.Name ?? string.Empty).Where(t => !string.IsNullOrEmpty(t)).ToList();
+    }
+
+    /// <summary>
+    /// Rebuilds <see cref="PlaylistContextMenuEntries"/> based on current playlist membership
+    /// for all songs by this artist. Also updates <see cref="IsInAnyPlaylist"/>.
+    /// </summary>
+    private void RebuildPlaylistContextMenuEntries()
+    {
+        if (_playlists == null)
+        {
+            PlaylistContextMenuEntries = null;
+            IsInAnyPlaylist = false;
+            return;
+        }
+
+        var songHashes = Songs?.Select(s => s.Hash).ToHashSet() ?? new HashSet<string>();
+
+        var entries = _playlists.Select(playlist =>
+        {
+            var fullyInPlaylist = songHashes.Count > 0
+                && songHashes.All(h => playlist.Songs.Contains(h));
+            return new AddToPlaylistContextMenuEntry(playlist.Name, ToggleArtistInPlaylist, fullyInPlaylist);
+        }).ToList();
+
+        PlaylistContextMenuEntries = entries;
+        IsInAnyPlaylist = entries.Any(e => e.IsFullyInPlaylist);
+    }
+
+    /// <summary>
+    /// If all artist songs are already in the playlist, removes them all.
+    /// Otherwise, adds any missing songs.
+    /// After the operation, refreshes the context menu entries.
+    /// </summary>
+    private async void ToggleArtistInPlaylist(string name)
+    {
+        var playlist = _playlists?.FirstOrDefault(x => x.Name == name);
+        if (playlist == null || Songs == null) return;
+
+        var songHashes = Songs.Select(s => s.Hash).ToHashSet();
+        var fullyInPlaylist = songHashes.Count > 0 && songHashes.All(h => playlist.Songs.Contains(h));
+
+        if (fullyInPlaylist)
+        {
+            foreach (var song in Songs)
+                await PlaylistManager.RemoveSongFromPlaylist(playlist, song);
+        }
+        else
+        {
+            foreach (var song in Songs.Where(s => !playlist.Songs.Contains(s.Hash)))
+                await PlaylistManager.AddSongToPlaylistAsync(playlist, song);
+        }
+
+        Player.TriggerPlaylistChanged(new PropertyChangedEventArgs(name));
+
+        // Refresh membership state after the change
+        RebuildPlaylistContextMenuEntries();
     }
 
     private async void AddAllSongsToPlaylist(string name)

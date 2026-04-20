@@ -9,7 +9,7 @@
              xmlns:classes="clr-namespace:OsuPlayer.Data.OsuPlayer.Classes;assembly=OsuPlayer.Data"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="OsuPlayer.Views.ArtistView"
-        x:DataType="views:ArtistViewModel"
+             x:DataType="views:ArtistViewModel"
              FontWeight="{DynamicResource DefaultFontWeight}"
              SizeChanged="ArtistView_SizeChanged">
 
@@ -41,7 +41,12 @@
     </ScrollViewer.Styles>
     <StackPanel Margin="0 1">
       <!-- Artist header: rounded square image + name/back-button -->
-      <Grid x:Name="ArtistHeaderGrid" ColumnDefinitions="256, *, Auto" Margin="16 12">
+      <Grid
+      x:Name="ArtistHeaderGrid"
+      ColumnDefinitions="256, *"
+      Margin="16 12"
+      ColumnSpacing="32"
+      >
         <!-- Rounded square artist image (hidden until loaded) -->
         <Border x:Name="ArtistImageBorder"
                 Grid.Column="0"
@@ -50,7 +55,7 @@
                 ClipToBounds="True"
                 HorizontalAlignment="Stretch"
                 IsVisible="{Binding ArtistImage, Converter={x:Static ObjectConverters.IsNotNull}}"
-                Margin="0 0 32 0"
+                Margin="0 0 0 0"
                 VerticalAlignment="Center">
           <Image Source="{Binding ArtistImage}"
                  Stretch="UniformToFill" />
@@ -58,111 +63,88 @@
 
         <!-- Name + back button -->
         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
-          <Button Width="40" Height="40" CornerRadius="50"
-                  Background="Transparent" Click="BackButton_Click"
-                  HorizontalAlignment="Left">
-            <avalonia:MaterialIcon Kind="ArrowLeft" Height="24" Width="24" />
-          </Button>
-          <TextBlock x:Name="ArtistNameText"
-                     Text="{Binding ArtistName}"
-                     FontWeight="Bold"
-                     TextWrapping="Wrap" />
-        </StackPanel>
-
-        <!-- Right-side header content (add to playlist, tags, stats) -->
-        <Border x:Name="RightHeaderWrapper" Grid.Column="2">
-        <StackPanel
-        VerticalAlignment="Center"
-        HorizontalAlignment="Right"
-        Spacing="12"
-        Margin="8 8 16 8"
-        IsVisible="{Binding HasLastFmData}">
-          <!-- Add to playlist button -->
-          <Panel HorizontalAlignment="Right">
-            <Button Name="AddToPlaylistButton" Click="AddToPlaylistButton_Click"
-                    Padding="10 6" CornerRadius="6">
-              <StackPanel Orientation="Horizontal" Spacing="6">
-                <avalonia:MaterialIcon Kind="PlaylistPlus" Height="18" Width="18" VerticalAlignment="Center" />
-                <TextBlock Text="Add to playlist" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-              </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Left">
+            <Button
+            Width="40" Height="40" CornerRadius="50"
+            BorderThickness="1 1 0 0"
+            Background="Transparent" Click="BackButton_Click"
+            ToolTip.Tip="Go back">
+              <avalonia:MaterialIcon Kind="ArrowLeft" Height="24" Width="24" />
             </Button>
-            <Popup Placement="AnchorAndGravity"
-                   PlacementTarget="{Binding ElementName=AddToPlaylistButton}"
-                   Width="220" IsOpen="{Binding IsAddToPlaylistPopupOpen}"
-                   IsLightDismissEnabled="True">
-              <Border Background="{DynamicResource PopupBase}" CornerRadius="6" Padding="4">
-                <ItemsControl ItemsSource="{Binding PlaylistContextMenuEntries}">
-                  <ItemsControl.ItemTemplate>
+            <Panel>
+              <Button
+              Name="AddToPlaylistButton" Width="40" Height="40" CornerRadius="50"
+              Background="Transparent" Click="AddToPlaylistButton_Click"
+              ToolTip.Tip="Add to playlist"
+              BorderThickness="1 1 0 0"
+              Padding="12 6 10 5"
+              IsVisible="{Binding HasLastFmData}">
+                <Panel>
+                  <avalonia:MaterialIcon Kind="PlaylistEdit" Height="24" Width="24"
+                                         IsVisible="{Binding IsInAnyPlaylist}" />
+                  <avalonia:MaterialIcon Kind="PlaylistPlus" Height="24" Width="24"
+                                         IsVisible="{Binding !IsInAnyPlaylist}" />
+                </Panel>
+              </Button>
+              <Popup Placement="AnchorAndGravity"
+                     PlacementTarget="{Binding ElementName=AddToPlaylistButton}"
+                     Width="220" IsOpen="{Binding IsAddToPlaylistPopupOpen}"
+                     IsLightDismissEnabled="True">
+                <Border Background="{DynamicResource PopupBase}" CornerRadius="6" Padding="4">
+                  <ItemsControl ItemsSource="{Binding PlaylistContextMenuEntries}">
+                    <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="classes:AddToPlaylistContextMenuEntry">
-                      <Button Background="Transparent" HorizontalAlignment="Stretch"
-                              HorizontalContentAlignment="Left"
-                              Padding="10 6"
-                              Click="PlaylistPopupItem_Click">
-                        <TextBlock Text="{Binding Name}" FontSize="13" />
-                      </Button>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </Border>
-            </Popup>
-          </Panel>
-
-          <!-- Tags -->
-          <ItemsControl ItemsSource="{Binding Tags}"
-                        HorizontalAlignment="Right"
-                        IsVisible="{Binding Tags, Converter={x:Static ObjectConverters.IsNotNull}}">
-            <ItemsControl.ItemsPanel>
-              <ItemsPanelTemplate>
-                <WrapPanel Orientation="Horizontal" />
-              </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Border
-                  Background="Transparent"
-                  BorderBrush="{DynamicResource ButtonBorderBrush}"
-                  BorderThickness="1"
-                  CornerRadius="4"
-                  Padding="8 3"
-                  Margin="0 0 6 4">
-                  <TextBlock Text="{Binding}" FontSize="12" />
+                        <Button Background="Transparent" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="10 6"
+                                Click="PlaylistPopupItem_Click">
+                          <Grid ColumnDefinitions="20, *">
+                            <avalonia:MaterialIcon Grid.Column="0"
+                                                   Kind="Check" Height="14" Width="14"
+                                                   VerticalAlignment="Center"
+                                                   IsVisible="{Binding IsFullyInPlaylist}"
+                                                   Opacity="0.7" />
+                            <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13"
+                                       Margin="4 0 0 0" VerticalAlignment="Center" />
+                          </Grid>
+                        </Button>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
                 </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-
-          <!-- Stats -->
-          <StackPanel Orientation="Horizontal" Spacing="16"
-                      HorizontalAlignment="Right"
-                      IsVisible="{Binding Listeners, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-            <StackPanel Orientation="Horizontal" Spacing="4">
-              <avalonia:MaterialIcon Kind="AccountGroup" Height="16" Width="16" VerticalAlignment="Center" />
-              <TextBlock FontSize="13" VerticalAlignment="Center">
-                <TextBlock.Text>
-                  <MultiBinding StringFormat="{}{0} listeners">
-                    <Binding Path="Listeners" />
-                  </MultiBinding>
-                </TextBlock.Text>
-              </TextBlock>
-            </StackPanel>
+              </Popup>
+            </Panel>
           </StackPanel>
-          <StackPanel Orientation="Horizontal" Spacing="16"
-                      HorizontalAlignment="Right"
-                      IsVisible="{Binding Listeners, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-            <StackPanel Orientation="Horizontal" Spacing="4"
-                        IsVisible="{Binding PlayCount, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-              <avalonia:MaterialIcon Kind="Play" Height="16" Width="16" VerticalAlignment="Center" />
-              <TextBlock FontSize="13" VerticalAlignment="Center">
-                <TextBlock.Text>
-                  <MultiBinding StringFormat="{}{0} plays">
-                    <Binding Path="PlayCount" />
-                  </MultiBinding>
-                </TextBlock.Text>
-              </TextBlock>
-            </StackPanel>
+          <StackPanel
+          Orientation="Horizontal" Spacing="16"
+          HorizontalAlignment="Left"
+          VerticalAlignment="Center"
+          >
+            <TextBlock x:Name="ArtistNameText"
+                       Text="{Binding ArtistName}"
+                       FontWeight="Bold"
+                       TextWrapping="Wrap" />
+
+            <Border
+            Background="Transparent"
+            BorderBrush="{DynamicResource ButtonBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="8 3 8 4"
+            Margin="0 3 0 0"
+            IsVisible="{Binding Tags, Converter={x:Static ObjectConverters.IsNotNull}}"
+            VerticalAlignment="Center"
+            >
+              <TextBlock
+              Text="{Binding Tags[0]}"
+              FontSize="12"
+              FontWeight="Light"
+              Opacity="0.4"
+              />
+            </Border>
           </StackPanel>
         </StackPanel>
-        </Border>
+
       </Grid>
 
       <!-- Loading indicator -->
@@ -176,6 +158,24 @@
       </Border>
 
       <!-- Song list -->
+      <!-- Empty state — shown when no songs exist for this artist -->
+      <Border IsVisible="{Binding HasNoSongs}" Padding="20 12 20 20">
+        <StackPanel Spacing="6" HorizontalAlignment="Center">
+          <avalonia:MaterialIcon Kind="MusicOff" Width="40" Height="40"
+                              HorizontalAlignment="Center"
+                              Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+          <TextBlock TextAlignment="Center" FontSize="14" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+            <Run Text="No songs found for " />
+            <Run Text="{Binding ArtistName}" FontWeight="Bold"
+                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+          </TextBlock>
+          <TextBlock Text="Download songs in osu! to see them here."
+                     TextAlignment="Center" FontSize="12"
+                     Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+        </StackPanel>
+      </Border>
+
       <ListBox x:Name="SongListBox"
                ItemsSource="{Binding Songs}" Background="Transparent"
                ScrollViewer.VerticalScrollBarVisibility="Disabled"
@@ -183,6 +183,10 @@
                Padding="20 0"
                >
         <ListBox.Styles>
+          <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="4 0 24 0" />
+            <Setter Property="CornerRadius" Value="9" />
+          </Style>
           <!-- Suppress the default selection highlight -->
           <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="Transparent" />
@@ -225,12 +229,12 @@
               IsVisible="{Binding $parent[ListBox].((views:ArtistViewModel)DataContext).DisplaySongListCovers}">
                 <Panel>
                   <customControls:AsyncCoverImage
-                    Width="64" Height="64"
-                    CornerRadius="8"
-                    Entry="{Binding .}" />
+                  Width="64" Height="64"
+                  CornerRadius="8"
+                  Entry="{Binding .}" />
                   <customControls:MiniAudioVisualizerView
-                    Width="64" Height="64"
-                    Entry="{Binding .}" />
+                  Width="64" Height="64"
+                  Entry="{Binding .}" />
                 </Panel>
               </Border>
 
@@ -263,7 +267,9 @@
           <TextBlock Text="Similar Artists" FontSize="20" FontWeight="SemiBold" />
         </Border>
 
-        <ItemsControl ItemsSource="{Binding SimilarArtists}" Margin="10 4">
+        <ItemsControl
+        ItemsSource="{Binding SimilarArtists}"
+        Margin="20 4 8 4">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <WrapPanel Orientation="Horizontal" />

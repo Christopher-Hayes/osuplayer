@@ -79,7 +79,7 @@
               </Style>
             </Button.Styles>
           </Button>
-          <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="4 0 0 0">
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="4 0 0 0" Spacing="-4">
             <ToolTip.Tip>
               <TextBlock Text="{Binding SongText}" />
             </ToolTip.Tip>
@@ -103,23 +103,48 @@
         </Grid>
 
         <DockPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
-          <Button Name="ActivePlaylistLabel"
-                  Theme="{StaticResource TransparentButton}"
-                  Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
-                  Cursor="Hand"
-                  IsVisible="{Binding IsPlayingFromPlaylist}"
-                  VerticalAlignment="Center"
-                  Click="ActivePlaylistLabel_OnClick"
-                  Padding="6 2"
-                  Margin="0 0 2 0">
-            <ToolTip.Tip>
-              <TextBlock Text="{Binding ActivePlaylist}" />
-            </ToolTip.Tip>
-            <TextBlock Text="{Binding ActivePlaylist}"
-                       FontSize="12"
-                       Foreground="#FF88BBFF"
-                       TextTrimming="CharacterEllipsis" />
-          </Button>
+          <StackPanel x:Name="PlaylistButtonWrapper" Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 4 0" Spacing="1">
+            <StackPanel.Styles>
+              <Style Selector="StackPanel#PlaylistButtonWrapper Button#ClearPlaylistButton">
+                <Setter Property="Opacity" Value="0" />
+              </Style>
+              <Style Selector="StackPanel#PlaylistButtonWrapper:pointerover Button#ClearPlaylistButton">
+                <Setter Property="Opacity" Value="1" />
+              </Style>
+            </StackPanel.Styles>
+            <Button Name="ActivePlaylistLabel"
+                    Theme="{StaticResource TransparentButton}"
+                    Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
+                    Cursor="Hand"
+                    IsVisible="{Binding IsPlayingFromPlaylist}"
+                    VerticalAlignment="Center"
+                    Click="ActivePlaylistLabel_OnClick"
+                    Padding="6 2"
+                    CornerRadius="4 0 0 4"
+                    >
+              <ToolTip.Tip>
+                <TextBlock Text="{Binding ActivePlaylist}" />
+              </ToolTip.Tip>
+              <TextBlock Text="{Binding ActivePlaylist}"
+                        FontSize="12"
+                        Foreground="#FF88BBFF"
+                        TextTrimming="CharacterEllipsis" />
+            </Button>
+            <Button Name="ClearPlaylistButton"
+                    Theme="{StaticResource TransparentButton}"
+                    Cursor="Hand"
+                    IsVisible="{Binding IsPlayingFromPlaylist}"
+                    VerticalAlignment="Center"
+                    Click="ClearPlaylistButton_OnClick"
+                    Padding="4 4 4 3"
+                    CornerRadius="0 4 4 0"
+                    >
+              <ToolTip.Tip>
+                <TextBlock Text="Stop playing from playlist" />
+              </ToolTip.Tip>
+              <avalonia:MaterialIcon Kind="Close" Width="14" Height="14" />
+            </Button>
+          </StackPanel>
           <Panel>
             <Button Name="Volume" Width="38" Height="38" CornerRadius="50"
                     Theme="{StaticResource TransparentButton}" PointerWheelChanged="Volume_OnPointerWheelChanged">
@@ -213,7 +238,14 @@
             <avalonia:MaterialIcon Kind="SkipBackward" Height="19" Width="19" />
           </Button>
 
-          <Button Name="PlayPause" Width="50" Height="50" CornerRadius="50" Margin="8 0" Click="SongControl">
+          <Button
+            Name="PlayPause"
+            Width="50" Height="50"
+            CornerRadius="50"
+            BorderThickness="2 1 0 0"
+            Margin="8 0"
+            Background="#0F000000"
+            Click="SongControl">
             <ToolTip.Tip>
               <TextBlock Text="Play / Pause" />
             </ToolTip.Tip>

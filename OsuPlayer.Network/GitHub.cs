@@ -27,8 +27,6 @@ public static class GitHub
         {
             var curVersion = Assembly.GetEntryAssembly()!.GetName().Version;
 
-            var currentVersion = $"{curVersion!.Major}.{curVersion.Minor}.{curVersion.Build}";
-
             var release = await GetLatestRelease(releaseChannel);
 
             if (release == default)
@@ -37,7 +35,15 @@ public static class GitHub
                     IsNewVersionAvailable = false
                 };
 
-            if (currentVersion != release.TagName)
+            // Parse the GitHub tag as a Version so the comparison is numeric,
+            // not string-based (avoids "2026.4.18" != "2026.04.18.4" false-positives).
+            if (!Version.TryParse(release.TagName, out var releaseVersion))
+                return new UpdateResponse
+                {
+                    IsNewVersionAvailable = false
+                };
+
+            if (curVersion < releaseVersion)
                 return new UpdateResponse
                 {
                     IsNewVersionAvailable = true,

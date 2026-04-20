@@ -111,12 +111,12 @@
     </Grid>
 
     <ui:FANavigationView
-      Grid.Row="1"
-      CompactPaneLength="60"
-      OpenPaneLength="216"
-      PaneDisplayMode="LeftCompact"
-      Name="AppNavigationView"
-      ItemInvoked="AppNavigationView_OnItemInvoked" IsSettingsVisible="False">
+    Grid.Row="1"
+    CompactPaneLength="60"
+    OpenPaneLength="216"
+    PaneDisplayMode="LeftCompact"
+    Name="AppNavigationView"
+    ItemInvoked="AppNavigationView_OnItemInvoked" IsSettingsVisible="False">
       <ui:FANavigationView.Resources>
         <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="Transparent" />
         <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
@@ -144,12 +144,12 @@
 
     <!-- Song Artwork Expanded Overlay -->
     <Panel Grid.Row="0" Grid.RowSpan="3" ZIndex="200"
-           IsVisible="{Binding PlayerControl.IsArtworkOverlayVisible}"
+           IsVisible="False"
            Name="ArtworkOverlayRoot">
       <!-- Dark backdrop — click to dismiss -->
       <Panel Name="ArtworkOverlayBackdrop" Background="#CC000000" />
       <!-- Centered artwork card -->
-      <Panel IsHitTestVisible="True">
+      <Panel Name="ArtworkOverlayContent" IsHitTestVisible="True">
         <Border Margin="120"
                 VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                 CornerRadius="10" ClipToBounds="True"

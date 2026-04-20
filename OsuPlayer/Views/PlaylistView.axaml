@@ -17,7 +17,7 @@
   </Design.DataContext>
 
   <Grid ColumnDefinitions="260, 1, *">
-    <Grid Column="0" Margin="0 1" RowDefinitions="auto, *, auto, auto">
+    <Grid Column="0" Margin="0 1" RowDefinitions="auto, *, auto">
       <Border Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <TextBlock
         Text="Your Playlists"
@@ -58,23 +58,25 @@
         </ListBox.ItemTemplate>
       </ListBox>
 
-      <Button
-      Grid.Row="2" Content="playlist editor"
-      Margin="24 0"
-      Padding="12 4"
-      VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center"
-      HorizontalAlignment="Left" Click="OpenPlaylistEditor_OnClick" FontWeight="SemiBold"
-      Background="Transparent"
-      />
+      <StackPanel
+      HorizontalAlignment="Left"
+      Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="16 8 16 24">
+        <Button
+        Content="playlist editor"
+        Padding="12 4"
+        VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center"
+        Click="OpenPlaylistEditor_OnClick" FontWeight="SemiBold"
+        Background="Transparent"
+        />
 
-      <Button
-      Grid.Row="3" Content="blacklist editor"
-      Margin="24 12 24 16"
-      Padding="12 4"
-      VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center"
-      HorizontalAlignment="Left" Click="OpenBlacklistEditor_OnClick" FontWeight="SemiBold"
-      Background="Transparent"
-      />
+        <Button
+        Content="blacklist"
+        Padding="12 4"
+        VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center"
+        Click="OpenBlacklistEditor_OnClick" FontWeight="SemiBold"
+        Background="Transparent"
+        />
+      </StackPanel>
     </Grid>
 
     <GridSplitter Grid.Column="1" Background="Transparent" ResizeDirection="Columns"/>

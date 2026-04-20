@@ -146,6 +146,13 @@ public partial class PlayerControlView : ReactiveControl<PlayerControlViewModel>
         }
     }
 
+    private void ClearPlaylistButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var player = ViewModel.Player;
+        player.ActivePlaylistContext.Value = null;
+        player.ActiveArtistContext.Value = null;
+    }
+
     private void ArtistText_OnClick(object? sender, RoutedEventArgs e)
     {
         if (_mainWindow?.ViewModel == default) return;

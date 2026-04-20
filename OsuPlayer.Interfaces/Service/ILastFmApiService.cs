@@ -7,6 +7,14 @@ public interface ILastFmApiService
     public bool LoadSessionKey();
     public Task<bool> LoadSessionKeyAsync();
     public bool IsAuthorized();
+
+    /// <summary>
+    /// Validates the current session key against the Last.fm server.
+    /// Returns true when the key is accepted, false when it is revoked/expired (error 9).
+    /// Also clears the in-memory key and wipes the on-disk session file when invalid.
+    /// </summary>
+    public Task<bool> ValidateSessionAsync();
+
     public Task<string> GetAuthToken();
     public void AuthorizeToken();
     public Task GetSessionKey();

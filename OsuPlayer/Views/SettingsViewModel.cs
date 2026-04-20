@@ -630,6 +630,9 @@ public class SettingsViewModel : BaseViewModel
         _displaySongListCovers = config.Container.DisplaySongListCovers;
         _useSongNameUnicode = config.Container.UseSongNameUnicode;
 
+        _lastFmApiKey = config.Container.LastFmApiKey ?? string.Empty;
+        _lastFmApiSecret = config.Container.LastFmSecret ?? string.Empty;
+
         var lastFmApi = Locator.Current.GetService<ILastFmApiService>();
 
         _isLastFmAuthorized = lastFmApi.LoadSessionKey();

@@ -128,7 +128,7 @@ public partial class SettingsView : ReactiveControl<SettingsViewModel>
         await using var config = new Config();
 
         var apiKey = string.IsNullOrWhiteSpace(ViewModel.LastFmApiKey) ? config.Container.LastFmApiKey : ViewModel.LastFmApiKey;
-        var apiSecret = string.IsNullOrWhiteSpace(ViewModel.LastFmApiKey) ? config.Container.LastFmSecret : ViewModel.LastFmApiSecret;
+        var apiSecret = string.IsNullOrWhiteSpace(ViewModel.LastFmApiSecret) ? config.Container.LastFmSecret : ViewModel.LastFmApiSecret;
 
         if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(apiSecret))
         {
@@ -136,22 +136,32 @@ public partial class SettingsView : ReactiveControl<SettingsViewModel>
             return;
         }
 
-        // We only load the APIKey from the config, as it is the only key that we save
-        // 1. Because we always need the api key for all the request
-        // 2. The secret is only used for the first authentication of the token
-        // 3. After that all subsequent last.fm api calls only need the api key and session key
+        // Persist credentials to config immediately so they survive restarts even if
+        // the auth flow below fails partway through.
+        config.Container.LastFmApiKey = apiKey;
+        config.Container.LastFmSecret = apiSecret;
+        await config.SaveAsync(config.Container);
+
         lastFmApi.SetApiKeyAndSecret(apiKey, apiSecret);
 
         await lastFmApi.LoadSessionKeyAsync();
 
-        ViewModel.IsLastFmAuthorized = lastFmApi.IsAuthorized();
+        // If a local session key exists, verify it's still accepted by Last.FM before
+        // skipping the re-auth flow. This catches revoked/expired keys immediately
+        // without waiting for the next scrobble to fail.
+        if (lastFmApi.IsAuthorized())
+            ViewModel.IsLastFmAuthorized = await lastFmApi.ValidateSessionAsync();
+        else
+            ViewModel.IsLastFmAuthorized = false;
 
         if (!ViewModel.IsLastFmAuthorized)
         {
             await lastFmApi.GetAuthToken();
             lastFmApi.AuthorizeToken();
 
-            await MessageBox.ShowDialogAsync(window, "Close this window, when you are done, authenticating in the browser");
+            await MessageBox.ShowDialogAsync(window,
+                "A Last.FM authorization page has been opened in your browser.\n\nGo to that tab, log in, and approve access for osu!player. Once you've clicked \"Allow\" in the browser, come back here and click OK.",
+                "Authorize Last.FM");
 
             await lastFmApi.GetSessionKey();
 

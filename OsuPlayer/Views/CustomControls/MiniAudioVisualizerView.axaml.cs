@@ -58,7 +58,20 @@ public partial class MiniAudioVisualizerView : UserControl
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(33) }; // ~30 fps
         _timer.Tick += OnTimerTick;
+        // Timer is started/stopped in OnAttachedToVisualTree / OnDetachedFromVisualTree
+        // so off-screen (virtualized-out) instances don't burn CPU.
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
         _timer.Start();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        _timer.Stop();
+        base.OnDetachedFromVisualTree(e);
     }
 
     private void UpdateVisibility()

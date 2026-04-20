@@ -66,6 +66,14 @@ public class AsyncCoverImage : Panel
     /// </summary>
     private const int DebounceMs = 120;
 
+    /// <summary>
+    /// Maximum pixel width to decode cover images at. Covers are displayed at small sizes
+    /// (44–64 px) so decoding multi-megapixel osu! backgrounds at full resolution wastes
+    /// GPU memory and hurts compositing performance during animations.
+    /// We use 2× the largest display size to stay sharp on HiDPI screens.
+    /// </summary>
+    private const int DecodePixelWidth = 128;
+
     public AsyncCoverImage()
     {
         _image = new Image
@@ -125,7 +133,11 @@ public class AsyncCoverImage : Panel
             // Load the bitmap off the UI thread
             var bitmap = await Task.Run(() =>
             {
-                try { return new Bitmap(path); }
+                try
+                {
+                    using var stream = File.OpenRead(path);
+                    return Bitmap.DecodeToWidth(stream, DecodePixelWidth, BitmapInterpolationMode.LowQuality);
+                }
                 catch { return null; }
             }, token);
 

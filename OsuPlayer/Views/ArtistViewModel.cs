@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Reactive.Disposables;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.ReactiveUI;
 using Avalonia.Threading;
@@ -27,6 +28,12 @@ namespace OsuPlayer.Views;
 public class ArtistViewModel : BaseViewModel
 {
     public readonly IPlayer Player;
+
+    /// <summary>
+    /// Decode artist images to 2× the display size (256 px) for HiDPI sharpness
+    /// without keeping multi-megapixel textures in GPU memory.
+    /// </summary>
+    private const int ArtistImageDecodeWidth = 512;
 
     private string _artistName = string.Empty;
     private ReadOnlyObservableCollection<IMapEntryBase>? _songs;
@@ -442,7 +449,11 @@ public class ArtistViewModel : BaseViewModel
 
             var bitmap = await Task.Run(() =>
             {
-                try { return new Bitmap(path); }
+                try
+                {
+                    using var stream = File.OpenRead(path);
+                    return Bitmap.DecodeToWidth(stream, ArtistImageDecodeWidth, BitmapInterpolationMode.MediumQuality);
+                }
                 catch { return null; }
             });
 
@@ -541,7 +552,8 @@ public class ArtistViewModel : BaseViewModel
         {
             try
             {
-                var bmp = new Bitmap(path);
+                using var stream = File.OpenRead(path);
+                var bmp = Bitmap.DecodeToWidth(stream, ArtistImageDecodeWidth, BitmapInterpolationMode.MediumQuality);
                 ArtistImage?.Dispose();
                 ArtistImage = bmp;
             }

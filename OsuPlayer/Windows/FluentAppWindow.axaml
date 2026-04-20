@@ -150,12 +150,17 @@
       <Panel Name="ArtworkOverlayBackdrop" Background="#CC000000" />
       <!-- Centered artwork card -->
       <Panel Name="ArtworkOverlayContent" IsHitTestVisible="True">
-        <Border Margin="120"
-                VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                CornerRadius="10" ClipToBounds="True"
-                BoxShadow="0 16 48 8 #CC000000">
-          <Image Source="{Binding PlayerControl.CurrentSongImage}"
-                 Stretch="Uniform" />
+        <Border
+        Margin="120"
+        VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+        >
+          <Border
+          VerticalAlignment="Center" HorizontalAlignment="Center"
+          CornerRadius="32" ClipToBounds="True"
+          BoxShadow="0 16 48 8 #CC000000">
+            <Image Source="{Binding PlayerControl.CurrentSongImage}"
+                   Stretch="Uniform" />
+          </Border>
         </Border>
         <Button Name="ArtworkOverlayCloseButton"
                 VerticalAlignment="Top" HorizontalAlignment="Right"

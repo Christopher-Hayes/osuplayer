@@ -10,7 +10,8 @@ An [osu!player](https://github.com/Founntain/osuplayer) fork. This is a music pl
 
 This fork is solely focused on core music player features. Accounts / online features are absent.
 
-<img width="1546" height="1005" alt="image" src="https://github.com/user-attachments/assets/cb5a5955-da7a-4ccd-bc6c-d1adc31a300f" />
+<img width="1424" height="967" alt="Screenshot of the app playing the song 'Dance the Night Away' from the k-pop band, TWICE. The app uses a blurred background of the song artwork, with a dark semi-transparent UI design." src="https://github.com/user-attachments/assets/8702bb6c-ef79-4b05-9fa0-8888354cdd5d" />
+
 
 ## Differences from osu!player
 

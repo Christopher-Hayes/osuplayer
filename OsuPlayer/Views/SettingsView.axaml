@@ -118,12 +118,6 @@
                         </ui:FASettingsExpanderItem.Footer>
                     </ui:FASettingsExpanderItem>
 
-                    <ui:FASettingsExpanderItem Content="Enable Discord Rich Presence"
-                                             Description="Enable if you want to display your current playing song in your Discord Status">
-                        <ui:FASettingsExpanderItem.Footer>
-                            <ToggleSwitch IsChecked="{Binding UseDiscordRpc}" />
-                        </ui:FASettingsExpanderItem.Footer>
-                    </ui:FASettingsExpanderItem>
                 </ui:FASettingsExpander>
 
                 <!-- ——————————————— -->
@@ -263,10 +257,10 @@
                     </ui:FASettingsExpanderItem>
                 </ui:FASettingsExpander>
 
-                <!-- ——————————————— -->
-                <!-- Network Settings -->
-                <!-- ——————————————— -->
-                <ui:FASettingsExpander Header="Network Settings"
+                <!-- ——————————————————— -->
+                <!-- App Integrations    -->
+                <!-- ——————————————————— -->
+                <ui:FASettingsExpander Header="App Integrations"
                                      IconSource="Wifi4"
                                      Description="Settings regarding anything that goes beyond the application itself"
                                      Name="NetworkSettingsExpander">
@@ -303,6 +297,13 @@
                                              Description="Toggle if you want to send your play activity as scrobbles to Last.FM">
                         <ui:FASettingsExpanderItem.Footer>
                             <ToggleSwitch IsChecked="{Binding EnableScrobbling}" />
+                        </ui:FASettingsExpanderItem.Footer>
+                    </ui:FASettingsExpanderItem>
+
+                    <ui:FASettingsExpanderItem Content="Enable Discord Rich Presence"
+                                             Description="Enable if you want to display your current playing song in your Discord Status">
+                        <ui:FASettingsExpanderItem.Footer>
+                            <ToggleSwitch IsChecked="{Binding UseDiscordRpc}" />
                         </ui:FASettingsExpanderItem.Footer>
                     </ui:FASettingsExpanderItem>
                 </ui:FASettingsExpander>

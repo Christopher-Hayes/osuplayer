@@ -10,7 +10,8 @@ An [osu!player](https://github.com/Founntain/osuplayer) fork. This is a music pl
 
 This fork is solely focused on core music player features. Accounts / online features are absent.
 
-<img width="1424" height="967" alt="Screenshot of the app playing the song 'Dance the Night Away' from the k-pop band, TWICE. The app uses a blurred background of the song artwork, with a dark semi-transparent UI design." src="https://github.com/user-attachments/assets/8702bb6c-ef79-4b05-9fa0-8888354cdd5d" />
+<img width="1596" height="1097" alt="Screenshot of the app playing the song 'Hold on Tight' from the k-pop band, aespa. The app uses a blurred background of the song artwork, with a dark semi-transparent UI design. The app is open to the artist page for aespa." src="https://github.com/user-attachments/assets/ca89ab7b-8b50-4444-beb2-247ac05c186c" />
+
 
 
 ## Differences from osu!player

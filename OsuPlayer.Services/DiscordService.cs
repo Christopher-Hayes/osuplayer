@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
@@ -15,9 +15,9 @@ public class DiscordService : OsuPlayerService, IDiscordService
 {
     public override string ServiceName => "DISCORD_SERVICE";
 
-    private const string ApplicationId = "506435812397940736";
+    private const string ApplicationId = "1495955314522980497";
     private const string DefaultImageKey = "logo";
-    private readonly DiscordRpcClient _client;
+    private DiscordRpcClient _client;
     private readonly string _defaultOsuThumbnailUrl = "https://assets.ppy.sh/beatmaps/{0}/covers/list.jpg";
     private string _lastOsuThumbnailUrl = string.Empty;
 
@@ -28,13 +28,21 @@ public class DiscordService : OsuPlayerService, IDiscordService
 
     public DiscordService()
     {
-        _client = new DiscordRpcClient(ApplicationId);
-
         _defaultAssets = new Assets
         {
-            LargeImageKey = "logo",
-            LargeImageText = $"osu!player v{Assembly.GetEntryAssembly().ToVersionString()}"
+            LargeImageKey = "logo"
         };
+
+        _client = CreateClient();
+    }
+
+    private DiscordRpcClient CreateClient()
+    {
+        var client = new DiscordRpcClient(ApplicationId);
+        client.Logger = new ConsoleLogger { Level = LogLevel.Warning };
+        client.OnReady += Client_OnReady;
+        client.OnPresenceUpdate += Client_OnPresenceUpdate;
+        return client;
     }
 
     /// <summary>
@@ -42,24 +50,25 @@ public class DiscordService : OsuPlayerService, IDiscordService
     /// </summary>
     public void Initialize()
     {
-        _client.Logger = new ConsoleLogger
-        {
-            Level = LogLevel.Warning
-        };
+        // If the previous client was disposed, create a fresh one before initializing.
+        if (_client.IsDisposed)
+            _client = CreateClient();
 
-        _client.OnReady += Client_OnReady;
-        _client.OnPresenceUpdate += Client_OnPresenceUpdate;
+        if (_client.IsInitialized)
+            return;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            EnsureLinuxIpcSymlinks();
 
         _client.Initialize();
 
         _client.SetPresence(new RichPresence
         {
-            Details = "osu!player",
+            Details = "Music Player for osu!",
             State = "doing nothing...",
             Assets = new Assets
             {
-                LargeImageKey = DefaultImageKey,
-                LargeImageText = "osu!player"
+                LargeImageKey = DefaultImageKey
             },
             Type = ActivityType.Listening
         });
@@ -71,11 +80,66 @@ public class DiscordService : OsuPlayerService, IDiscordService
     }
 
     /// <summary>
+    /// On Linux, the DiscordRichPresence library only checks a fixed set of socket paths.
+    /// Flatpak Discord puts its IPC socket under a subdirectory that the library doesn't scan.
+    /// This method creates symlinks from the expected paths to wherever Discord actually
+    /// placed its socket, covering the most common install methods (native, Flatpak, Snap).
+    /// </summary>
+    private static void EnsureLinuxIpcSymlinks()
+    {
+        var runtimeDir = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR")
+                         ?? $"/run/user/{Environment.GetEnvironmentVariable("UID") ?? "1000"}";
+
+        // Subdirectories where different Discord installs place their IPC sockets.
+        var candidates = new[]
+        {
+            Path.Combine(runtimeDir, "app", "com.discordapp.Discord"),      // Flatpak
+            Path.Combine(runtimeDir, "app", "com.discordapp.DiscordCanary"), // Flatpak Canary
+            Path.Combine(runtimeDir, "app", "com.discordapp.DiscordPTB"),   // Flatpak PTB
+            Path.Combine(runtimeDir, "snap.discord"),                        // Snap (already checked by lib, but let's keep native symlink)
+        };
+
+        for (var pipe = 0; pipe < 10; pipe++)
+        {
+            var socketName = $"discord-ipc-{pipe}";
+            var standardPath = Path.Combine(runtimeDir, socketName);
+
+            // If the standard path already exists (real socket or symlink), skip it.
+            if (File.Exists(standardPath) || Path.Exists(standardPath))
+                continue;
+
+            foreach (var dir in candidates)
+            {
+                var source = Path.Combine(dir, socketName);
+                if (!File.Exists(source) && !Path.Exists(source))
+                    continue;
+
+                try
+                {
+                    File.CreateSymbolicLink(standardPath, source);
+                    Debug.WriteLine($"[Discord] Created symlink {standardPath} -> {source}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[Discord] Could not create symlink {standardPath}: {ex.Message}");
+                }
+
+                break; // Only need one symlink per pipe number.
+            }
+        }
+    }
+
+    /// <summary>
     /// Needs to be called to dispose the client properly.
     /// </summary>
     public void DeInitialize()
     {
-        _client.Dispose();
+        if (!_client.IsDisposed)
+        {
+            if (_client.IsInitialized)
+                _client.ClearPresence();
+            _client.Dispose();
+        }
     }
 
     /// <summary>
@@ -146,8 +210,7 @@ public class DiscordService : OsuPlayerService, IDiscordService
 
         return new()
         {
-            LargeImageKey = url,
-            LargeImageText = $"osu!player v{Assembly.GetEntryAssembly().ToVersionString()}"
+            LargeImageKey = url
         };
     }
 
@@ -157,8 +220,8 @@ public class DiscordService : OsuPlayerService, IDiscordService
         {
             new()
             {
-                Label = "osu!player GitHub",
-                Url = "https://github.com/osu-player/osuplayer"
+                Label = "GitHub",
+                Url = "https://github.com/Christopher-Hayes/osuplayer"
             }
         };
     }

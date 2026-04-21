@@ -502,6 +502,12 @@ public class SettingsViewModel : BaseViewModel
 
             using var cfg = new Config();
             cfg.Container.UseDiscordRpc = value;
+
+            var discordService = Locator.Current.GetService<IDiscordService>();
+            if (value)
+                discordService?.Initialize();
+            else
+                discordService?.DeInitialize();
         }
     }
 

@@ -22,6 +22,12 @@ public class DiscordService : OsuPlayerService, IDiscordService
     private string _lastOsuThumbnailUrl = string.Empty;
 
     /// <summary>
+    /// Cancels any in-flight UpdatePresence call so that a stale async thumbnail fetch
+    /// cannot overwrite a newer presence update (e.g. a Play() arriving after a Pause()).
+    /// </summary>
+    private CancellationTokenSource _presenceCts = new();
+
+    /// <summary>
     /// Default assets for the RPC including the logo
     /// </summary>
     private readonly Assets _defaultAssets;
@@ -150,17 +156,43 @@ public class DiscordService : OsuPlayerService, IDiscordService
     /// <param name="beatmapSetId">Optional beatmapset ID</param>
     /// <param name="assets">Optional assets to use</param>
     /// <param name="durationLeft">Optional duration left that is displayed in the RPC</param>
-    public async Task UpdatePresence(string details, string state, int beatmapSetId = 0, Assets? assets = null, TimeSpan? durationLeft = null)
+    public async Task UpdatePresence(string details, string state, int beatmapSetId = 0, Assets? assets = null, TimeSpan? elapsed = null, TimeSpan? durationLeft = null)
     {
         if (!_client.IsInitialized)
             return;
 
+        // Cancel any previous in-flight update and grab a fresh token.
+        // This prevents a slow thumbnail fetch (e.g. from Pause()) from
+        // overwriting a faster, newer update (e.g. from Play() after a seek).
+        var oldCts = _presenceCts;
+        _presenceCts = new CancellationTokenSource();
+        var token = _presenceCts.Token;
+        oldCts.Cancel();
+        oldCts.Dispose();
+
         if (assets == null && beatmapSetId != 0)
         {
-            assets = await TryToGetThumbnail(beatmapSetId);
+            assets = await TryToGetThumbnail(beatmapSetId, token);
         }
 
-        var timestamps = durationLeft == null ? null : Timestamps.FromTimeSpan(durationLeft.Value);
+        // Bail out if a newer UpdatePresence call has already superseded this one.
+        if (token.IsCancellationRequested)
+            return;
+
+        // Build timestamps from the caller-supplied elapsed/remaining values so that:
+        //   Start = now - elapsed  → Discord shows the correct elapsed time (not reset on seek)
+        //   End   = now + remaining → Discord shows a countdown to the end of the track
+        // When neither value is provided (e.g. paused) Timestamps is left null and Discord
+        // removes the timer entirely.
+        Timestamps? timestamps = null;
+        if (elapsed.HasValue || durationLeft.HasValue)
+        {
+            timestamps = new Timestamps();
+            if (elapsed.HasValue)
+                timestamps.Start = DateTime.UtcNow - elapsed.Value;
+            if (durationLeft.HasValue)
+                timestamps.End = DateTime.UtcNow + durationLeft.Value;
+        }
 
         _client.SetPresence(new RichPresence
         {
@@ -173,7 +205,7 @@ public class DiscordService : OsuPlayerService, IDiscordService
         });
     }
 
-    private async Task<Assets?> TryToGetThumbnail(int beatmapSetId)
+    private async Task<Assets?> TryToGetThumbnail(int beatmapSetId, CancellationToken cancellationToken = default)
     {
         var url = string.Format(_defaultOsuThumbnailUrl, beatmapSetId);
 
@@ -195,7 +227,7 @@ public class DiscordService : OsuPlayerService, IDiscordService
 
                 var req = new HttpRequestMessage(HttpMethod.Get, url);
 
-                response = await client.SendAsync(req);
+                response = await client.SendAsync(req, cancellationToken);
             }
             catch (Exception)
             {

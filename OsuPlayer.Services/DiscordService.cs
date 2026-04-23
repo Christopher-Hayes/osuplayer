@@ -28,6 +28,13 @@ public class DiscordService : OsuPlayerService, IDiscordService
     private CancellationTokenSource _presenceCts = new();
 
     /// <summary>
+    /// Cancels the pending inactivity clear when the player resumes before the timeout fires.
+    /// </summary>
+    private CancellationTokenSource _inactivityCts = new();
+
+    private static readonly TimeSpan InactivityTimeout = TimeSpan.FromMinutes(5);
+
+    /// <summary>
     /// Default assets for the RPC including the logo
     /// </summary>
     private readonly Assets _defaultAssets;
@@ -203,6 +210,24 @@ public class DiscordService : OsuPlayerService, IDiscordService
             Timestamps = timestamps,
             Type = ActivityType.Listening
         });
+
+        // Cancel any running inactivity countdown, then restart it only when paused
+        // (no timestamps means the player is paused — elapsed/durationLeft are both null).
+        var oldInactivityCts = _inactivityCts;
+        _inactivityCts = new CancellationTokenSource();
+        oldInactivityCts.Cancel();
+        oldInactivityCts.Dispose();
+
+        if (timestamps == null)
+        {
+            var inactivityToken = _inactivityCts.Token;
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(InactivityTimeout, inactivityToken);
+                if (!inactivityToken.IsCancellationRequested && _client.IsInitialized)
+                    _client.ClearPresence();
+            }, inactivityToken);
+        }
     }
 
     private async Task<Assets?> TryToGetThumbnail(int beatmapSetId, CancellationToken cancellationToken = default)

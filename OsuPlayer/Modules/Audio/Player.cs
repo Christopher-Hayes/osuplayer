@@ -136,7 +136,12 @@ public class Player : IPlayer, IImportNotifications
 
         CurrentSong.BindValueChanged(OnCurrentSongChanged, true);
         RepeatMode.BindValueChanged(OnRepeatModeChanged, true);
-        IsShuffle.BindValueChanged(_ => _shuffleProvider?.ShuffleImpl?.Init(0));
+        IsShuffle.BindValueChanged(e =>
+        {
+            _shuffleProvider?.ShuffleImpl?.Init(0);
+            _linuxMprisService?.UpdateShuffle(e.NewValue);
+        });
+        RepeatMode.BindValueChanged(e => _linuxMprisService?.UpdateRepeatMode(e.NewValue));
         SelectedPlaylist.BindValueChanged(OnSelectedPlaylistChanged, true);
         ActivePlaylistContext.BindValueChanged(OnActivePlaylistContextChanged, true);
         ActiveArtistContext.BindValueChanged(OnActiveArtistContextChanged, true);

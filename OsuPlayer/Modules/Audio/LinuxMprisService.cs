@@ -17,7 +17,7 @@ namespace OsuPlayer.Modules.Audio;
 /// with <see cref="MessageWriter.WriteDictionary(Dictionary{string, VariantValue})"/> so that
 /// alignment, type signatures and variant nesting are handled entirely by the library.
 /// </summary>
-public sealed class LinuxMprisService : IMethodHandler, IDisposable
+public sealed class LinuxMprisService : IPathMethodHandler, IDisposable
 {
     // ── Constants ────────────────────────────────────────────────────────────
 
@@ -110,7 +110,7 @@ public sealed class LinuxMprisService : IMethodHandler, IDisposable
     // ── State ────────────────────────────────────────────────────────────────
 
     private readonly IPlayer _player;
-    private Connection? _connection;
+    private DBusConnection? _connection;
     private bool _isPlaying;
     private IMapEntry? _currentSong;
     private string? _currentArtUrl;
@@ -118,6 +118,7 @@ public sealed class LinuxMprisService : IMethodHandler, IDisposable
     // ── IMethodHandler ───────────────────────────────────────────────────────
 
     public string Path => MprisPath;
+    public bool HandlesChildPaths => false;
 
     /// <summary>
     /// Run synchronously on the receive loop to avoid the async-void wrapper in
@@ -138,7 +139,7 @@ public sealed class LinuxMprisService : IMethodHandler, IDisposable
     {
         try
         {
-            _connection = new Connection(Address.Session!);
+            _connection = new DBusConnection(DBusAddress.Session!);
             await _connection.ConnectAsync();
 
             // Register our method handler BEFORE requesting the name so we can
@@ -282,6 +283,7 @@ public sealed class LinuxMprisService : IMethodHandler, IDisposable
             case "GetAll":
             {
                 var target = reader.ReadString();
+                Console.Error.WriteLine($"[MPRIS] GetAll target='{target}' PlayerIface='{PlayerIface}' RootIface='{RootIface}' match={target == RootIface || target == PlayerIface}");
                 var dict = target switch
                 {
                     PlayerIface => BuildPlayerProps(),
@@ -304,7 +306,27 @@ public sealed class LinuxMprisService : IMethodHandler, IDisposable
             }
             case "Set":
             {
-                // Read-only — silently acknowledge
+                var target = reader.ReadString();
+                var prop = reader.ReadString();
+                var value = reader.ReadVariantValue();
+
+                if (target == PlayerIface)
+                {
+                    switch (prop)
+                    {
+                        case "Shuffle":
+                            var newShuffle = value.GetBool();
+                            Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => _player.IsShuffle.Value = newShuffle);
+                            UpdateShuffle(newShuffle);
+                            break;
+                        case "LoopStatus":
+                            var newMode = MprisToRepeatMode(value.GetString());
+                            Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => _player.RepeatMode.Value = newMode);
+                            UpdateRepeatMode(newMode);
+                            break;
+                    }
+                }
+
                 using var w = ctx.CreateReplyWriter(null);
                 ctx.Reply(w.CreateMessage());
                 return;
@@ -373,9 +395,9 @@ public sealed class LinuxMprisService : IMethodHandler, IDisposable
         return new Dictionary<string, VariantValue>
         {
             ["PlaybackStatus"] = _isPlaying ? "Playing" : "Paused",
-            ["LoopStatus"]     = "None",
+            ["LoopStatus"]     = RepeatModeToMpris(_player.RepeatMode.Value),
             ["Rate"]           = 1.0,
-            ["Shuffle"]        = VariantValue.Bool(false),
+            ["Shuffle"]        = VariantValue.Bool(_player.IsShuffle.Value),
             ["Volume"]         = 1.0,
             ["Position"]       = VariantValue.Int64(0),
             ["MinimumRate"]    = 1.0,
@@ -471,6 +493,38 @@ public sealed class LinuxMprisService : IMethodHandler, IDisposable
 
         return string.Empty;
     }
+
+    public void UpdateShuffle(bool isShuffle)
+    {
+        if (_connection is null) return;
+        EmitPropertiesChanged(PlayerIface, new Dictionary<string, VariantValue>
+        {
+            ["Shuffle"] = VariantValue.Bool(isShuffle),
+        });
+    }
+
+    public void UpdateRepeatMode(RepeatMode mode)
+    {
+        if (_connection is null) return;
+        EmitPropertiesChanged(PlayerIface, new Dictionary<string, VariantValue>
+        {
+            ["LoopStatus"] = RepeatModeToMpris(mode),
+        });
+    }
+
+    private static string RepeatModeToMpris(RepeatMode mode) => mode switch
+    {
+        RepeatMode.RepeatAll => "Playlist",
+        RepeatMode.RepeatOne => "Track",
+        _                    => "None",
+    };
+
+    private static RepeatMode MprisToRepeatMode(string mpris) => mpris switch
+    {
+        "Playlist" => RepeatMode.RepeatAll,
+        "Track"    => RepeatMode.RepeatOne,
+        _          => RepeatMode.NoRepeat,
+    };
 
     // ── Signal emission ──────────────────────────────────────────────────────
 

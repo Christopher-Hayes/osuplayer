@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Avalonia;
 using Avalonia.ReactiveUI;
+using Avalonia.X11;
 using Nein.Extensions;
 using OsuPlayer.Data.DataModels;
 using OsuPlayer.Extensions;
@@ -63,7 +64,8 @@ internal static class Program
             .UseSkia()
             .UseHarfBuzz()
             .UseReactiveUI()
-            .With(new Win32PlatformOptions());
+            .With(new Win32PlatformOptions())
+        .With(new X11PlatformOptions { EnableIme = false });
     }
 
     private static void Register(IMutableDependencyResolver services, IReadonlyDependencyResolver resolver)

@@ -103,7 +103,7 @@ public partial class ExportSongsProcessWindow : ReactiveWindow<ExportSongsProces
                     var tFile = File.Create(exportPath);
 
                     tFile.Tag.Title = mapEntry.GetTitle();
-                    tFile.Tag.Album = "osu!player";
+                    tFile.Tag.Album = "Music Player for osu!";
                     tFile.Tag.Track = (uint) index + 1;
                     tFile.Tag.AlbumArtists = new[]
                     {

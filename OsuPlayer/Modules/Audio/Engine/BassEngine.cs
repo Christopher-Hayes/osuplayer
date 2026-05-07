@@ -11,7 +11,7 @@ using OsuPlayer.Services;
 namespace OsuPlayer.Modules.Audio.Engine;
 
 /// <summary>
-/// Audio engine for the osu!player using <see cref="ManagedBass" />
+/// Audio engine for the Music Player for osu! using <see cref="ManagedBass" />
 /// </summary>
 public sealed class BassEngine : OsuPlayerService, IAudioEngine
 {

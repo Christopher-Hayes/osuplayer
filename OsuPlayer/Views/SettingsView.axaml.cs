@@ -160,7 +160,7 @@ public partial class SettingsView : ReactiveControl<SettingsViewModel>
             lastFmApi.AuthorizeToken();
 
             await MessageBox.ShowDialogAsync(window,
-                "A Last.FM authorization page has been opened in your browser.\n\nGo to that tab, log in, and approve access for osu!player. Once you've clicked \"Allow\" in the browser, come back here and click OK.",
+                "A Last.FM authorization page has been opened in your browser.\n\nGo to that tab, log in, and approve access for Music Player for osu!. Once you've clicked \"Allow\" in the browser, come back here and click OK.",
                 "Authorize Last.FM");
 
             await lastFmApi.GetSessionKey();

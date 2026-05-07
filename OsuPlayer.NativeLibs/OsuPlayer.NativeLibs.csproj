@@ -2,7 +2,7 @@
     <PropertyGroup Label="Project">
         <TargetFramework>net10.0</TargetFramework>
         <OutputType>Library</OutputType>
-        <AssemblyTitle>osu!player Libraries</AssemblyTitle>
+        <AssemblyTitle>Music Player for osu! Libraries</AssemblyTitle>
         <AssemblyName>OsuPlayer.NativeLibs</AssemblyName>
         <PackageProjectUrl>https://github.com/Christopher-Hayes/osuplayer</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Christopher-Hayes/osuplayer</RepositoryUrl>
@@ -13,8 +13,8 @@
 
     <PropertyGroup Label="Nuget">
         <IsPackable>true</IsPackable>
-        <Title>osu!player Libraries</Title>
-        <Description>Native libraries for osu!player</Description>
+        <Title>Music Player for osu! Libraries</Title>
+        <Description>Native libraries for Music Player for osu!</Description>
         <PackageId>ChrisHayes.OsuPlayer.NativeLibs</PackageId>
         <PackageTags>osuplayer libraries</PackageTags>
         <IncludeBuildOutput>false</IncludeBuildOutput>

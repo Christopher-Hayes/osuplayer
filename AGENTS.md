@@ -186,7 +186,7 @@ Prefer declarative AXAML techniques over programmatic code-behind for responsive
 | `LastFmService` | Last.fm scrobbling |
 | `DiscordService` | Discord rich presence |
 | `ProfileManagerService` | User profile management |
-| `ApiStatisticsService` | osu!player API stats |
+| `ApiStatisticsService` | Music Player for osu! API stats |
 | `LoggingService` | App-level logging |
 | `JsonService` | Generic JSON persistence |
 | `DbReaderFactory` | Creates the osu! DB reader for the current install type |
@@ -206,7 +206,7 @@ Prefer declarative AXAML techniques over programmatic code-behind for responsive
 
 ## Linux / MPRIS2
 
-`LinuxMprisService` implements the MPRIS2 D-Bus interface so GNOME Shell, KDE, and other desktop environments route hardware media keys to osu!player. It is instantiated by `Player.cs` on Linux only.
+`LinuxMprisService` implements the MPRIS2 D-Bus interface so GNOME Shell, KDE, and other desktop environments route hardware media keys to Music Player for osu!. It is instantiated by `Player.cs` on Linux only.
 
 - Do **not** add an explicit `Tmds.DBus.Protocol` package reference — it is resolved transitively from `Avalonia.FreeDesktop` and must stay in sync with Avalonia.
 - `PlayerControlView` and `Miniplayer` must remain aligned with any transport changes that also affect MPRIS.

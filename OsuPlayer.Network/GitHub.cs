@@ -11,7 +11,7 @@ namespace OsuPlayer.Network;
 
 /// <summary>
 /// A static class to help us access various GitHub Repository data
-/// Also it helps us provide updates for the osu!player and check if updates are available by checking our
+/// Also it helps us provide updates for the Music Player for osu! and check if updates are available by checking our
 /// GitHub-Repository releases
 /// </summary>
 public static class GitHub
@@ -80,7 +80,7 @@ public static class GitHub
     {
         try
         {
-            var github = new GitHubClient(new ProductHeaderValue("osu!player"));
+            var github = new GitHubClient(new ProductHeaderValue("Music Player for osu!"));
 
             var releases = await github.Repository.Release.GetAll("Christopher-Hayes", "osuplayer");
 
@@ -138,7 +138,7 @@ public static class GitHub
     {
         try
         {
-            var github = new GitHubClient(new ProductHeaderValue("osu!player"));
+            var github = new GitHubClient(new ProductHeaderValue("Music Player for osu!"));
 
             var githubData = await github.Repository.GetAllContributors("Christopher-Hayes", "osuplayer");
 

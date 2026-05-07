@@ -52,7 +52,7 @@ public static class Program
             {
                 Console.WriteLine($"Error deleting old file {oldFile} with exception: {e.Message}");
                 Console.WriteLine(
-                    "Please delete all old files (not the folders!) and copy the content from 'update_temp' manually into your osu!player directory");
+                    "Please delete all old files (not the folders!) and copy the content from 'update_temp' manually into your Music Player for osu! directory");
 
                 Console.ReadKey();
 
@@ -73,7 +73,7 @@ public static class Program
             catch (Exception e)
             {
                 Console.WriteLine($"{file} has error with exception: {e.Message}");
-                Console.WriteLine("Please restart the updater and make sure osu!player has quit.");
+                Console.WriteLine("Please restart the updater and make sure Music Player for osu! has quit.");
 
                 Console.ReadKey();
                 return;
@@ -83,7 +83,7 @@ public static class Program
         if (!containsUpdaterFiles)
             Directory.Delete("update_temp");
 
-        Console.WriteLine("Updating finished successfully. Please restart the osu!player manually. Press any key to quit.");
+        Console.WriteLine("Updating finished successfully. Please restart the Music Player for osu! manually. Press any key to quit.");
 
         Console.ReadLine();
     }

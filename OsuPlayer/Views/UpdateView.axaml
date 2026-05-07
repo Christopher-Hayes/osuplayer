@@ -14,7 +14,7 @@
 
     <Grid Background="{DynamicResource AcrylicBaseColor}">
         <Grid RowDefinitions="Auto, *, 50" Margin="5">
-            <TextBlock Grid.Row="0" Text="Look a new osu!player update" FontSize="48" FontStyle="Italic"
+            <TextBlock Grid.Row="0" Text="Look a new Music Player for osu! update" FontSize="48" FontStyle="Italic"
                        VerticalAlignment="Center" HorizontalAlignment="Left" />
 
             <ScrollViewer Grid.Row="1">

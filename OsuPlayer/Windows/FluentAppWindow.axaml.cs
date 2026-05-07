@@ -272,7 +272,7 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
                     lastFmApi.AuthorizeToken();
 
                     await MessageBox.ShowDialogAsync(window,
-                        "A Last.FM authorization page has been opened in your browser.\n\nGo to that tab, log in, and approve access for osu!player. Once you've clicked \"Allow\" in the browser, come back here and click OK.",
+                        "A Last.FM authorization page has been opened in your browser.\n\nGo to that tab, log in, and approve access for Music Player for osu!. Once you've clicked \"Allow\" in the browser, come back here and click OK.",
                         "Authorize Last.FM");
 
                     await lastFmApi.GetSessionKey();
@@ -532,7 +532,7 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
             catch (Exception e)
             {
                 Console.WriteLine($"{remainingUpdateFile} has error with exception: {e.Message}");
-                Console.WriteLine("Please restart the updater and make sure osu!player has quit.");
+                Console.WriteLine("Please restart the updater and make sure Music Player for osu! has quit.");
 
                 Console.ReadKey();
                 return;

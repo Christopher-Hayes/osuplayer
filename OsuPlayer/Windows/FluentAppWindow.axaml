@@ -9,7 +9,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OsuPlayer.Windows.FluentAppWindow"
         x:DataType="windows:FluentAppWindowViewModel"
-        Title="osu!player"
+        Title="Music Player for osu!"
         WindowStartupLocation="CenterScreen"
         Opened="Window_OnOpened">
 

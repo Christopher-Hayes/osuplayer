@@ -11,7 +11,7 @@ namespace OsuPlayer.Modules.Audio;
 
 /// <summary>
 /// Implements MPRIS2 D-Bus service on Linux so desktop media keys (play/pause/next/previous)
-/// are routed to osu!player by GNOME Shell and other MPRIS-aware environments.
+/// are routed to Music Player for osu! by GNOME Shell and other MPRIS-aware environments.
 ///
 /// All a{sv} dictionaries are built as Dictionary&lt;string, VariantValue&gt; and serialised
 /// with <see cref="MessageWriter.WriteDictionary(Dictionary{string, VariantValue})"/> so that
@@ -419,7 +419,7 @@ public sealed class LinuxMprisService : IPathMethodHandler, IDisposable
             ["CanQuit"]             = VariantValue.Bool(false),
             ["CanRaise"]            = VariantValue.Bool(false),
             ["HasTrackList"]        = VariantValue.Bool(false),
-            ["Identity"]            = "osu!player",
+            ["Identity"]            = "Music Player for osu!",
             ["SupportedUriSchemes"] = new Array<string>(),
             ["SupportedMimeTypes"]  = new Array<string>(),
         };
@@ -484,7 +484,7 @@ public sealed class LinuxMprisService : IPathMethodHandler, IDisposable
                 "CanQuit"             => VariantValue.Bool(false),
                 "CanRaise"            => VariantValue.Bool(false),
                 "HasTrackList"        => VariantValue.Bool(false),
-                "Identity"            => (VariantValue)"osu!player",
+                "Identity"            => (VariantValue)"Music Player for osu!",
                 "SupportedUriSchemes" => new Array<string>(),
                 "SupportedMimeTypes"  => new Array<string>(),
                 _                     => (VariantValue)string.Empty,

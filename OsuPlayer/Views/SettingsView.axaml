@@ -317,13 +317,13 @@
                                      Name="HelpSettingsExpander">
 
                     <ui:FASettingsExpanderItem Content="Stargaze us"
-                                             Description="You like the osu!player? Then Head to our GitHub and give us a star! We would greatly appreciate it!"
+                                             Description="You like the Music Player for osu!? Then Head to our GitHub and give us a star! We would greatly appreciate it!"
                                              IsClickEnabled="True"
                                              ActionIconSource="Go"
                                              Click="Github_OnClick" />
 
                     <ui:FASettingsExpanderItem Content="Request a feature"
-                                             Description="You are missing something you would like to see in the osu!player? Head to our GitHub and request it"
+                                             Description="You are missing something you would like to see in the Music Player for osu!? Head to our GitHub and request it"
                                              IsClickEnabled="True"
                                              ActionIconSource="Go"
                                              Click="ReportBug_OnClick" />
@@ -333,7 +333,7 @@
                                              ActionIconSource="Go"
                                              Click="ReportBug_OnClick" />
 
-                    <ui:FASettingsExpanderItem Content="osu!player Discord Server"
+                    <ui:FASettingsExpanderItem Content="Music Player for osu! Discord Server"
                                              Description="Join our Discord server to ask question, dev updates and other stuff"
                                              IsClickEnabled="True"
                                              ActionIconSource="Go"
@@ -365,7 +365,7 @@
                 <!-- ——————————————————— -->
                 <ui:FASettingsExpander Header="Contributers"
                                      IconSource="Code"
-                                     Description="The amazing people that help us make osu!player a better place"
+                                     Description="The amazing people that help us make Music Player for osu! a better place"
                                      Name="ContributeSettingsExpander">
                     <StackPanel Margin="1" Spacing="1" Name="ContributePanel">
                         <Border>

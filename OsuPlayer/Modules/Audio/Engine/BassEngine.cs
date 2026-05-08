@@ -194,6 +194,12 @@ public sealed class BassEngine : OsuPlayerService, IAudioEngine
                 break;
             }
 
+        if (!Bass.GetDeviceInfo(index).IsInitialized)
+        {
+            var success = Bass.Init(index);
+            LogToConsole($"LAZY INIT DEVICE {index} | SUCCESSFUL: {success} | CODE: {Bass.LastError}");
+        }
+
         Bass.CurrentDevice = index;
         Bass.ChannelSetDevice(_fxStream, index);
 
@@ -244,11 +250,19 @@ public sealed class BassEngine : OsuPlayerService, IAudioEngine
 
         foreach (var deviceInfo in GetAudioDevices().Skip(1))
         {
-            var success = Bass.Init(counter);
-
-            LogToConsole($"INIT DEVICE {deviceInfo} | SUCCESSFUL: {success} | CODE: {Bass.LastError}");
-
-            if (success) AvailableAudioDevices.Add(deviceInfo);
+            // Only initialize the default device at startup — each Bass.Init() call
+            // creates a PipeWire node, so initializing all devices creates duplicates.
+            // Non-default devices are initialized lazily in SetDevice() when selected.
+            if (deviceInfo.IsDefault)
+            {
+                var success = Bass.Init(counter);
+                LogToConsole($"INIT DEVICE {deviceInfo} | SUCCESSFUL: {success} | CODE: {Bass.LastError}");
+                if (success) AvailableAudioDevices.Add(deviceInfo);
+            }
+            else
+            {
+                AvailableAudioDevices.Add(deviceInfo);
+            }
 
             counter++;
         }

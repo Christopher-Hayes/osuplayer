@@ -15,6 +15,7 @@ public abstract class Storable<T> : IDisposable, IAsyncDisposable where T : ISto
 {
     private T? _storableContainer;
     private readonly IJsonService _jsonService;
+    private readonly SemaphoreSlim _saveLock = new(1, 1);
 
     /// <summary>
     /// The path in which the <see cref="IStorableContainer" /> is to be stored
@@ -44,6 +45,7 @@ public abstract class Storable<T> : IDisposable, IAsyncDisposable where T : ISto
         if (_storableContainer != null)
             await SaveAsync(_storableContainer);
 
+        _saveLock.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -52,6 +54,7 @@ public abstract class Storable<T> : IDisposable, IAsyncDisposable where T : ISto
         if (_storableContainer != null)
             Save(_storableContainer);
 
+        _saveLock.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -118,17 +121,25 @@ public abstract class Storable<T> : IDisposable, IAsyncDisposable where T : ISto
 
     private void TrySave(T container)
     {
-        for (var i = 0; i < 3; i++)
-            try
-            {
-                _jsonService.SerializeToJsonFile(Path!, container);
-                break;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                Thread.Sleep(50);
-            }
+        _saveLock.Wait();
+        try
+        {
+            for (var i = 0; i < 3; i++)
+                try
+                {
+                    _jsonService.SerializeToJsonFile(Path!, container);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    Thread.Sleep(50);
+                }
+        }
+        finally
+        {
+            _saveLock.Release();
+        }
     }
 
     /// <summary>
@@ -148,16 +159,24 @@ public abstract class Storable<T> : IDisposable, IAsyncDisposable where T : ISto
 
     private async Task TrySaveAsync(T container)
     {
-        for (var i = 0; i < 3; i++)
-            try
-            {
-                await _jsonService.SerializeToJsonFileAsync(Path!, container);
-                break;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                await Task.Delay(50);
-            }
+        await _saveLock.WaitAsync();
+        try
+        {
+            for (var i = 0; i < 3; i++)
+                try
+                {
+                    await _jsonService.SerializeToJsonFileAsync(Path!, container);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    await Task.Delay(50);
+                }
+        }
+        finally
+        {
+            _saveLock.Release();
+        }
     }
 }

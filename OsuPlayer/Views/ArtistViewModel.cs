@@ -288,7 +288,8 @@ public class ArtistViewModel : BaseViewModel
 
         Listeners = FormatStatNumber(info.Artist.Stats?.Listeners);
         PlayCount = FormatStatNumber(info.Artist.Stats?.Playcount);
-        Tags = info.Artist.Tags?.Tag?.Select(t => t.Name ?? string.Empty).Where(t => !string.IsNullOrEmpty(t)).ToList();
+        var tags = info.Artist.Tags?.Tag?.Select(t => t.Name ?? string.Empty).Where(t => !string.IsNullOrEmpty(t)).ToList();
+        Tags = tags is { Count: > 0 } ? tags : null;
     }
 
     /// <summary>

@@ -136,7 +136,7 @@
             VerticalAlignment="Center"
             >
               <TextBlock
-              Text="{Binding Tags[0]}"
+              Text="{Binding Tags[0], FallbackValue=''}"
               FontSize="12"
               FontWeight="Light"
               Opacity="0.4"

@@ -80,7 +80,7 @@ public static class GitHub
     {
         try
         {
-            var github = new GitHubClient(new ProductHeaderValue("Music Player for osu!"));
+            var github = new GitHubClient(new ProductHeaderValue("osuplayer"));
 
             var releases = await github.Repository.Release.GetAll("Christopher-Hayes", "osuplayer");
 
@@ -138,7 +138,7 @@ public static class GitHub
     {
         try
         {
-            var github = new GitHubClient(new ProductHeaderValue("Music Player for osu!"));
+            var github = new GitHubClient(new ProductHeaderValue("osuplayer"));
 
             var githubData = await github.Repository.GetAllContributors("Christopher-Hayes", "osuplayer");
 

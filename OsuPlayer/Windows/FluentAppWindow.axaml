@@ -83,7 +83,7 @@
         <AutoCompleteBox Name="SearchBox"
                          MaxWidth="500"
                          MaxDropDownHeight="500"
-                         PlaceholderText="Search songs (hit enter to play)" ItemsSource="{Binding SongList}"
+                         PlaceholderText="Search songs" ItemsSource="{Binding SongList}"
                          FilterMode="ContainsOrdinal"
                          KeyUp="SearchBox_OnKeyUp"
                          SelectionChanged="SearchBox_OnSelectionChanged">
@@ -128,7 +128,7 @@
         <ui:FANavigationViewItem Content="Playlists" Tag="PlaylistNavigation" IconSource="Library" Cursor="Hand" />
       </ui:FANavigationView.MenuItems>
       <ui:FANavigationView.FooterMenuItems>
-        <ui:FANavigationViewItem Content="Open Miniplayer" Tag="MiniplayerNavigation" IconSource="FullScreenMinimize" Cursor="Hand" />
+        <ui:FANavigationViewItem Content="Miniplayer" Tag="MiniplayerNavigation" IconSource="FullScreenMinimize" Cursor="Hand" />
         <ui:FANavigationViewItem Name="Settings" Content="Settings" Tag="SettingsNavigation" IconSource="Settings" Cursor="Hand" />
       </ui:FANavigationView.FooterMenuItems>
       <ui:FANavigationView.Content>

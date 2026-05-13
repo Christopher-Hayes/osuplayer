@@ -32,8 +32,8 @@ public partial class PlayerControlView : ReactiveControl<PlayerControlViewModel>
 
             Repeat.AddHandler(PointerReleasedEvent, Repeat_OnPointerReleased, RoutingStrategies.Tunnel);
 
-            ViewModel.RaisePropertyChanged(nameof(ViewModel.IsAPlaylistSelected));
-            ViewModel.RaisePropertyChanged(nameof(ViewModel.IsCurrentSongInPlaylist));
+            ViewModel.RaisePropertyChanged(nameof(ViewModel.IsCurrentSongInAnyPlaylist));
+            ViewModel.RaisePropertyChanged(nameof(ViewModel.PlaylistPickerItems));
             ViewModel.RaisePropertyChanged(nameof(ViewModel.IsCurrentSongOnBlacklist));
         });
     }
@@ -79,15 +79,15 @@ public partial class PlayerControlView : ReactiveControl<PlayerControlViewModel>
         ViewModel.RaisePropertyChanged(nameof(ViewModel.IsCurrentSongOnBlacklist));
     }
 
-    internal async void Favorite_OnClick(object? sender, RoutedEventArgs e)
+    internal async void PlaylistItem_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (ViewModel.Player.CurrentSong.Value != null)
-        {
-            await PlaylistManager.ToggleSongOfCurrentPlaylist(ViewModel.Player.SelectedPlaylist.Value, ViewModel.Player.CurrentSong.Value);
-            ViewModel.Player.TriggerPlaylistChanged(new PropertyChangedEventArgs("Fav"));
-        }
+        if (sender is not Button { Tag: OsuPlayer.Data.OsuPlayer.StorageModels.Playlist playlist }) return;
+        if (ViewModel.Player.CurrentSong.Value == null) return;
 
-        ViewModel.RaisePropertyChanged(nameof(ViewModel.IsCurrentSongInPlaylist));
+        await PlaylistManager.ToggleSongOfCurrentPlaylist(playlist, ViewModel.Player.CurrentSong.Value);
+        ViewModel.Player.TriggerPlaylistChanged(new PropertyChangedEventArgs("PlaylistPicker"));
+        ViewModel.RaisePropertyChanged(nameof(ViewModel.PlaylistPickerItems));
+        ViewModel.RaisePropertyChanged(nameof(ViewModel.IsCurrentSongInAnyPlaylist));
     }
 
     private void SongControl(object? sender, RoutedEventArgs e)

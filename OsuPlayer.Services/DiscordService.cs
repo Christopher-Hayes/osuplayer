@@ -52,7 +52,7 @@ public class DiscordService : OsuPlayerService, IDiscordService
     private DiscordRpcClient CreateClient()
     {
         var client = new DiscordRpcClient(ApplicationId);
-        client.Logger = new ConsoleLogger { Level = LogLevel.Warning };
+        client.Logger = new ConsoleLogger { Level = LogLevel.None };
         client.OnReady += Client_OnReady;
         client.OnPresenceUpdate += Client_OnPresenceUpdate;
         return client;

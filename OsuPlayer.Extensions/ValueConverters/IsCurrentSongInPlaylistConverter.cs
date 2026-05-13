@@ -10,7 +10,7 @@ public class IsCurrentSongInPlaylistConverter : IValueConverter
     {
         var x = value != null && (bool) value;
 
-        return x ? MaterialIconKind.Heart : MaterialIconKind.HeartOutline;
+        return x ? MaterialIconKind.PlaylistCheck : MaterialIconKind.PlaylistPlus;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

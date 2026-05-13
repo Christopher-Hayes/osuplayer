@@ -135,7 +135,7 @@ public class MiniplayerViewModel : BaseWindowViewModel
     public string ActivePlaylist => Player.ActiveArtistContext.Value != null
         ? $"▶ Artist: {Player.ActiveArtistContext.Value}"
         : Player.ActivePlaylistContext.Value != null
-            ? $"▶ Playlist: {Player.ActivePlaylistContext.Value.Name}"
+            ? $"▶ {Player.ActivePlaylistContext.Value.Name}"
             : string.Empty;
 
     public bool IsPlayingFromPlaylist => Player.ActivePlaylistContext.Value != null || Player.ActiveArtistContext.Value != null;

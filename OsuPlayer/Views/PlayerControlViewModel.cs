@@ -54,6 +54,18 @@ public class PlayerControlViewModel : BaseViewModel
 
     public bool IsAPlaylistSelected => Player.SelectedPlaylist.Value != default;
 
+    public bool IsCurrentSongInAnyPlaylist => CurrentSong.Value != null
+                                              && (PlaylistManager.GetAllPlaylists()
+                                                  ?.Any(p => p.Songs.Contains(CurrentSong.Value.Hash)) ?? false);
+
+    public IEnumerable<PlaylistPickerItem> PlaylistPickerItems =>
+        (PlaylistManager.GetAllPlaylists() ?? Enumerable.Empty<Playlist>())
+        .Select(p => new PlaylistPickerItem
+        {
+            Playlist = p,
+            IsChecked = CurrentSong.Value != null && p.Songs.Contains(CurrentSong.Value.Hash)
+        });
+
     public bool IsCurrentSongOnBlacklist => new Blacklist().Contains(CurrentSong.Value);
 
     private bool _displayBackgroundImage;
@@ -178,7 +190,7 @@ public class PlayerControlViewModel : BaseViewModel
     public string ActivePlaylist => Player.ActiveArtistContext.Value != null
         ? $"Artist: {Player.ActiveArtistContext.Value}"
         : Player.ActivePlaylistContext.Value != null
-            ? $"Playlist: {Player.ActivePlaylistContext.Value.Name}"
+            ? $"{Player.ActivePlaylistContext.Value.Name}"
             : string.Empty;
 
     public bool IsPlayingFromPlaylist => Player.ActivePlaylistContext.Value != null || Player.ActiveArtistContext.Value != null;
@@ -216,6 +228,8 @@ public class PlayerControlViewModel : BaseViewModel
             this.RaisePropertyChanged(nameof(ArtistText));
             this.RaisePropertyChanged(nameof(SongText));
             this.RaisePropertyChanged(nameof(IsCurrentSongInPlaylist));
+            this.RaisePropertyChanged(nameof(IsCurrentSongInAnyPlaylist));
+            this.RaisePropertyChanged(nameof(PlaylistPickerItems));
             this.RaisePropertyChanged(nameof(IsCurrentSongOnBlacklist));
         });
 
@@ -250,6 +264,8 @@ public class PlayerControlViewModel : BaseViewModel
         {
             this.RaisePropertyChanged(nameof(IsAPlaylistSelected));
             this.RaisePropertyChanged(nameof(IsCurrentSongInPlaylist));
+            this.RaisePropertyChanged(nameof(IsCurrentSongInAnyPlaylist));
+            this.RaisePropertyChanged(nameof(PlaylistPickerItems));
         }, true);
 
         Player.ActivePlaylistContext.BindValueChanged(_ =>
@@ -268,4 +284,11 @@ public class PlayerControlViewModel : BaseViewModel
 
         this.WhenActivated(disposables => { Disposable.Create(() => { }).DisposeWith(disposables); });
     }
+}
+
+public sealed class PlaylistPickerItem
+{
+    public Playlist Playlist { get; init; } = null!;
+    public bool IsChecked { get; init; }
+    public string Name => Playlist.Name;
 }

@@ -11,7 +11,7 @@ public class IsCurrentSongOnBlacklistConverter : IValueConverter
         if (value is not bool x)
             return MaterialIconKind.QuestionMark;
 
-        return x ? MaterialIconKind.HeartBroken : MaterialIconKind.HeartBrokenOutline;
+        return x ? MaterialIconKind.MinusCircle : MaterialIconKind.MinusCircleOutline;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

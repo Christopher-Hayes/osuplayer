@@ -137,32 +137,66 @@ public sealed class LinuxMprisService : IPathMethodHandler, IDisposable
 
     public async Task StartAsync()
     {
+        // Retry up to ~5 seconds in case a previous instance (e.g. killed via pkill)
+        // hasn't released the bus name yet when we start.
+        const int maxAttempts = 10;
+        const int retryDelayMs = 500;
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                _connection = new DBusConnection(DBusAddress.Session);
+                await _connection.ConnectAsync();
+
+                // Monitor for silent receive-loop death — logs the cause if it crashes.
+                _ = MonitorDisconnectAsync(_connection);
+
+                // Register our method handler BEFORE requesting the name so we can
+                // respond to the burst of GetAll queries GNOME Shell fires the
+                // instant the name appears on the bus.
+                _connection.AddMethodHandler(this);
+
+                // Request the well-known MPRIS bus name
+                uint reply = await RequestNameAsync();
+                if (reply is 1 or 4) // 1=PrimaryOwner, 4=AlreadyOwner
+                {
+                    Console.Error.WriteLine($"[MPRIS] Registered as {BusName}");
+                    EmitPropertiesChanged(PlayerIface, BuildPlayerProps());
+                    return;
+                }
+
+                // reply=3 means another instance still holds the name; wait and retry.
+                Console.Error.WriteLine($"[MPRIS] Name busy (reply={reply}), attempt {attempt}/{maxAttempts}");
+                _connection.Dispose();
+                _connection = null;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[MPRIS] Attempt {attempt} failed: {ex.GetType().Name}: {ex.Message}");
+                _connection?.Dispose();
+                _connection = null;
+            }
+
+            await Task.Delay(retryDelayMs);
+        }
+
+        Console.Error.WriteLine("[MPRIS] Giving up after all attempts.");
+    }
+
+    private static async Task MonitorDisconnectAsync(DBusConnection connection)
+    {
         try
         {
-            _connection = new DBusConnection(DBusAddress.Session!);
-            await _connection.ConnectAsync();
-
-            // Register our method handler BEFORE requesting the name so we can
-            // respond to the burst of GetAll queries GNOME Shell fires the
-            // instant the name appears on the bus.
-            _connection.AddMethodHandler(this);
-
-            // Request the well-known MPRIS bus name
-            uint reply = await RequestNameAsync();
-            if (reply is not (1 or 4)) // 1=PrimaryOwner, 4=AlreadyOwner
-                throw new InvalidOperationException($"RequestName returned {reply}");
-
-            Console.Error.WriteLine($"[MPRIS] Registered as {BusName}");
-
-            // Announce full Player property set so the desktop starts routing
-            // media keys to us immediately.
-            EmitPropertiesChanged(PlayerIface, BuildPlayerProps());
+            var ex = await connection.DisconnectedAsync();
+            if (ex is not null)
+                Console.Error.WriteLine($"[MPRIS] Connection lost: {ex.GetType().Name}: {ex.Message}");
+            else
+                Console.Error.WriteLine("[MPRIS] Connection closed cleanly.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"[MPRIS] Failed to start: {ex.GetType().Name}: {ex.Message}");
-            _connection?.Dispose();
-            _connection = null;
+            Console.Error.WriteLine($"[MPRIS] DisconnectedAsync threw: {ex.GetType().Name}: {ex.Message}");
         }
     }
 
@@ -210,7 +244,7 @@ public sealed class LinuxMprisService : IPathMethodHandler, IDisposable
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"[MPRIS] {iface}.{member} failed: {ex.Message}");
+            Console.Error.WriteLine($"[MPRIS] {iface}.{member} failed: {ex.GetType().Name}: {ex.Message}");
             try { context.ReplyError("org.freedesktop.DBus.Error.Failed", ex.Message); }
             catch { /* prevent cascading disconnect */ }
         }
@@ -283,7 +317,6 @@ public sealed class LinuxMprisService : IPathMethodHandler, IDisposable
             case "GetAll":
             {
                 var target = reader.ReadString();
-                Console.Error.WriteLine($"[MPRIS] GetAll target='{target}' PlayerIface='{PlayerIface}' RootIface='{RootIface}' match={target == RootIface || target == PlayerIface}");
                 var dict = target switch
                 {
                     PlayerIface => BuildPlayerProps(),

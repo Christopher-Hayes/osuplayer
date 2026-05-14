@@ -11,10 +11,6 @@
   <UserControl.Styles>
     <StyleInclude Source="/Styles/SliderStyle.axaml" />
     <StyleInclude Source="/Styles/FlyoutStyle.axaml" />
-    <Style Selector="Button">
-      <Setter Property="(ToolTip.Placement)" Value="Top" />
-      <Setter Property="(ToolTip.VerticalOffset)" Value="-8" />
-    </Style>
   </UserControl.Styles>
 
   <Design.DataContext>
@@ -60,7 +56,9 @@
           Width="80" Height="64"
           Margin="6"
           Padding="0"
-          VerticalAlignment="Center">
+          VerticalAlignment="Center"
+          ToolTip.Placement="Top"
+          ToolTip.VerticalOffset="-8">
             <ToolTip.Tip>
               <TextBlock Text="Open artwork" />
             </ToolTip.Tip>
@@ -88,14 +86,16 @@
               <TextBlock Text="{Binding SongText}" />
             </ToolTip.Tip>
             <Button Name="CurrentSongLabel" Theme="{StaticResource TransparentButton}" Cursor="Hand"
-                    Click="CurrentSongLabel_OnClick">
+                    Click="CurrentSongLabel_OnClick"
+                    ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
               <ToolTip.Tip>
                 <TextBlock Text="Open current song" />
               </ToolTip.Tip>
               <TextBlock Name="TitleText" Text="{Binding TitleText}" FontSize="20" Foreground="White" TextTrimming="CharacterEllipsis" />
             </Button>
             <Button Name="ArtistText" Theme="{StaticResource TransparentButton}" Cursor="Hand"
-                    Click="ArtistText_OnClick" Margin="6 0 0 2" Padding="6 2">
+                    Click="ArtistText_OnClick" Margin="6 0 0 2" Padding="6 2"
+                    ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
               <ToolTip.Tip>
                 <TextBlock Text="Open artist" />
               </ToolTip.Tip>
@@ -125,6 +125,7 @@
                     Click="ActivePlaylistLabel_OnClick"
                     Padding="6 2"
                     CornerRadius="4 0 0 4"
+                    ToolTip.Placement="Top" ToolTip.VerticalOffset="-8"
                     >
               <ToolTip.Tip>
                 <TextBlock Text="{Binding ActivePlaylist}" />
@@ -142,6 +143,7 @@
                     Click="ClearPlaylistButton_OnClick"
                     Padding="4 4 4 3"
                     CornerRadius="0 4 4 0"
+                    ToolTip.Placement="Top" ToolTip.VerticalOffset="-8"
                     >
               <ToolTip.Tip>
                 <TextBlock Text="Stop playing from playlist" />
@@ -151,7 +153,8 @@
           </StackPanel>
           <Panel>
             <Button Name="Volume" Width="38" Height="38" CornerRadius="50"
-                    Theme="{StaticResource TransparentButton}" PointerWheelChanged="Volume_OnPointerWheelChanged">
+                    Theme="{StaticResource TransparentButton}" PointerWheelChanged="Volume_OnPointerWheelChanged"
+                    ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
               <ToolTip.Tip>
                 <TextBlock Text="Volume" />
               </ToolTip.Tip>
@@ -161,7 +164,8 @@
                 <Flyout>
                   <StackPanel Orientation="Horizontal">
                     <Button Name="VolumeFly" Width="38" Height="38" CornerRadius="50"
-                            Theme="{StaticResource TransparentButton}" Click="Volume_OnClick" >
+                            Theme="{StaticResource TransparentButton}" Click="Volume_OnClick"
+                            ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
                       <ToolTip.Tip>
                         <TextBlock Text="Mute / Unmute" />
                       </ToolTip.Tip>
@@ -179,7 +183,8 @@
           </Panel>
 
           <Panel>
-            <Button Name="PlaybackSpeed" Width="38" Height="38" CornerRadius="50" Theme="{StaticResource TransparentButton}">
+            <Button Name="PlaybackSpeed" Width="38" Height="38" CornerRadius="50" Theme="{StaticResource TransparentButton}"
+                    ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
               <ToolTip.Tip>
                 <TextBlock Text="Playback speed" />
               </ToolTip.Tip>
@@ -188,7 +193,8 @@
                 <Flyout>
                   <StackPanel Orientation="Horizontal">
                     <Button Name="PlaybackSpeedFly" Width="38" Height="38" CornerRadius="50"
-                            Theme="{StaticResource TransparentButton}" Click="PlaybackSpeed_OnClick">
+                            Theme="{StaticResource TransparentButton}" Click="PlaybackSpeed_OnClick"
+                            ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
                       <ToolTip.Tip>
                         <TextBlock Text="Reset speed" />
                       </ToolTip.Tip>
@@ -211,7 +217,8 @@
             </Button>
           </Panel>
 
-          <Button Name="Favorite" Width="38" Height="38" CornerRadius="50" Theme="{StaticResource TransparentButton}">
+          <Button Name="Favorite" Width="38" Height="38" CornerRadius="50" Theme="{StaticResource TransparentButton}"
+                  ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
             <ToolTip.Tip>
               <TextBlock Text="Manage playlists" />
             </ToolTip.Tip>
@@ -242,7 +249,8 @@
             </Button.Flyout>
           </Button>
 
-          <Button Name="Blacklist" Margin="0 0 8 0" Width="38" Height="38" CornerRadius="50" Click="Blacklist_OnClick" Theme="{StaticResource TransparentButton}">
+          <Button Name="Blacklist" Margin="0 0 8 0" Width="38" Height="38" CornerRadius="50" Click="Blacklist_OnClick" Theme="{StaticResource TransparentButton}"
+                  ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
             <ToolTip.Tip>
               <TextBlock Text="Hide / unhide song" />
             </ToolTip.Tip>
@@ -251,7 +259,8 @@
         </DockPanel>
 
         <DockPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-          <Button Name="Repeat" Width="38" Height="38" CornerRadius="50" Click="SongControl" Theme="{StaticResource TransparentButton}">
+          <Button Name="Repeat" Width="38" Height="38" CornerRadius="50" Click="SongControl" Theme="{StaticResource TransparentButton}"
+                  ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
             <ToolTip.Tip>
               <TextBlock Text="{Binding IsRepeating}" />
             </ToolTip.Tip>
@@ -259,7 +268,8 @@
                                    Height="19" Width="19" />
           </Button>
 
-          <Button Name="Previous" Width="38" Height="38" CornerRadius="50" Margin="4 0" Click="SongControl" Theme="{StaticResource TransparentButton}">
+          <Button Name="Previous" Width="38" Height="38" CornerRadius="50" Margin="4 0" Click="SongControl" Theme="{StaticResource TransparentButton}"
+                  ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
             <ToolTip.Tip>
               <TextBlock Text="Previous" />
             </ToolTip.Tip>
@@ -273,21 +283,24 @@
             BorderThickness="2 1 0 0"
             Margin="8 0"
             Background="#0F000000"
-            Click="SongControl">
+            Click="SongControl"
+            ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
             <ToolTip.Tip>
               <TextBlock Text="Play / Pause" />
             </ToolTip.Tip>
             <avalonia:MaterialIcon Kind="{Binding IsPlaying, Converter={StaticResource PlayPauseConverter}}" Height="32" Width="32" />
           </Button>
 
-          <Button Name="Next" Width="38" Height="38" CornerRadius="50" Margin="4 0" Click="SongControl" Theme="{StaticResource TransparentButton}">
+          <Button Name="Next" Width="38" Height="38" CornerRadius="50" Margin="4 0" Click="SongControl" Theme="{StaticResource TransparentButton}"
+                  ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
             <ToolTip.Tip>
               <TextBlock Text="Next" />
             </ToolTip.Tip>
             <avalonia:MaterialIcon Kind="SkipForward" Height="19" Width="19" />
           </Button>
 
-          <Button Name="Shuffle" Width="38" Height="38" CornerRadius="50" Click="SongControl" Theme="{StaticResource TransparentButton}">
+          <Button Name="Shuffle" Width="38" Height="38" CornerRadius="50" Click="SongControl" Theme="{StaticResource TransparentButton}"
+                  ToolTip.Placement="Top" ToolTip.VerticalOffset="-8">
             <ToolTip.Tip>
               <TextBlock Text="Shuffle" />
             </ToolTip.Tip>

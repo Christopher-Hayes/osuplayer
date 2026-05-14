@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using DiscordRPC;
@@ -34,10 +34,10 @@ public class DiscordService : OsuPlayerService, IDiscordService
 
     private static readonly TimeSpan InactivityTimeout = TimeSpan.FromMinutes(5);
 
-    /// <summary>
-    /// Default assets for the RPC including the logo
-    /// </summary>
     private readonly Assets _defaultAssets;
+
+    public DiscordConnectionStatus ConnectionStatus { get; private set; } = DiscordConnectionStatus.Disconnected;
+    public event Action<DiscordConnectionStatus>? ConnectionStatusChanged;
 
     public DiscordService()
     {
@@ -52,10 +52,19 @@ public class DiscordService : OsuPlayerService, IDiscordService
     private DiscordRpcClient CreateClient()
     {
         var client = new DiscordRpcClient(ApplicationId);
-        client.Logger = new ConsoleLogger { Level = LogLevel.None };
+        client.Logger = new ConsoleLogger { Level = LogLevel.Warning };
         client.OnReady += Client_OnReady;
         client.OnPresenceUpdate += Client_OnPresenceUpdate;
+        client.OnError += Client_OnError;
+        client.OnClose += Client_OnClose;
+        client.OnConnectionFailed += Client_OnConnectionFailed;
         return client;
+    }
+
+    private void SetStatus(DiscordConnectionStatus status)
+    {
+        ConnectionStatus = status;
+        ConnectionStatusChanged?.Invoke(status);
     }
 
     /// <summary>
@@ -63,7 +72,6 @@ public class DiscordService : OsuPlayerService, IDiscordService
     /// </summary>
     public void Initialize()
     {
-        // If the previous client was disposed, create a fresh one before initializing.
         if (_client.IsDisposed)
             _client = CreateClient();
 
@@ -73,6 +81,7 @@ public class DiscordService : OsuPlayerService, IDiscordService
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             EnsureLinuxIpcSymlinks();
 
+        SetStatus(DiscordConnectionStatus.Connecting);
         _client.Initialize();
 
         _client.SetPresence(new RichPresence
@@ -95,21 +104,21 @@ public class DiscordService : OsuPlayerService, IDiscordService
     /// <summary>
     /// On Linux, the DiscordRichPresence library only checks a fixed set of socket paths.
     /// Flatpak Discord puts its IPC socket under a subdirectory that the library doesn't scan.
-    /// This method creates symlinks from the expected paths to wherever Discord actually
-    /// placed its socket, covering the most common install methods (native, Flatpak, Snap).
+    /// This method creates symlinks from the expected paths to wherever Discord actually placed its
+    /// socket, and removes stale sockets/symlinks that exist on disk but are no longer accepting
+    /// connections (e.g. after Discord restarts without a full system reboot to clear /run).
     /// </summary>
-    private static void EnsureLinuxIpcSymlinks()
+    private void EnsureLinuxIpcSymlinks()
     {
         var runtimeDir = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR")
                          ?? $"/run/user/{Environment.GetEnvironmentVariable("UID") ?? "1000"}";
 
-        // Subdirectories where different Discord installs place their IPC sockets.
         var candidates = new[]
         {
-            Path.Combine(runtimeDir, "app", "com.discordapp.Discord"),      // Flatpak
+            Path.Combine(runtimeDir, "app", "com.discordapp.Discord"),       // Flatpak
             Path.Combine(runtimeDir, "app", "com.discordapp.DiscordCanary"), // Flatpak Canary
-            Path.Combine(runtimeDir, "app", "com.discordapp.DiscordPTB"),   // Flatpak PTB
-            Path.Combine(runtimeDir, "snap.discord"),                        // Snap (already checked by lib, but let's keep native symlink)
+            Path.Combine(runtimeDir, "app", "com.discordapp.DiscordPTB"),    // Flatpak PTB
+            Path.Combine(runtimeDir, "snap.discord"),                         // Snap
         };
 
         for (var pipe = 0; pipe < 10; pipe++)
@@ -117,9 +126,18 @@ public class DiscordService : OsuPlayerService, IDiscordService
             var socketName = $"discord-ipc-{pipe}";
             var standardPath = Path.Combine(runtimeDir, socketName);
 
-            // If the standard path already exists (real socket or symlink), skip it.
+            // If the standard path already exists, verify it actually accepts connections.
+            // A stale socket/symlink (e.g. from a Discord crash or restart without a reboot)
+            // will appear to exist but refuse connections, causing the RPC library to fail silently.
             if (File.Exists(standardPath) || Path.Exists(standardPath))
-                continue;
+            {
+                if (IsSocketAlive(standardPath))
+                    continue;
+
+                LogToConsole($"pipe #{pipe}: {standardPath} is stale, removing it.", LogType.Warning);
+                try { File.Delete(standardPath); }
+                catch (Exception ex) { LogToConsole($"pipe #{pipe}: Could not remove stale path: {ex.Message}", LogType.Error); }
+            }
 
             foreach (var dir in candidates)
             {
@@ -127,18 +145,46 @@ public class DiscordService : OsuPlayerService, IDiscordService
                 if (!File.Exists(source) && !Path.Exists(source))
                     continue;
 
+                if (!IsSocketAlive(source))
+                {
+                    // Delete the stale file from the candidate directory so Discord can
+                    // recreate it the next time it starts. Without this, Discord finds the
+                    // file already exists at its bind path and silently skips IPC setup.
+                    LogToConsole($"pipe #{pipe}: candidate {source} is stale, removing it so Discord can recreate it on next launch.", LogType.Warning);
+                    try { File.Delete(source); }
+                    catch (Exception ex) { LogToConsole($"pipe #{pipe}: Could not remove stale candidate: {ex.Message}", LogType.Error); }
+                    continue;
+                }
+
                 try
                 {
                     File.CreateSymbolicLink(standardPath, source);
-                    Debug.WriteLine($"[Discord] Created symlink {standardPath} -> {source}");
+                    LogToConsole($"pipe #{pipe}: Created symlink {standardPath} -> {source}", LogType.Success);
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"[Discord] Could not create symlink {standardPath}: {ex.Message}");
+                    LogToConsole($"pipe #{pipe}: Could not create symlink: {ex.Message}", LogType.Error);
                 }
 
-                break; // Only need one symlink per pipe number.
+                break;
             }
+        }
+    }
+
+    /// <summary>
+    /// Returns true if a Unix socket at <paramref name="path"/> is currently accepting connections.
+    /// </summary>
+    private static bool IsSocketAlive(string path)
+    {
+        try
+        {
+            using var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+            socket.Connect(new UnixDomainSocketEndPoint(path));
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 
@@ -153,24 +199,18 @@ public class DiscordService : OsuPlayerService, IDiscordService
                 _client.ClearPresence();
             _client.Dispose();
         }
+
+        SetStatus(DiscordConnectionStatus.Disconnected);
     }
 
     /// <summary>
     /// Update the current RPC
     /// </summary>
-    /// <param name="details">Text of the first line</param>
-    /// <param name="state">Text of the second line</param>
-    /// <param name="beatmapSetId">Optional beatmapset ID</param>
-    /// <param name="assets">Optional assets to use</param>
-    /// <param name="durationLeft">Optional duration left that is displayed in the RPC</param>
     public async Task UpdatePresence(string details, string state, int beatmapSetId = 0, Assets? assets = null, TimeSpan? elapsed = null, TimeSpan? durationLeft = null)
     {
         if (!_client.IsInitialized)
             return;
 
-        // Cancel any previous in-flight update and grab a fresh token.
-        // This prevents a slow thumbnail fetch (e.g. from Pause()) from
-        // overwriting a faster, newer update (e.g. from Play() after a seek).
         var oldCts = _presenceCts;
         _presenceCts = new CancellationTokenSource();
         var token = _presenceCts.Token;
@@ -182,7 +222,6 @@ public class DiscordService : OsuPlayerService, IDiscordService
             assets = await TryToGetThumbnail(beatmapSetId, token);
         }
 
-        // Bail out if a newer UpdatePresence call has already superseded this one.
         if (token.IsCancellationRequested)
             return;
 
@@ -211,8 +250,6 @@ public class DiscordService : OsuPlayerService, IDiscordService
             Type = ActivityType.Listening
         });
 
-        // Cancel any running inactivity countdown, then restart it only when paused
-        // (no timestamps means the player is paused — elapsed/durationLeft are both null).
         var oldInactivityCts = _inactivityCts;
         _inactivityCts = new CancellationTokenSource();
         oldInactivityCts.Cancel();
@@ -236,11 +273,8 @@ public class DiscordService : OsuPlayerService, IDiscordService
 
         if (url != _lastOsuThumbnailUrl)
         {
-            // Discord can't accept URLs bigger than 256 bytes and throws an exception, so we check for that here
             if (Encoding.UTF8.GetByteCount(url) > 256)
-            {
                 return null;
-            }
 
             LogToConsole($"Request => {url}");
 
@@ -249,10 +283,7 @@ public class DiscordService : OsuPlayerService, IDiscordService
             try
             {
                 using var client = new HttpClient();
-
-                var req = new HttpRequestMessage(HttpMethod.Get, url);
-
-                response = await client.SendAsync(req, cancellationToken);
+                response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url), cancellationToken);
             }
             catch (Exception)
             {
@@ -271,25 +302,40 @@ public class DiscordService : OsuPlayerService, IDiscordService
         };
     }
 
-    private Button[]? GetButtons()
+    private static Button[]? GetButtons()
     {
-        return new Button[]
-        {
+        return
+        [
             new()
             {
                 Label = "GitHub",
                 Url = "https://github.com/Christopher-Hayes/osuplayer"
             }
-        };
+        ];
     }
 
     private void Client_OnReady(object sender, ReadyMessage args)
     {
-        Debug.WriteLine("Discord client ready...");
+        SetStatus(DiscordConnectionStatus.Connected);
     }
 
-    private void Client_OnPresenceUpdate(object sender, PresenceMessage args)
+    private void Client_OnPresenceUpdate(object sender, PresenceMessage args) { }
+
+    private void Client_OnError(object sender, ErrorMessage args)
     {
-        Debug.WriteLine("Discord Presence updated...");
+        LogToConsole($"Discord RPC error: [{args.Code}] {args.Message}", LogType.Error);
+        SetStatus(DiscordConnectionStatus.Error);
+    }
+
+    private void Client_OnClose(object sender, CloseMessage args)
+    {
+        LogToConsole($"Discord RPC connection closed: [{args.Code}] {args.Reason}", LogType.Warning);
+        SetStatus(DiscordConnectionStatus.Disconnected);
+    }
+
+    private void Client_OnConnectionFailed(object sender, ConnectionFailedMessage args)
+    {
+        LogToConsole($"Discord RPC connection failed on pipe #{args.FailedPipe}. Is Discord running?", LogType.Error);
+        SetStatus(DiscordConnectionStatus.Error);
     }
 }

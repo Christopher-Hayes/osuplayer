@@ -224,7 +224,7 @@ public class Player : IPlayer, IImportNotifications
 
         var remaining = TimeSpan.FromSeconds(_audioEngine.ChannelLength.Value);
 
-        _discordService?.UpdatePresence(mapEntry.NewValue.Title, $"by {mapEntry.NewValue.Artist}", mapEntry.NewValue.BeatmapSetId, elapsed: TimeSpan.Zero, durationLeft: remaining);
+        _discordService?.UpdatePresence(mapEntry.NewValue.Title, $"{mapEntry.NewValue.Artist}", mapEntry.NewValue.BeatmapSetId, elapsed: TimeSpan.Zero, durationLeft: remaining);
     }
 
     public void OnImportStarted()
@@ -318,7 +318,7 @@ public class Player : IPlayer, IImportNotifications
         var elapsed = TimeSpan.FromSeconds(_audioEngine.ChannelPosition.Value);
         var remaining = TimeSpan.FromSeconds(_audioEngine.ChannelLength.Value - _audioEngine.ChannelPosition.Value);
 
-        _discordService?.UpdatePresence(CurrentSong.Value.Title, $"by {CurrentSong.Value.Artist}", CurrentSong.Value.BeatmapSetId, elapsed: elapsed, durationLeft: remaining);
+        _discordService?.UpdatePresence(CurrentSong.Value.Title, $"{CurrentSong.Value.Artist}", CurrentSong.Value.BeatmapSetId, elapsed: elapsed, durationLeft: remaining);
     }
 
     public void UpdatePlaybackMethod()
@@ -356,7 +356,7 @@ public class Player : IPlayer, IImportNotifications
         var elapsed = TimeSpan.FromSeconds(_audioEngine.ChannelPosition.Value);
         var remaining = TimeSpan.FromSeconds(_audioEngine.ChannelLength.Value - _audioEngine.ChannelPosition.Value);
 
-        _discordService?.UpdatePresence(CurrentSong.Value.Title, $"by {CurrentSong.Value.Artist}", CurrentSong.Value.BeatmapSetId, elapsed: elapsed, durationLeft: remaining);
+        _discordService?.UpdatePresence(CurrentSong.Value.Title, $"{CurrentSong.Value.Artist}", CurrentSong.Value.BeatmapSetId, elapsed: elapsed, durationLeft: remaining);
     }
 
     public void Pause()
@@ -369,7 +369,7 @@ public class Player : IPlayer, IImportNotifications
 #endif
         _linuxMprisService?.UpdatePlaybackStatus(false);
 
-        _discordService?.UpdatePresence(CurrentSong.Value.Title, $"by {CurrentSong.Value.Artist}", CurrentSong.Value.BeatmapSetId);
+        _discordService?.UpdatePresence(CurrentSong.Value.Title, $"{CurrentSong.Value.Artist}", CurrentSong.Value.BeatmapSetId);
     }
 
     public void Stop()

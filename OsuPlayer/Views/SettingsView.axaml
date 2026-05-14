@@ -303,7 +303,15 @@
                     <ui:FASettingsExpanderItem Content="Enable Discord Rich Presence"
                                              Description="Enable if you want to display your current playing song in your Discord Status">
                         <ui:FASettingsExpanderItem.Footer>
-                            <ToggleSwitch IsChecked="{Binding UseDiscordRpc}" />
+                            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding DiscordStatusText}"
+                                           IsVisible="{Binding UseDiscordRpc}"
+                                           Foreground="{Binding DiscordStatusBrush}"
+                                           VerticalAlignment="Center"
+                                           FontSize="12"
+                                           Opacity="0.8" />
+                                <ToggleSwitch IsChecked="{Binding UseDiscordRpc}" />
+                            </StackPanel>
                         </ui:FASettingsExpanderItem.Footer>
                     </ui:FASettingsExpanderItem>
                 </ui:FASettingsExpander>

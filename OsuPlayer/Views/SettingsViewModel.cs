@@ -70,6 +70,7 @@ public class SettingsViewModel : BaseViewModel
     private readonly IShuffleServiceProvider? _shuffleServiceProvider;
     private bool _useAudioNormalization;
     private bool _useDiscordRpc;
+    private DiscordConnectionStatus _discordConnectionStatus;
     private bool _useLeftNavigationPosition;
 
     private bool _usePitch;
@@ -511,6 +512,18 @@ public class SettingsViewModel : BaseViewModel
         }
     }
 
+    public string DiscordStatusText => _discordConnectionStatus switch
+    {
+        DiscordConnectionStatus.Connecting => "Connecting...",
+        DiscordConnectionStatus.Connected => "Connected",
+        DiscordConnectionStatus.Error => "Could not connect — is Discord running?",
+        _ => string.Empty
+    };
+
+    public IBrush DiscordStatusBrush => _discordConnectionStatus == DiscordConnectionStatus.Error
+        ? Brushes.OrangeRed
+        : Brushes.LightGreen;
+
     public bool PlaylistEnableOnPlay
     {
         get => _playlistEnableOnPlay.Value;
@@ -625,6 +638,18 @@ public class SettingsViewModel : BaseViewModel
         _selectedShuffleAlgorithm = ShuffleAlgorithms?.FirstOrDefault(x => x == _shuffleServiceProvider?.ShuffleImpl);
         _selectedAudioDevice = AvailableAudioDevices.FirstOrDefault(x => x.Driver == config.Container.SelectedAudioDeviceDriver);
         _useDiscordRpc = config.Container.UseDiscordRpc;
+
+        var discordService = Locator.Current.GetService<IDiscordService>();
+        if (discordService != null)
+        {
+            _discordConnectionStatus = discordService.ConnectionStatus;
+            discordService.ConnectionStatusChanged += status =>
+            {
+                _discordConnectionStatus = status;
+                this.RaisePropertyChanged(nameof(DiscordStatusText));
+                this.RaisePropertyChanged(nameof(DiscordStatusBrush));
+            };
+        }
         _usePitch = config.Container.UsePitch;
         _useAudioNormalization = config.Container.UseAudioNormalization;
         _displayBackgroundImage = config.Container.DisplayBackgroundImage;

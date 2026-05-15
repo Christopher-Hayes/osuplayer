@@ -25,8 +25,8 @@ public partial class SearchView : ReactiveControl<SearchViewModel>
 
     private async void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
-        var list = sender as ListBox;
-        var song = list!.SelectedItem as IMapEntryBase;
+        var song = (e.Source as Control)?.DataContext as IMapEntryBase;
+        if (song == null) return;
 
         // Playing from search clears any active playlist context
         ViewModel.Player.ActivePlaylistContext.Value = null;

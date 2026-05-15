@@ -54,6 +54,7 @@
         <valueConverters:VolumeConverter x:Key="VolumeConverter" />
         <valueConverters:IsCurrentSongInPlaylistConverter x:Key="IsCurrentSongInPlaylistConverter" />
         <valueConverters:IsCurrentSongOnBlacklistConverter x:Key="IsCurrentSongOnBlacklistConverter" />
+        <valueConverters:BlacklistOpacityConverter x:Key="BlacklistOpacityConverter" />
         <valueConverters:SourceListValueConverter x:Key="SourceListValueConverter" />
         <valueConverters:GridFormatter x:Key="GridFormatter" />
         <valueConverters:LastFmToAuthConverter x:Key="LastFmToAuthConverter" />

@@ -1,17 +1,16 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Avalonia.Data.Converters;
-using Material.Icons;
 
 namespace OsuPlayer.Extensions.ValueConverters;
 
-public class IsCurrentSongOnBlacklistConverter : IValueConverter
+public class BlacklistOpacityConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not bool x)
-            return MaterialIconKind.QuestionMark;
+        if (value is not bool isBlacklisted)
+            return 1.0;
 
-        return x ? MaterialIconKind.EyeOff : MaterialIconKind.EyeOutline;
+        return isBlacklisted ? 0.5 : 1.0;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

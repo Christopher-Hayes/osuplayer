@@ -16,6 +16,7 @@ using OsuPlayer.Data.DataModels.Interfaces;
 using OsuPlayer.Data.OsuPlayer.Classes;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.Interfaces.Service;
+using OsuPlayer.IO.Storage.Blacklist;
 using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.Modules.Audio.Interfaces;
 using OsuPlayer.Network.LastFm.Responses;
@@ -189,8 +190,10 @@ public class ArtistViewModel : BaseViewModel
         IMapEntryBase? firstSong = null;
         if (allSongs != null)
         {
+            var blacklist = new Blacklist();
             var artistSongs = allSongs
                 .Where(s => string.Equals(s.Artist, artistName, StringComparison.OrdinalIgnoreCase))
+                .Where(s => !blacklist.Contains(s))
                 .ToList();
 
             firstSong = artistSongs.FirstOrDefault();

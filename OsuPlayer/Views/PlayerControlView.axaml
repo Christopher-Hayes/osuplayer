@@ -18,7 +18,8 @@
   </Design.DataContext>
 
   <Border
-  Padding="16 24 24 0">
+  Padding="16 24 24 0"
+  Opacity="{Binding IsCurrentSongOnBlacklist, Converter={StaticResource BlacklistOpacityConverter}}">
     <Grid
     RowDefinitions="30, *"
     Height="110"

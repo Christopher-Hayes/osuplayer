@@ -60,8 +60,8 @@ public partial class HomeView : ReactiveControl<HomeViewModel>
 
     private async void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
-        var list = sender as ListBox;
-        var song = list!.SelectedItem as IMapEntryBase;
+        var song = (e.Source as Control)?.DataContext as IMapEntryBase;
+        if (song == null) return;
 
         // Playing from the library view clears any active playlist context
         ViewModel.Player.ActivePlaylistContext.Value = null;

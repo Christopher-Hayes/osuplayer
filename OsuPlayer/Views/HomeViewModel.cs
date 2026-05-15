@@ -11,6 +11,7 @@ using OsuPlayer.Data.OsuPlayer.Classes;
 using OsuPlayer.Data.OsuPlayer.Enums;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.IO.Importer;
+using OsuPlayer.IO.Storage.Blacklist;
 using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.Interfaces.Service;
 using OsuPlayer.Modules.Audio.Interfaces;
@@ -80,7 +81,23 @@ public class HomeViewModel : BaseViewModel
         _songsLoading.BindTo(((IImportNotifications) Player).SongsLoading);
         _songsLoading.BindValueChanged(_ => this.RaisePropertyChanged(nameof(SongsLoading)));
 
-        player.SongSourceProvider.Songs?.ObserveOn(AvaloniaScheduler.Instance).Bind(out _sortedSongEntries).Subscribe();
+        var blacklistFilter = Observable
+            .FromEvent<System.ComponentModel.PropertyChangedEventHandler, System.ComponentModel.PropertyChangedEventArgs>(
+                action => (_, args) => action(args),
+                h => player.BlacklistChanged += h,
+                h => player.BlacklistChanged -= h)
+            .Select(_ => BuildBlacklistFilter())
+            .StartWith(BuildBlacklistFilter());
+
+        var filtered = player.SongSourceProvider.Songs?.Filter(blacklistFilter);
+
+        if (_sortProvider != null)
+            filtered = filtered?.Sort(_sortProvider.SortingModeObservable);
+
+        filtered?
+            .ObserveOn(AvaloniaScheduler.Instance)
+            .Bind(out _sortedSongEntries)
+            .Subscribe();
 
         this.RaisePropertyChanged(nameof(SortedSongEntries));
 
@@ -96,6 +113,12 @@ public class HomeViewModel : BaseViewModel
         _playlists = (await PlaylistManager.GetAllPlaylistsAsync())?.ToList();
         PlaylistContextMenuEntries = _playlists?.Select(x => new AddToPlaylistContextMenuEntry(x.Name, AddToPlaylist)).ToList();
 
+    }
+
+    private static Func<IMapEntryBase, bool> BuildBlacklistFilter()
+    {
+        var blacklist = new Blacklist();
+        return song => !blacklist.Contains(song);
     }
 
     private async void AddToPlaylist(string name)

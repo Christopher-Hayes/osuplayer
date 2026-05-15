@@ -84,7 +84,7 @@
                          MaxWidth="500"
                          MaxDropDownHeight="500"
                          PlaceholderText="Search songs" ItemsSource="{Binding SongList}"
-                         FilterMode="ContainsOrdinal"
+                         FilterMode="Contains"
                          KeyUp="SearchBox_OnKeyUp"
                          SelectionChanged="SearchBox_OnSelectionChanged">
           <!-- wnd:AppWindow.AllowInteractionInTitleBar="True" -->

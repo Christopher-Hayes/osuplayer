@@ -7,9 +7,12 @@ using Nein.Base;
 using OsuPlayer.Data.DataModels.Interfaces;
 using OsuPlayer.Data.OsuPlayer.Classes;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
+using OsuPlayer.IO.Storage.Blacklist;
 using OsuPlayer.IO.Storage.Playlists;
+using OsuPlayer.Interfaces.Service;
 using OsuPlayer.Modules.Audio.Interfaces;
 using ReactiveUI;
+using Splat;
 
 namespace OsuPlayer.Views;
 
@@ -50,8 +53,25 @@ public class SearchViewModel : BaseViewModel
             .Throttle(TimeSpan.FromMilliseconds(20))
             .Select(BuildFilter);
 
-        player.SongSourceProvider.Songs?.Filter(filter, ListFilterPolicy.ClearAndReplace).ObserveOn(AvaloniaScheduler.Instance)
-            .Bind(out _filteredSongEntries).Subscribe();
+        var blacklistFilter = Observable
+            .FromEvent<System.ComponentModel.PropertyChangedEventHandler, System.ComponentModel.PropertyChangedEventArgs>(
+                action => (_, args) => action(args),
+                h => player.BlacklistChanged += h,
+                h => player.BlacklistChanged -= h)
+            .Select(_ => BuildBlacklistFilter())
+            .StartWith(BuildBlacklistFilter());
+
+        var sortProvider = Locator.Current.GetService<ISortProvider>();
+        var filtered = player.SongSourceProvider.Songs?.Filter(blacklistFilter);
+
+        if (sortProvider != null)
+            filtered = filtered?.Sort(sortProvider.SortingModeObservable);
+
+        filtered?
+            .Filter(filter, ListFilterPolicy.ClearAndReplace)
+            .ObserveOn(AvaloniaScheduler.Instance)
+            .Bind(out _filteredSongEntries)
+            .Subscribe();
 
         this.RaisePropertyChanged(nameof(FilteredSongEntries));
 
@@ -77,6 +97,12 @@ public class SearchViewModel : BaseViewModel
         await PlaylistManager.AddSongToPlaylistAsync(playlist, SelectedSong);
 
         Player.TriggerPlaylistChanged(new PropertyChangedEventArgs(name));
+    }
+
+    private static Func<IMapEntryBase, bool> BuildBlacklistFilter()
+    {
+        var blacklist = new Blacklist();
+        return song => !blacklist.Contains(song);
     }
 
     /// <summary>

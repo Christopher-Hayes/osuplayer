@@ -1,13 +1,18 @@
-﻿using System.Reactive.Disposables;
+﻿using System.ComponentModel;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.ReactiveUI;
 using Avalonia.Threading;
+using DynamicData;
 using Nein.Base;
 using Nein.Extensions;
 using OsuPlayer.Data.DataModels.Interfaces;
 using OsuPlayer.Interfaces.Service;
+using OsuPlayer.IO.Storage.Blacklist;
 using OsuPlayer.Modules;
 using OsuPlayer.Modules.Audio.Interfaces;
 using OsuPlayer.Views;
@@ -133,7 +138,25 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
             MaterialOpacity = 0.25
         };
 
-        SongList = Player.SongSourceProvider.SongSourceList;
+        var blacklistFilter = Observable
+            .FromEvent<PropertyChangedEventHandler, PropertyChangedEventArgs>(
+                action => (_, args) => action(args),
+                h => player.BlacklistChanged += h,
+                h => player.BlacklistChanged -= h)
+            .Select(_ => BuildBlacklistFilter())
+            .StartWith(BuildBlacklistFilter());
+
+        ReadOnlyObservableCollection<IMapEntryBase>? filteredSongList = null;
+        var filtered = player.SongSourceProvider.Songs?.Filter(blacklistFilter);
+
+        if (sortProvider != null)
+            filtered = filtered?.Sort(sortProvider.SortingModeObservable);
+
+        filtered?
+            .ObserveOn(AvaloniaScheduler.Instance)
+            .Bind(out filteredSongList)
+            .Subscribe();
+        SongList = filteredSongList;
 
         Player.CurrentSongImage.BindValueChanged(d =>
         {
@@ -174,5 +197,11 @@ public class FluentAppWindowViewModel : BaseWindowViewModel
                 });
             });
         }, true, true);
+    }
+
+    private static Func<IMapEntryBase, bool> BuildBlacklistFilter()
+    {
+        var blacklist = new Blacklist();
+        return song => !blacklist.Contains(song);
     }
 }

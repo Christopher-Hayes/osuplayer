@@ -10,7 +10,6 @@ using OsuPlayer.Data.OsuPlayer.Enums;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.Interfaces.Service;
 using OsuPlayer.IO.Importer;
-using OsuPlayer.IO.Storage.Blacklist;
 using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.Modules.Audio.Engine;
 using OsuPlayer.Modules.Audio.Interfaces;
@@ -519,44 +518,14 @@ public class Player : IPlayer, IImportNotifications
 
             _shuffleProvider.ShuffleImpl.Init(songSource.Count);
 
-            // Iteratively skip blacklisted songs without unbounded recursion.
-            var shuffleVisited = new HashSet<int>();
-            var shuffleIndex = currentIndex;
-            while (true)
-            {
-                var nextIdx = _shuffleProvider.ShuffleImpl.DoShuffle(shuffleIndex, (ShuffleDirection) playDirection);
-                var candidate = songSource[nextIdx];
-
-                if (!BlacklistSkip.Value || !new Blacklist().Container.Songs.Contains(candidate.Hash))
-                    return candidate;
-
-                // Song is blacklisted — try advancing again, but bail out if every song has
-                // been visited to avoid an infinite loop when the entire list is blacklisted.
-                if (!shuffleVisited.Add(nextIdx) || shuffleVisited.Count >= songSource.Count)
-                    return candidate;
-
-                shuffleIndex = nextIdx;
-            }
+            var nextIdx = _shuffleProvider.ShuffleImpl.DoShuffle(currentIndex, (ShuffleDirection) playDirection);
+            return songSource[nextIdx];
         }
         else
         {
-            // Iteratively skip blacklisted songs without unbounded recursion.
-            // All index arithmetic stays in songSource-space to avoid the index-translation
-            // bug that existed in the old recursive implementation.
-            var visited = new HashSet<int>();
-            while (true)
-            {
-                var x = (currentIndex + offset) % songSource.Count;
-                currentIndex = x < 0 ? x + songSource.Count : x;
-
-                var candidate = songSource[currentIndex];
-
-                if (!BlacklistSkip.Value || !new Blacklist().Container.Songs.Contains(candidate.Hash))
-                    return candidate;
-
-                if (!visited.Add(currentIndex) || visited.Count >= songSource.Count)
-                    return candidate;
-            }
+            var x = (currentIndex + offset) % songSource.Count;
+            currentIndex = x < 0 ? x + songSource.Count : x;
+            return songSource[currentIndex];
         }
     }
 

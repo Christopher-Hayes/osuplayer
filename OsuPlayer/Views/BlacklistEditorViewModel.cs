@@ -43,7 +43,7 @@ public class BlacklistEditorViewModel : BaseViewModel
 
         Player = player;
 
-        Player.BlacklistChanged += (_, _) => Dispatcher.UIThread.Post(() => Blacklist = new Blacklist().Container);
+        Player.BlacklistChanged += (_, _) => Dispatcher.UIThread.Post(() => this.RaisePropertyChanged(nameof(Blacklist)));
 
         //_sortProvider.SortingModeBindable.BindValueChanged(d => UpdateSorting(d.NewValue), true);
         var filter = this.WhenAnyValue(x => x.FilterText)

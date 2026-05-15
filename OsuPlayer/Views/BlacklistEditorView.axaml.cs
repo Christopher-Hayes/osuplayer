@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System.ComponentModel;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Nein.Base;
@@ -51,6 +52,7 @@ public partial class BlacklistEditorView : ReactiveControl<BlacklistEditorViewMo
 
         ViewModel.SelectedSongListItems.Clear();
         ViewModel.RaisePropertyChanged(nameof(ViewModel.SelectedSongListItems));
+        ViewModel.Player.TriggerBlacklistChanged(new PropertyChangedEventArgs("Blacklist"));
     }
 
     private async void RemoveFromBlacklist_OnClick(object? sender, RoutedEventArgs e)
@@ -72,6 +74,7 @@ public partial class BlacklistEditorView : ReactiveControl<BlacklistEditorViewMo
         }
 
         ViewModel.SelectedBlacklistItems.Clear();
+        ViewModel.Player.TriggerBlacklistChanged(new PropertyChangedEventArgs("Blacklist"));
     }
 
     private void SongList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)

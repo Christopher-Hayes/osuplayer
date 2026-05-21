@@ -10,6 +10,7 @@ using OsuPlayer.Data.OsuPlayer.Enums;
 using OsuPlayer.Data.OsuPlayer.StorageModels;
 using OsuPlayer.Interfaces.Service;
 using OsuPlayer.IO.Importer;
+using OsuPlayer.IO.Storage.Blacklist;
 using OsuPlayer.IO.Storage.Playlists;
 using OsuPlayer.Modules.Audio.Engine;
 using OsuPlayer.Modules.Audio.Interfaces;
@@ -472,6 +473,7 @@ public class Player : IPlayer, IImportNotifications
     private IMapEntryBase GetNextSongToPlay(IList<IMapEntryBase> songSource, int currentIndex, PlayDirection playDirection)
     {
         var offset = (int) playDirection;
+        var blacklist = new Blacklist();
 
         if (SongSourceProvider.SongSourceList == null || !SongSourceProvider.SongSourceList.Any())
             throw new NullOrEmptyException($"{nameof(SongSourceProvider.SongSourceList)} can't be null or empty");
@@ -510,7 +512,8 @@ public class Player : IPlayer, IImportNotifications
 
                 if (currentHistoryIndex > 0)
                 {
-                    var prevSong = songSource.FirstOrDefault(s => s.Hash == history[currentHistoryIndex - 1].MapEntry.Hash);
+                    var prevSong = songSource.FirstOrDefault(s =>
+                        s.Hash == history[currentHistoryIndex - 1].MapEntry.Hash && !blacklist.Contains(s));
                     if (prevSong != null)
                         return prevSong;
                 }
@@ -518,13 +521,27 @@ public class Player : IPlayer, IImportNotifications
 
             _shuffleProvider.ShuffleImpl.Init(songSource.Count);
 
-            var nextIdx = _shuffleProvider.ShuffleImpl.DoShuffle(currentIndex, (ShuffleDirection) playDirection);
-            return songSource[nextIdx];
+            var attempts = 0;
+            IMapEntryBase candidate;
+            do
+            {
+                var nextIdx = _shuffleProvider.ShuffleImpl.DoShuffle(currentIndex, (ShuffleDirection) playDirection);
+                candidate = songSource[nextIdx];
+                attempts++;
+            } while (blacklist.Contains(candidate) && attempts < songSource.Count);
+
+            return candidate;
         }
         else
         {
-            var x = (currentIndex + offset) % songSource.Count;
-            currentIndex = x < 0 ? x + songSource.Count : x;
+            var attempts = 0;
+            do
+            {
+                var x = (currentIndex + offset) % songSource.Count;
+                currentIndex = x < 0 ? x + songSource.Count : x;
+                attempts++;
+            } while (blacklist.Contains(songSource[currentIndex]) && attempts < songSource.Count);
+
             return songSource[currentIndex];
         }
     }

@@ -211,6 +211,11 @@ public class DiscordService : OsuPlayerService, IDiscordService
         if (!_client.IsInitialized)
             return;
 
+        // Discord requires Details and State to be between 2 and 128 characters.
+        // Strings outside this range cause the update to be silently ignored.
+        details = SanitizePresenceField(details, "Unknown title");
+        state   = SanitizePresenceField(state,   "Unknown artist");
+
         var oldCts = _presenceCts;
         _presenceCts = new CancellationTokenSource();
         var token = _presenceCts.Token;
@@ -218,18 +223,11 @@ public class DiscordService : OsuPlayerService, IDiscordService
         oldCts.Dispose();
 
         if (assets == null && beatmapSetId != 0)
-        {
             assets = await TryToGetThumbnail(beatmapSetId, token);
-        }
 
         if (token.IsCancellationRequested)
             return;
 
-        // Build timestamps from the caller-supplied elapsed/remaining values so that:
-        //   Start = now - elapsed  → Discord shows the correct elapsed time (not reset on seek)
-        //   End   = now + remaining → Discord shows a countdown to the end of the track
-        // When neither value is provided (e.g. paused) Timestamps is left null and Discord
-        // removes the timer entirely.
         Timestamps? timestamps = null;
         if (elapsed.HasValue || durationLeft.HasValue)
         {
@@ -265,6 +263,22 @@ public class DiscordService : OsuPlayerService, IDiscordService
                     _client.ClearPresence();
             }, inactivityToken);
         }
+    }
+
+    /// <summary>
+    /// Ensures a Discord presence field meets the 2–128 character requirement.
+    /// Returns <paramref name="fallback"/> when the value is null/whitespace,
+    /// pads to 2 chars with a trailing space when too short, and truncates at 128.
+    /// </summary>
+    private static string SanitizePresenceField(string? value, string fallback)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return fallback;
+        if (value.Length == 1)
+            return value + " ";
+        if (value.Length > 128)
+            return value[..128];
+        return value;
     }
 
     private async Task<Assets?> TryToGetThumbnail(int beatmapSetId, CancellationToken cancellationToken = default)

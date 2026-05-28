@@ -64,10 +64,8 @@ public class SettingsViewModel : BaseViewModel
     private string? _selectedFont;
     private FontWeights _selectedFontWeight;
     private ReleaseChannels _selectedReleaseChannel;
-    private IShuffleImpl? _selectedShuffleAlgorithm;
     private StartupSong _selectedStartupSong;
     private string _settingsSearchQ = string.Empty;
-    private readonly IShuffleServiceProvider? _shuffleServiceProvider;
     private bool _useAudioNormalization;
     private bool _useDiscordRpc;
     private DiscordConnectionStatus _discordConnectionStatus;
@@ -449,22 +447,6 @@ public class SettingsViewModel : BaseViewModel
         }
     }
 
-    public List<IShuffleImpl>? ShuffleAlgorithms => _shuffleServiceProvider?.ShuffleAlgorithms;
-
-    public IShuffleImpl? SelectedShuffleAlgorithm
-    {
-        get => _selectedShuffleAlgorithm;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _selectedShuffleAlgorithm, value);
-            this.RaisePropertyChanged(nameof(SelectedShuffleAlgorithmInfoText));
-
-            _shuffleServiceProvider?.SetShuffleImpl(value);
-        }
-    }
-
-    public string SelectedShuffleAlgorithmInfoText => $"{SelectedShuffleAlgorithm?.Name} - {SelectedShuffleAlgorithm?.Description}";
-
     public List<AudioDevice> AvailableAudioDevices { get; }
 
     public AudioDevice SelectedAudioDevice
@@ -616,13 +598,11 @@ public class SettingsViewModel : BaseViewModel
         }
     }
 
-    public SettingsViewModel(IPlayer player, ISortProvider? sortProvider, IShuffleServiceProvider? shuffleServiceProvider)
+    public SettingsViewModel(IPlayer player, ISortProvider? sortProvider, IShuffleServiceProvider? shuffleServiceProvider = null)
     {
         _faTheme = (Application.Current!.Styles[0] as FluentAvaloniaTheme)!;
 
         Player = player;
-
-        _shuffleServiceProvider = shuffleServiceProvider;
 
         AvailableAudioDevices = Player.AvailableAudioDevices;
 
@@ -635,7 +615,6 @@ public class SettingsViewModel : BaseViewModel
         _selectedAccentColor = config.Container.AccentColor;
         _selectedFontWeight = config.Container.DefaultFontWeight;
         _selectedFont = config.Container.Font ?? FontManager.Current.DefaultFontFamily.Name;
-        _selectedShuffleAlgorithm = ShuffleAlgorithms?.FirstOrDefault(x => x == _shuffleServiceProvider?.ShuffleImpl);
         _selectedAudioDevice = AvailableAudioDevices.FirstOrDefault(x => x.Driver == config.Container.SelectedAudioDeviceDriver);
         _useDiscordRpc = config.Container.UseDiscordRpc;
 

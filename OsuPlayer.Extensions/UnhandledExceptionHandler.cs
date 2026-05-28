@@ -8,21 +8,12 @@ namespace OsuPlayer.Extensions;
 public static class UnhandledExceptionHandler
 {
     /// <summary>
-    /// Creates missing log directory if it does not exists
-    /// </summary>
-    private static void CreatLogsDirectoryIfItsMissing()
-    {
-        Directory.CreateDirectory("logs");
-    }
-
     /// <summary>
     /// Create a crashlog from an unhandled exception and save it inside the logs folder.
     /// </summary>
     /// <param name="ex">The exception that should be logged</param>
     public static void HandleException(Exception ex)
     {
-        CreatLogsDirectoryIfItsMissing();
-
         var date = DateTime.UtcNow;
 
         var dateString = date.ToString("yyyyMMdd_HHmmss");
@@ -39,6 +30,8 @@ public static class UnhandledExceptionHandler
             + Environment.NewLine
             + ex.Message + Environment.NewLine + ex.StackTrace;
 
-        File.WriteAllText($"logs/{dateString}.txt", crashlog);
+        var logsDirectory = Path.Combine(AppContext.BaseDirectory, "logs");
+        Directory.CreateDirectory(logsDirectory);
+        File.WriteAllText(Path.Combine(logsDirectory, $"{dateString}.txt"), crashlog);
     }
 }

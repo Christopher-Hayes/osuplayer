@@ -95,12 +95,21 @@ public class ArtistsViewModel : BaseViewModel
         var songs = Player.SongSourceProvider.SongSourceList;
         if (songs == null) return;
 
+        // Use unicode name if available and enabled, otherwise fallback to romanized
+        var useUnicode = Player.CurrentSong.Value?.UseUnicode ?? false;
         var grouped = songs
-            .GroupBy(s => s.Artist, StringComparer.OrdinalIgnoreCase)
+            .GroupBy(s =>
+                useUnicode && !string.IsNullOrWhiteSpace(s.ArtistUnicode)
+                    ? s.ArtistUnicode
+                    : s.Artist,
+                StringComparer.OrdinalIgnoreCase)
             .Select(g =>
             {
                 var first = g.First();
-                return new ArtistEntry(g.Key, g.Count(), first, GetCachedImagePathIfExists(g.Key));
+                var displayName = useUnicode && !string.IsNullOrWhiteSpace(first.ArtistUnicode)
+                    ? first.ArtistUnicode
+                    : first.Artist;
+                return new ArtistEntry(displayName, g.Count(), first, GetCachedImagePathIfExists(displayName));
             })
             .OrderBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();

@@ -96,14 +96,6 @@
                         </ui:FASettingsExpanderItem.Footer>
                     </ui:FASettingsExpanderItem>
 
-                    <ui:FASettingsExpanderItem Content="Shuffle Algorithm"
-                                             Description="{Binding SelectedShuffleAlgorithmInfoText}">
-                        <ui:FASettingsExpanderItem.Footer>
-                            <ComboBox ItemsSource="{Binding ShuffleAlgorithms}"
-                                           SelectedItem="{Binding SelectedShuffleAlgorithm}" />
-                        </ui:FASettingsExpanderItem.Footer>
-                    </ui:FASettingsExpanderItem>
-
                     <ui:FASettingsExpanderItem Content="Blacklist skipping"
                                              Description="Enable if you want songs on your blacklist get automatically skipped">
                         <ui:FASettingsExpanderItem.Footer>

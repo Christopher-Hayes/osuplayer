@@ -166,7 +166,18 @@ public class ArtistViewModel : BaseViewModel
     /// </summary>
     public async Task LoadArtistAsync(string artistName)
     {
-        ArtistName = artistName;
+        // Prefer unicode name if available and enabled
+        var useUnicode = Player.CurrentSong.Value?.UseUnicode ?? false;
+        var allSongsForName = Player.SongSourceProvider.SongSourceList;
+        string displayName = artistName;
+        if (useUnicode && allSongsForName != null)
+        {
+            var match = allSongsForName.FirstOrDefault(s =>
+                string.Equals(s.Artist, artistName, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(s.ArtistUnicode));
+            if (match != null)
+                displayName = match.ArtistUnicode;
+        }
+        ArtistName = displayName;
         ArtistImage = null;
         HasLastFmData = false;
         Biography = null;
@@ -192,11 +203,15 @@ public class ArtistViewModel : BaseViewModel
         {
             var blacklist = new Blacklist();
             var artistSongs = allSongs
-                .Where(s => string.Equals(s.Artist, artistName, StringComparison.OrdinalIgnoreCase))
+                .Where(s => string.Equals(s.Artist, artistName, StringComparison.OrdinalIgnoreCase)
+                         || string.Equals(s.ArtistUnicode, artistName, StringComparison.OrdinalIgnoreCase))
                 .Where(s => !blacklist.Contains(s))
                 .ToList();
 
             firstSong = artistSongs.FirstOrDefault();
+
+            // Use the romanized artist name for Last.fm/cache lookups when available.
+            artistName = firstSong?.Artist ?? artistName;
 
             _songs = new ReadOnlyObservableCollection<IMapEntryBase>(new ObservableCollection<IMapEntryBase>(artistSongs));
             this.RaisePropertyChanged(nameof(Songs));
@@ -373,7 +388,8 @@ public class ArtistViewModel : BaseViewModel
             .Select(a =>
             {
                 var inLibrary = allSongs?.Any(s =>
-                    string.Equals(s.Artist, a.Name, StringComparison.OrdinalIgnoreCase)) ?? false;
+                    string.Equals(s.Artist, a.Name, StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(s.ArtistUnicode, a.Name, StringComparison.OrdinalIgnoreCase)) ?? false;
                 return new SimilarArtistDisplayEntry(a.Name!, inLibrary);
             })
             .OrderByDescending(a => a.InLibrary)
@@ -558,7 +574,6 @@ public class ArtistViewModel : BaseViewModel
             {
                 using var stream = File.OpenRead(path);
                 var bmp = Bitmap.DecodeToWidth(stream, ArtistImageDecodeWidth, BitmapInterpolationMode.MediumQuality);
-                ArtistImage?.Dispose();
                 ArtistImage = bmp;
             }
             catch

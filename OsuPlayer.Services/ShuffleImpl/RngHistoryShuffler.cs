@@ -141,6 +141,8 @@ public class RngHistoryShuffler : OsuPlayerService, IShuffleImpl
 
     private int GenerateShuffledIndex()
     {
+        if (_maxRange <= 1) return 0;
+
         var rdm = new Random();
 
         int shuffleIndex;

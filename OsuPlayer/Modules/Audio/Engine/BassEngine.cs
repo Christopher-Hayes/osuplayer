@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using Avalonia.Threading;
 using ManagedBass;
 using ManagedBass.DirectX8;
@@ -270,7 +271,11 @@ public sealed class BassEngine : OsuPlayerService, IAudioEngine
 
     private void EndTrack(int handle, int channel, int data, IntPtr user)
     {
-        ChannelReachedEnd?.Invoke().Wait();
+        // BASS sync callbacks must return quickly and must NOT call back into BASS
+        // (e.g. StreamFree, ChannelStop, CreateStream) from this thread, or a deadlock occurs.
+        // Dispatch the next-song logic to the thread pool so this callback returns immediately.
+        if (ChannelReachedEnd != null)
+            _ = Task.Run(() => ChannelReachedEnd());
     }
 
     private void SetupStream()

@@ -12,6 +12,7 @@ using OsuPlayer.Interfaces.Service;
 using OsuPlayer.IO.Importer;
 using OsuPlayer.IO.Storage.Blacklist;
 using OsuPlayer.IO.Storage.Playlists;
+using OsuPlayer.Extensions;
 using OsuPlayer.Modules.Audio.Engine;
 using OsuPlayer.Modules.Audio.Interfaces;
 
@@ -197,12 +198,15 @@ public class Player : IPlayer, IImportNotifications
         if (SongSourceProvider.SongSourceList == null) return;
 
         ActivePlaylistSongs = SongSourceProvider.SongSourceList
-            .Where(s => string.Equals(s.Artist, artistContext.NewValue, StringComparison.OrdinalIgnoreCase))
+            .Where(s => string.Equals(s.Artist, artistContext.NewValue, StringComparison.OrdinalIgnoreCase)
+                     || string.Equals(s.ArtistUnicode, artistContext.NewValue, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
         if (CurrentSong.Value == null) return;
 
-        if (!ActivePlaylistSongs.Contains(CurrentSong.Value)) await NextSong(PlayDirection.Forward);
+        var songInList = ActivePlaylistSongs.Contains(CurrentSong.Value);
+        if (!songInList)
+            await NextSong(PlayDirection.Forward);
     }
 
     private void OnRepeatModeChanged(ValueChangedEvent<RepeatMode> repeatMode)
@@ -224,7 +228,7 @@ public class Player : IPlayer, IImportNotifications
 
         var remaining = TimeSpan.FromSeconds(_audioEngine.ChannelLength.Value);
 
-        _discordService?.UpdatePresence(mapEntry.NewValue.Title, $"{mapEntry.NewValue.Artist}", mapEntry.NewValue.BeatmapSetId, elapsed: TimeSpan.Zero, durationLeft: remaining);
+        _discordService?.UpdatePresence(DiscordTitle(mapEntry.NewValue), DiscordArtist(mapEntry.NewValue), mapEntry.NewValue.BeatmapSetId, elapsed: TimeSpan.Zero, durationLeft: remaining);
     }
 
     public void OnImportStarted()
@@ -318,7 +322,7 @@ public class Player : IPlayer, IImportNotifications
         var elapsed = TimeSpan.FromSeconds(_audioEngine.ChannelPosition.Value);
         var remaining = TimeSpan.FromSeconds(_audioEngine.ChannelLength.Value - _audioEngine.ChannelPosition.Value);
 
-        _discordService?.UpdatePresence(CurrentSong.Value.Title, $"{CurrentSong.Value.Artist}", CurrentSong.Value.BeatmapSetId, elapsed: elapsed, durationLeft: remaining);
+        _discordService?.UpdatePresence(DiscordTitle(CurrentSong.Value), DiscordArtist(CurrentSong.Value), CurrentSong.Value.BeatmapSetId, elapsed: elapsed, durationLeft: remaining);
     }
 
     public void UpdatePlaybackMethod()
@@ -356,7 +360,7 @@ public class Player : IPlayer, IImportNotifications
         var elapsed = TimeSpan.FromSeconds(_audioEngine.ChannelPosition.Value);
         var remaining = TimeSpan.FromSeconds(_audioEngine.ChannelLength.Value - _audioEngine.ChannelPosition.Value);
 
-        _discordService?.UpdatePresence(CurrentSong.Value.Title, $"{CurrentSong.Value.Artist}", CurrentSong.Value.BeatmapSetId, elapsed: elapsed, durationLeft: remaining);
+        _discordService?.UpdatePresence(DiscordTitle(CurrentSong.Value), DiscordArtist(CurrentSong.Value), CurrentSong.Value.BeatmapSetId, elapsed: elapsed, durationLeft: remaining);
     }
 
     public void Pause()
@@ -369,7 +373,7 @@ public class Player : IPlayer, IImportNotifications
 #endif
         _linuxMprisService?.UpdatePlaybackStatus(false);
 
-        _discordService?.UpdatePresence(CurrentSong.Value.Title, $"{CurrentSong.Value.Artist}", CurrentSong.Value.BeatmapSetId);
+        _discordService?.UpdatePresence(DiscordTitle(CurrentSong.Value), DiscordArtist(CurrentSong.Value), CurrentSong.Value.BeatmapSetId);
     }
 
     public void Stop()
@@ -398,9 +402,7 @@ public class Player : IPlayer, IImportNotifications
             return false;
 
         if (playDirection == PlayDirection.Backwards && _audioEngine.ChannelPosition.Value > 3)
-        {
             return await TryStartSongAsync(CurrentSong.Value ?? SongSourceProvider.SongSourceList[0]);
-        }
 
         // Determine the active song source: artist context, playlist context, or full library
         var songSource = ActiveArtistContext.Value != null && ActivePlaylistSongs.Any()
@@ -409,12 +411,12 @@ public class Player : IPlayer, IImportNotifications
                 ? ActivePlaylistSongs
                 : (IList<IMapEntryBase>) SongSourceProvider.SongSourceList;
 
+        var nextSong = GetNextSongToPlay(songSource, CurrentIndex, playDirection);
+
         return RepeatMode.Value switch
         {
-            Data.OsuPlayer.Enums.RepeatMode.NoRepeat => await TryPlaySongAsync(
-                GetNextSongToPlay(songSource, CurrentIndex, playDirection), playDirection),
-            Data.OsuPlayer.Enums.RepeatMode.RepeatAll => await TryPlaySongAsync(
-                GetNextSongToPlay(songSource, CurrentIndex, playDirection), playDirection),
+            Data.OsuPlayer.Enums.RepeatMode.NoRepeat => await TryPlaySongAsync(nextSong, playDirection),
+            Data.OsuPlayer.Enums.RepeatMode.RepeatAll => await TryPlaySongAsync(nextSong, playDirection),
             Data.OsuPlayer.Enums.RepeatMode.RepeatOne => await TryStartSongAsync(CurrentSong.Value!),
             _ => throw new ArgumentOutOfRangeException()
         };
@@ -470,25 +472,47 @@ public class Player : IPlayer, IImportNotifications
         await TryPlaySongAsync(SongSourceProvider.SongSourceList?[0]);
     }
 
+    /// Returns the best non-empty display artist for Discord RPC.
+    /// Falls back to the unicode field when the primary (UseUnicode-respecting) field is blank,
+    /// so songs that only have a unicode artist name are still shown correctly.
+    private static string DiscordArtist(IMapEntryBase song)
+    {
+        var a = song.GetArtist();
+        if (!string.IsNullOrWhiteSpace(a)) return a;
+        return string.IsNullOrWhiteSpace(song.ArtistUnicode) ? song.Artist : song.ArtistUnicode;
+    }
+
+    /// Returns a title string suitable for Discord presence (≥ 2 chars).
+    /// Falls back to the alternate title field when the primary is too short,
+    /// because Discord silently drops updates where Details/State are < 2 chars.
+    private static string DiscordTitle(IMapEntryBase song)
+    {
+        var t = song.GetTitle();
+        if (t.Length >= 2) return t;
+        if (song.Title?.Length >= 2) return song.Title;
+        if (song.TitleUnicode?.Length >= 2) return song.TitleUnicode;
+        return t; // SanitizePresenceField will pad as last resort
+    }
+
     private IMapEntryBase GetNextSongToPlay(IList<IMapEntryBase> songSource, int currentIndex, PlayDirection playDirection)
     {
         var offset = (int) playDirection;
         var blacklist = new Blacklist();
 
-        if (SongSourceProvider.SongSourceList == null || !SongSourceProvider.SongSourceList.Any())
+        var ssl = SongSourceProvider.SongSourceList;
+        if (ssl == null || !ssl.Any())
             throw new NullOrEmptyException($"{nameof(SongSourceProvider.SongSourceList)} can't be null or empty");
 
-        if (!SongSourceProvider.SongSourceList.IsInBounds(currentIndex))
+        if (!ssl.IsInBounds(currentIndex))
             currentIndex = 0;
 
-        // Remap from the global SongSourceList index into the active songSource index.
-        currentIndex = songSource.IndexOf(SongSourceProvider.SongSourceList[currentIndex]);
+        currentIndex = songSource.IndexOf(ssl[currentIndex]);
+        if (currentIndex < 0) currentIndex = 0;  // current song not in this context; start from beginning
 
         if (!songSource.Any())
         {
             RepeatMode.Value = Data.OsuPlayer.Enums.RepeatMode.NoRepeat;
-
-            return SongSourceProvider.SongSourceList[0];
+            return ssl[0];
         }
 
         if (IsShuffle.Value && _shuffleProvider?.ShuffleImpl != null)

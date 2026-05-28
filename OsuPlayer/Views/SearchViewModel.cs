@@ -115,13 +115,46 @@ public class SearchViewModel : BaseViewModel
         if (string.IsNullOrEmpty(searchText))
             return _ => true;
 
-        var searchQs = searchText.Split(' ');
+        var searchQs = searchText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        // First pass: find all artist names (romanized or unicode) that match the query
+        var player = Player;
+        var allSongs = player.SongSourceProvider.SongSourceList;
+        var matchingArtists = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (allSongs != null)
+        {
+            foreach (var song in allSongs)
+            {
+                bool matches = searchQs.All(x =>
+                    song.Artist.Contains(x, StringComparison.OrdinalIgnoreCase) ||
+                    song.ArtistUnicode.Contains(x, StringComparison.OrdinalIgnoreCase));
+                if (matches)
+                {
+                    if (!string.IsNullOrWhiteSpace(song.Artist))
+                        matchingArtists.Add(song.Artist);
+                    if (!string.IsNullOrWhiteSpace(song.ArtistUnicode))
+                        matchingArtists.Add(song.ArtistUnicode);
+                }
+            }
+        }
 
         return song =>
         {
+            // If the artist is in the matching set, show all their songs
+            if (matchingArtists.Contains(song.Artist) || matchingArtists.Contains(song.ArtistUnicode))
+                return true;
+
+            // Direct artist match — covers edge cases where matchingArtists was empty or incomplete
+            // (e.g. songs still loading when the filter was built, or inconsistent metadata)
+            if (searchQs.All(x =>
+                    song.Artist.Contains(x, StringComparison.OrdinalIgnoreCase) ||
+                    song.ArtistUnicode.Contains(x, StringComparison.OrdinalIgnoreCase)))
+                return true;
+
+            // Otherwise, fallback to title search
             return searchQs.All(x =>
                 song.Title.Contains(x, StringComparison.OrdinalIgnoreCase) ||
-                song.Artist.Contains(x, StringComparison.OrdinalIgnoreCase));
+                song.TitleUnicode.Contains(x, StringComparison.OrdinalIgnoreCase));
         };
     }
 }

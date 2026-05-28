@@ -169,6 +169,16 @@ public partial class FluentAppWindow : FluentReactiveWindow<FluentAppWindowViewM
     {
         Task.Run(() => SongImporter.ImportSongsAsync(player.SongSourceProvider, player as IImportNotifications));
 
+        // Custom filter that checks all name variants so unicode artists are always findable
+        SearchBox.ItemFilter = (search, item) =>
+        {
+            if (item is not OsuPlayer.Data.DataModels.Interfaces.IMapEntryBase song) return false;
+            return song.Artist.Contains(search, StringComparison.OrdinalIgnoreCase)
+                || song.ArtistUnicode.Contains(search, StringComparison.OrdinalIgnoreCase)
+                || song.Title.Contains(search, StringComparison.OrdinalIgnoreCase)
+                || song.TitleUnicode.Contains(search, StringComparison.OrdinalIgnoreCase);
+        };
+
         // Auto-switch to miniplayer when the window is resized to roughly miniplayer dimensions.
         SizeChanged += OnWindowSizeChanged;
 

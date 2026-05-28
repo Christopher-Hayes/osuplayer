@@ -1,41 +1,25 @@
-﻿using OsuPlayer.Extensions;
-using OsuPlayer.Interfaces.Service;
-using OsuPlayer.IO.Storage.Config;
+﻿using OsuPlayer.Interfaces.Service;
+using OsuPlayer.Services.ShuffleImpl;
 
 namespace OsuPlayer.Services;
 
 /// <summary>
-/// Provides a service for shuffle implementation registering the services using Splat.
+/// Provides the shuffle implementation used for song navigation.
+/// Always uses <see cref="RngHistoryShuffler"/> — random selection with a
+/// 10-entry history buffer so the user can go back to previously played songs.
 /// </summary>
 public class ShuffleService : OsuPlayerService, IShuffleServiceProvider
 {
-    public List<IShuffleImpl> ShuffleAlgorithms { get; }
+    public List<IShuffleImpl> ShuffleAlgorithms { get; } = new();
     public IShuffleImpl? ShuffleImpl { get; private set; }
 
     public override string ServiceName => "SHUFFLE_SERVICE";
 
     public ShuffleService()
     {
-        using var config = new Config();
-
-        var shuffleType = typeof(IShuffleImpl);
-        var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(p => shuffleType.IsAssignableFrom(p) && p != shuffleType);
-
-        ShuffleAlgorithms = types.Select(x => Activator.CreateInstance(x) as IShuffleImpl).ToList();
-
-        ShuffleAlgorithms.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.InvariantCulture));
-
-        var shuffleAlgo = ShuffleAlgorithms.FirstOrDefault(x =>
-            string.Equals(x.GetType().Name, config.Container.ShuffleAlgorithm, StringComparison.InvariantCultureIgnoreCase));
-
-        ShuffleImpl = shuffleAlgo ?? ShuffleAlgorithms.FirstOrDefault(x => x.GetType().IsDefined(typeof(DefaultImplAttr), false));
+        ShuffleImpl = new RngHistoryShuffler();
     }
 
-    public void SetShuffleImpl(IShuffleImpl? algorithm)
-    {
-        using var config = new Config();
-        config.Container.ShuffleAlgorithm = algorithm?.GetType().Name;
-
-        ShuffleImpl = algorithm;
-    }
+    // No-op: algorithm is fixed; kept for interface compatibility.
+    public void SetShuffleImpl(IShuffleImpl? algorithm) { }
 }

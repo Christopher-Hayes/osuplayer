@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.ReactiveUI;
 using Avalonia.X11;
@@ -24,6 +25,26 @@ internal static class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        DiagLog.StartSession();
+
+        // Catch exceptions thrown in fire-and-forget Tasks (async void / _ = Task.Run(...))
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            DiagLog.Write($"UnobservedTaskException: {e.Exception}");
+            UnhandledExceptionHandler.HandleException(e.Exception);
+            e.SetObserved();
+        };
+
+        // Catch exceptions thrown on non-UI threads
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            if (e.ExceptionObject is Exception ex)
+            {
+                DiagLog.Write($"AppDomain.UnhandledException: {ex}");
+                UnhandledExceptionHandler.HandleException(ex);
+            }
+        };
+
         try
         {
             var builder = BuildAvaloniaApp();

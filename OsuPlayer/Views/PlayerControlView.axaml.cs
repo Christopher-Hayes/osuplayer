@@ -151,7 +151,7 @@ public partial class PlayerControlView : ReactiveControl<PlayerControlViewModel>
         if (_mainWindow?.ViewModel == default) return;
 
         var player = ViewModel.Player;
-        var artistName = player.ActiveArtistContext.Value ?? player.CurrentSong.Value?.ArtistString;
+        var artistName = player.ActiveArtistContext.Value ?? player.CurrentSong.Value?.Artist;
 
         if (artistName == null) return;
 
